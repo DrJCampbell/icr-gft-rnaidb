@@ -28,7 +28,6 @@ my $sqldb_pass = '1nt3rnal';
 ## Declare variables globally ##
 
 my $ISOGENIC_SET;
-my $RNAI_SCREEN_QUALITY_CONTROL = "OK";
 my $ADD_NEW_FILES_LINK = "http://gft.icr.ac.uk/cgi-bin/2_copy_rnaidb.pl?add_new_files=1";
 
 #my $username;
@@ -1216,7 +1215,6 @@ sub save_new_screen{
     Gene_name_if_isogenic,    
     Isogenic_mutant_description,    
     Method_of_isogenic_knockdown,    
-    Rnai_screen_quality_control,    
     Rnai_template_library,    
     Plate_list_file_name,    
     Plate_conf_file_name,   
@@ -1241,7 +1239,6 @@ sub save_new_screen{
     '$gene_name_if_isogenic',
     '$isogenic_mutant_description',
     '$method_of_isogenic_knockdown',
-    '$RNAI_SCREEN_QUALITY_CONTROL',
     '$templib',
     '$platelist',
     '$plateconf',
