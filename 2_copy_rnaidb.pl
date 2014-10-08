@@ -7,7 +7,8 @@ use CGI qw( :standard );
 use CGI::Carp qw(fatalsToBrowser);
 use DBI;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
-# for new file upload - fixes the error - use string ("test_plateconf.txt") as a symbol ref while "strict refs" in use at...
+#use FileHandle;
+# for new file upload - fixes the error :- use string ("test_plateconf.txt") as a symbol ref while "strict refs" in use at...
 no strict 'refs';
 # to check if an error is due to dbi or not
 use Data::Dumper;
@@ -26,20 +27,24 @@ my $sqldb_pass = '1nt3rnal';
 
 ## Declare variables globally ##
 
-my $SCREEN_DIR_NAME;
-my $FILE_PATH;
 my $ISOGENIC_SET;
-my $RNAi_SCREEN_QUALITY_CONTROL = "OK";
+my $RNAI_SCREEN_QUALITY_CONTROL = "OK";
 my $ADD_NEW_FILES_LINK = "http://gft.icr.ac.uk/cgi-bin/2_copy_rnaidb.pl?add_new_files=1";
 
 #my $username;
 #my $password;
 
+#$| = 1;
+#$|++;
+
+#STDOUT->autoflush(1);
+#STDERR->autoflush(1);
+
 # These are needed to allow file uploads
 # whilst reducing the risk of attack (someone
 # uploading a huge file and filling the disk)
 $CGI::DISABLE_UPLOADS = 0;
-$CGI::POST_MAX = 1024 * 500;
+$CGI::POST_MAX = 1024 * 1000;
 # $CGI::POST_MAX limits the max size of a post in bytes
 # Note that most of the XLS files from the plate reader
 # are below 500 KB
@@ -50,10 +55,28 @@ my $auth_code_salt = "1IwaCauw4Lxum6WU5hM8";
 # The $auth_code_salt should be read in from
 # a file that is generated if it doesn't exist
 
-
 # HTML strings used in pages:
-my $page_header = "<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" /><title>GFT RNAi database</title><link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"  href=\"/css/rnaidb.css\" /><meta name=\"viewport\" content=\"width=1000, initial-scale=0.5, minimum-scale=0.45\" /></head><body><div id=\"Box\"></div><div id=\"MainFullWidth\"><a href=\"http://gft.icr.ac.uk\"><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>";
-my $page_footer = "</div> <!-- end Main --></div> <!-- end Box --></body></html>";
+
+my $page_header = "<html>
+				   <head>
+				   <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
+				   <title>GFT RNAi database</title>
+				   <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"  href=\"/css/rnaidb.css\" />
+				   <meta name=\"viewport\" content=\"width=1000, initial-scale=0.5, minimum-scale=0.45\" />
+				   </head>
+				   <body>
+				   <div id=\"Box\"></div><div id=\"MainFullWidth\">
+				   <a href=\"http://gft.icr.ac.uk\"><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>
+				   <p>
+				   <a href=\"/cgi-bin/2_copy_rnaidb.pl?add_new_screen=1\">Add new screen</a>\&nbsp;\&nbsp;
+				   <a href=\"/cgi-bin/2_copy_rnaidb.pl?show_all_screens=1\">Show all screens</a>\&nbsp;\&nbsp;
+				   <a href=\"/cgi-bin/2_copy_rnaidb.pl?configure_export=1\">Configure export</a>\&nbsp;\&nbsp;
+				   </p>";
+				   
+my $page_footer = "</div> <!-- end Main --></div> 
+				   <!-- end Box -->
+				   </body>
+				   </html>";
 
 # == config over, code below == #
 
@@ -115,8 +138,8 @@ elsif ($q-> param( "save_new_uploaded_templib_file" )){
 elsif ($q -> param( "configure_export" )){
   &configure_export ( $q );
 }
-elsif ($q -> param( "test_configure_export" )){
-  &test_configure_export ( $q );
+elsif ($q -> param( "show_qc" )){
+  &show_qc ( $q );
 }
 elsif ($q -> param( "run_export" )){
   &run_export ( $q );
@@ -138,11 +161,11 @@ sub home{
     );
 #  my $user = $q -> param('user');
   print "$page_header";
-  print "<h1>Hello:</h1>";
 
   # read data from database and output
   # summary info about all screens
 
+  print "<h1>Hello:</h1>";
   if(defined($login_key)){
     print "got cookie $login_key<br />";
   }
@@ -157,7 +180,7 @@ sub home{
   print "<p>";
   print "Go to ";
   print "<a href = \"http://gft.icr.ac.uk/cgi-bin/2_copy_rnaidb.pl?add_new_screen=1\">'Add new screen'</a>";
-  print " page for entering information on new RNAi screen(s) and analyzing";
+  print " page for entering information on new RNAi screen(s) and analysing";
   print "</p>";
  
   print "$page_footer";
@@ -183,19 +206,19 @@ sub add_new_screen{
   
   ## print a message if a new plateconf/platelist/library file has been successfully uploaded and saved to the server ##
   
- my $no_message = $q -> param(-name => 'no_message',
-  			  							-value => '');
+ #my $no_message = $q -> param(-name => 'no_message',
+  			  							#-value => '');
  
  # my $message = shift;
  # if ( defined($message)) {
   #  print "<div id=\"Message\"><p><b>$message</b></p></div>";
-  my $file_upload_message = shift;
-  if ( defined($file_upload_message)) {
-    print "<div id=\"Message\"><p><b>$file_upload_message</b></p></div>";
-  }
-  else {
-    print $no_message;
-  }
+  #my $file_upload_message = shift;
+  #if ( defined($file_upload_message)) {
+    #print "<div id=\"Message\"><p><b>$file_upload_message</b></p></div>";
+  #}
+  #else {
+    #print $no_message;
+  #}
   
   # =========================
   # add main screen info here
@@ -224,8 +247,8 @@ sub add_new_screen{
   my $plateconf_file_dest;
   my $plateconf_name;
   my @plateconf_path;
+  
   while ($plateconf_path = $query_handle->fetchrow_array){
-    #push (@PLATECONF_FILE_PATH, $plateconf_path);
     $plateconf_file_dest = $plateconf_path;
     $plateconf_file_dest =~ s/.*\///;
     $plateconf_name = $plateconf_file_dest;
@@ -233,7 +256,6 @@ sub add_new_screen{
     
     push (@plateconf_path, $plateconf_name);
   }
-  #join("\n", @plateconf_path);
   unshift(@plateconf_path, "Please select");
   print "<p>Plateconf file:<br />";
   
@@ -241,7 +263,7 @@ sub add_new_screen{
   						  -value=>\@plateconf_path,
   						  -default=>'Please select');							    		  
   print " - OR";
-  #link for the form for adding new plateconf file 
+  #link to the form for adding new plateconf file 
   print "<p>";
   print "<a href = \"http://gft.icr.ac.uk/cgi-bin/2_copy_rnaidb.pl?add_new_files=1\"> Add new plateconf file</a>";
   print "</p>";
@@ -257,8 +279,8 @@ sub add_new_screen{
   my $platelist_file_dest;
   my $platelist_name;
   my @platelist_path;
+  
   while ($platelist_path = $query_handle->fetchrow_array){
-    #push (@PLATELIST_FILE_PATH, $platelist_path);
     $platelist_file_dest = $platelist_path;
     $platelist_file_dest =~ s/.*\///;
     $platelist_name = $platelist_file_dest;
@@ -266,7 +288,6 @@ sub add_new_screen{
     push (@platelist_path, $platelist_name);
   }
   
-  #join("\n", @platelist_path);
   unshift(@platelist_path, "Please select");
   
   print "<p>Platelist file:<br />";
@@ -276,7 +297,7 @@ sub add_new_screen{
    						  -default=>'Please select');
   
   print " - OR";
-  #link for the form for adding new platelist file 
+  #link to the form for adding new platelist file 
   print "<p>";  
   print "<a href = \"http://gft.icr.ac.uk/cgi-bin/2_copy_rnaidb.pl?add_new_files=1\">Add new platelist file</a>";
   print "</p>";  
@@ -292,16 +313,14 @@ sub add_new_screen{
   my $templib_file_dest;
   my $templib_name;
   my @templib_path;
+  
   while ($templib_path = $query_handle->fetchrow_array){
-    #push (@TEMPLIB_FILE_PATH, $templib_path);
     $templib_file_dest = $templib_path;
     $templib_file_dest =~ s/.*\///;
     $templib_name = $templib_file_dest;
     $templib_name =~ s{\.[^.]+$}{};
     push (@templib_path, $templib_name);
   }
-  
-  #join("\n", @templib_path);
   unshift(@templib_path, "Please select");
   
   print "<p>Template library:<br />";
@@ -311,7 +330,7 @@ sub add_new_screen{
    						  -default => 'Please select');
   
   print " - OR";
-  #link for the form for adding new template library file 
+  #link to the form for adding new template library file 
   print "<p>";  	
   print "<a href = \"http://gft.icr.ac.uk/cgi-bin/2_copy_rnaidb.pl?add_new_files=1\"> Add new template library file</a>";
   print "</p>";
@@ -364,7 +383,7 @@ sub add_new_screen{
     
   ## get the transfection_reagent name from the database ##
   
-  my @transfection_reagent = ("Please select", "Lipofectamine", "Bleach"); 
+  my @transfection_reagent = ("Please select", "Lipofectamine 2000", "Lipofectamine 3000", "Lipofectamine RNAi max", "Dharmafect 3", "Dharmafect 4", "Oligofectamine", "Effectene"); 
   print $q -> popup_menu( -name => 'transfection_reagent',
   						  -value => \@transfection_reagent,
   						  -default => 'Please select');
@@ -373,7 +392,7 @@ sub add_new_screen{
   
   print "</p><p>Instrument:<br />";
   
-  my @instrument = ("Please select", "Inst_1", "Inst_2"); 
+  my @instrument = ("Please select", "1S10", "1C11"); 
   print $q -> popup_menu( -name => 'instrument',
   					      -values => \@instrument,
   						  -default => 'Please select');
@@ -564,9 +583,9 @@ sub add_new_screen{
   
   ## button for viewing all screens ##
   
-  print "<p>";
-  print "<input type=\"submit\" id=\"show_all_screens\" value=\"Show all analysed RNAi screens\" name=\"show_all_screens\" />";
-  print "</p>";
+  #print "<p>";
+  #print "<input type=\"submit\" id=\"show_all_screens\" value=\"Show all analysed RNAi screens\" name=\"show_all_screens\" />";
+  #print "</p>";
   
   print "</td>\n";
   print "</tr>\n";
@@ -641,7 +660,7 @@ sub add_new_files{
   print"<p><div id=\"Note\">NOTE: Please make sure that the name of the new uploaded plateconf file is unique and different from the names of existing plateconf files. The words in the filename must be joined with an underscore ( _ ). For example, an edited 'Plateconf_384' file can be renamed as 'Plateconf_384_ver_02' or 'Plateconf_384_edited_Aug-2014'.</div></p>";
   
   ## create a hidden field ##
-  #hidden fields pass information along with the user-entered input that is not to be manipulated by the user-a way to have web forms to remember previous information 
+  #hidden fields pass information along with the user-entered input that is not to be manipulated by the user ## a way to have web forms to remember previous information 
   
   print $q -> hidden ( -name=>'save_new_uploaded_plateconf_file',
   					   -default=>'save_new_uploaded_plateconf_file' );
@@ -820,7 +839,7 @@ sub save_new_screen{
   print $q -> header ("text/html");
   print "$page_header";
   print "<h1>Saving new screen data:</h1>";
-  
+
   $ISOGENIC_SET = $q -> param( "isogenicSet" );
   my $tissue_type = $q -> param( "tissue_type" );
   my $cell_line_name = $q -> param( "cell_line_name" );
@@ -834,139 +853,230 @@ sub save_new_screen{
   my $isogenic_mutant_description = $q -> param( "isogenic_mutant_description" );
   my $method_of_isogenic_knockdown = $q -> param( "method_of_isogenic_knockdown" );
   my $notes = $q -> param( "notes" );
+  my $sicon1 = $q -> param( "sicon1_empty" );
+  my $sicon2 = $q -> param( "sicon2_empty" );
+  my $allstar = $q -> param( "allstar_empty" );
+  my $excelFile = $q->param( "uploaded_excel_file" ); 
   
   ################################################[[[get params to check the previous page is working as expected]]]
   
   ################################################[[[my $tmp_file_path = "/home/agulati/data/tmp_file";]]]
+
+  ## match plateconf name, selected from the drop down menu, to the file and store it in a variable ##
   
   my $plateconf = $q -> param( "plate_conf" );
-  my $plateconf_file_path = "/home/agulati/data/plate_conf_folder/".$plateconf.".txt";
-
-  ## try to match $templatelibrary to a file path ##
-
-  my $templib = $q -> param( "template_library" );
-  my $templib_file_path = "/home/agulati/data/template_library_folder/".$templib.".txt";
-
-  ## try to match $platelist to a file path ##   
+  my $plateconf_file_path;
+  my $plateconf_target;
+  
+  ## match platelist name, selected from the drop down menu, to the file and store it in a variable ##   
       
   my $platelist = $q -> param( "plate_list" );
-  my $platelist_file_path = "/home/agulati/data/plate_list_folder/".$platelist.".txt";
-  
-  ## make new screen directory ##
-  
-  my $screenDir_path = "/home/agulati/data/New_screens_from_July_2014_onwards"; 
-  $SCREEN_DIR_NAME = $tissue_type."_".$cell_line_name."_".$templib."_".$date_of_run;
-  $FILE_PATH = "$screenDir_path/$SCREEN_DIR_NAME";
+  my $platelist_file_path;
+  my $platelist_target;
+  my $platelist_prefix;
 
-  if(! -e "$FILE_PATH"){mkdir("$FILE_PATH") && `chmod -R 777 $FILE_PATH` && `chown -R agulati:agulati $FILE_PATH`}
-    
-  else{
-    die "Cannot make new directory $SCREEN_DIR_NAME in $screenDir_path: $!";
-  }  
-  
-  print "<p>Created new screen directory: $SCREEN_DIR_NAME...</p>"; 
-  
-  my $platelist_target = $FILE_PATH."/".$SCREEN_DIR_NAME."_".$platelist.".txt";
-  my $plateconf_target = $FILE_PATH."/".$SCREEN_DIR_NAME."_".$plateconf.".txt";
-  my $templib_target = $FILE_PATH."/".$SCREEN_DIR_NAME."_".$templib.".txt";
-  
-  ## copy selected plateconf file to the screen directory ##
+  ## match templib name, selected from the drop down menu, to the file and store it in a variable ##
 
-  print "<p>Selected Platelist file saved in the new screen directory...</p>";  
+  my $templib = $q -> param( "template_library" );
+  my $templib_file_path;
+  my $templib_target;
   
-  my $prefix = $SCREEN_DIR_NAME."_";
+  ## New screen directory - name and location ##
   
-  open IN, "<$platelist_file_path";
-  open OUT, ">/home/agulati/data/plate_list_folder/tmp_platelist_file.txt";
-  while (<IN>)
-  {
-    if ($_ =~ /^Filename/)
-    {
-      print OUT $_;
-    }
-    else
-    {
-      print OUT $prefix.$_;
-    }
+  my $screen_dir_name = $q -> param( "screen_dir_name" );
+  my $screenDescription_filename;
+  my $guide_file;
+  
+  if (not defined ($screen_dir_name)) {
+    $screen_dir_name = $tissue_type."_".$cell_line_name."_".$templib."_".$date_of_run;
   }
-  close IN;
-  close OUT; 
-   
-  `cp /home/agulati/data/plate_list_folder/tmp_platelist_file.txt $platelist_target`; 
-  `cp $plateconf_file_path $plateconf_target`;
-  `cp $templib_file_path $templib_target`;     
+  my $screenDir_path = "/home/agulati/data/New_screens_from_July_2014_onwards";
+  my $file_path = "$screenDir_path/$screen_dir_name";
+  
+  if (! -e $file_path) {
+      mkdir("$file_path");
+      `chmod -R 777 $file_path`;
+      `chown -R agulati:agulati $file_path`;
+      
+      print "<p>Created new screen directory: $screen_dir_name...</p>"
+        or die "Cannot make new directory $screen_dir_name in $screenDir_path: $!"; 
+    
+    ## add screen directory name as prefix to all the filenames in the selected platelist file ##
+
+    $plateconf_file_path = "/home/agulati/data/plate_conf_folder/".$plateconf.".txt";
+    $plateconf_target = $file_path."/".$screen_dir_name."_".$plateconf.".txt";
+    `cp $plateconf_file_path $plateconf_target`;
+    
+    print "<p>Selected plateconf file saved in the new screen directory...</p>";  
+  
+    ## match platelist name, selected from the drop down menu, to the file and store it in a variable ##   
+      
+    $platelist_file_path = "/home/agulati/data/plate_list_folder/".$platelist.".txt";
+    $platelist_target = $file_path."/".$screen_dir_name."_".$platelist.".txt";
+    `cp /home/agulati/data/plate_list_folder/tmp_platelist_file.txt $platelist_target`; 
+    
+    print "<p>Selected platelist file saved in the new screen directory...</p>";  
+  
+    $platelist_prefix = $screen_dir_name."_";
+  
+    open IN, "< $platelist_file_path";
+    open OUT, "> /home/agulati/data/plate_list_folder/tmp_platelist_file.txt";
+    while (<IN>)
+    {
+      if ($_ =~ /^Filename/) {
+        print OUT $_;
+      }
+      else{
+        print OUT $platelist_prefix.$_;
+      }
+    }
+    close IN;
+    close OUT; 
+    
+    ## match templib name, selected from the drop down menu, to the file and store it in a variable ##
+
+    $templib_file_path = "/home/agulati/data/template_library_folder/".$templib.".txt";
+    $templib_target = $file_path."/".$screen_dir_name."_".$templib.".txt"; 
+    `cp $templib_file_path $templib_target`; 
+    
+    print "<p>Selected template library file saved in the new screen directory...</p>";  
   
   ############################################[[[probably need to copy $temp_file_path somewhere safe and give it to an R script to convert]]]
   
-  ## Upload excel file and save it to new screen directory ##
+    ## Upload excel file and save it to new screen directory ##
   
-  my $lightweight_fh  = $q->upload('uploaded_excel_file');
-  my $excelFile = $q->param( "uploaded_excel_file" );
-  my $target = $FILE_PATH."/".$excelFile;
-  # undef may be returned if it's not a valid file handle
+    my $lightweight_fh  = $q->upload('uploaded_excel_file');
+    #my $excelFile = $q->param( "uploaded_excel_file" );
+    my $target = $file_path."/".$excelFile;
+    # undef may be returned if it's not a valid file handle
   
-  if (defined $lightweight_fh) {
-  # Upgrade the handle to one compatible with IO::Handle:
-    my $io_handle = $lightweight_fh->handle;
+    if (defined $lightweight_fh) {
+    # Upgrade the handle to one compatible with IO::Handle:
+      my $io_handle = $lightweight_fh->handle;
  
-    open ($excelFile,'>',$target)
-      or die "Cannot open '$target':$!";
-      print "<p>Uploaded Excel file saved to the new screen directory...</p>";
+      open ($excelFile,'>',$target)
+        or die "Cannot open '$target':$!";
+        print "<p>Uploaded Excel file saved to the new screen directory...</p>";
     
-    my $bytesread = undef;
-    my $buffer = undef;
-    while ($bytesread = $io_handle->read($buffer,1024)) {
-      print $excelFile $buffer
+      my $bytesread = undef;
+      my $buffer = undef;
+    
+      while ($bytesread = $io_handle->read($buffer,1024)) {
+        print $excelFile $buffer
+          or die "Error writing '$target' : $!";
+      }
+      close $excelFile
         or die "Error writing '$target' : $!";
-    }
-    close $excelFile
-      or die "Error writing '$target' : $!";
-    }
+      }
     
-    ## rename uploaded excel file ##
+      ## rename uploaded excel file ##
     
-    my $new_xls_file = rename($FILE_PATH."/".$excelFile, $FILE_PATH."/".$SCREEN_DIR_NAME.".xls") or die "Cannot rename $excelFile :$!";
+      my $new_xls_file = rename($file_path."/".$excelFile, $file_path."/".$screen_dir_name.".xls") or die "Cannot rename $excelFile :$!";
     
-    print "<p>";
-    print "<p>Excel file renamed...</p>";
-    print "</p>"; 
+      print "<p>";
+      print "<p>Excel file renamed...</p>";
+      print "</p>"; 
     
   ###############################################[[[either copy the platelist/palteconf/library etc to the new screen folder or use symlinks to point to the templates]]]
   
-  ## write $notes to a 'Description.txt' file ##
+    ## write $notes to a 'Description.txt' file ##
   
-  my $descripFile = $FILE_PATH."/".$SCREEN_DIR_NAME."_Description.txt";
-  open NOTES, "> $descripFile" or die "Can't write notes file to ... :$!\n";
-    print NOTES $notes;
-    my $screenDescription_filename = $SCREEN_DIR_NAME."_Description.txt";
-  close NOTES;
-  
-  ## Add new screen info to Guide file ##
-  
-  my $guide_file = $SCREEN_DIR_NAME."_guide_file.txt";
-  
-  open GUIDEFILE, '>', $FILE_PATH."/".$guide_file or die "Can't open $FILE_PATH";
+    my $descripFile = $file_path."/".$screen_dir_name."_Description.txt";
+    open NOTES, "> $descripFile" or die "Can't write notes file to ... :$!\n";
+      print NOTES $notes;
+      $screenDescription_filename = $screen_dir_name."_Description.txt";
+    close NOTES;
     
-  print GUIDEFILE "ID\t", "Cell_line\t", "Datapath\t", "Template_library_file\t", "Platelist_file\t", "Plateconf_file\t", "Descrip_file\t", "report_html\t", "zscore_file\t", "summary_file\t", "zprime_file\t", "reportdir_file\t", "xls_file\n"; 
-  print GUIDEFILE "1\t", "$cell_line_name\t", "$FILE_PATH\t", "$templib_target\t", "$platelist_target\t", "$plateconf_target\t", "$screenDescription_filename\t", "TRUE\t", "$SCREEN_DIR_NAME"."_zscores.txt\t", "$SCREEN_DIR_NAME"."_summary.txt\t", "$SCREEN_DIR_NAME"."_zprime.txt\t", "$SCREEN_DIR_NAME"."_reportdir\t", "$SCREEN_DIR_NAME".".xls\n";   
-  print "<p>Guide file created: $guide_file...</p>"; 
+    print "<p>Created 'Description.txt' file in the new screen directory...</p>";  
+  
+    ## Add new screen info to Guide file ##
+  
+    $guide_file = $screen_dir_name."_guide_file.txt";
+  
+    open GUIDEFILE, '>', $file_path."/".$guide_file or die "Can't open $file_path";
+    
+    print GUIDEFILE 
+      "Cell_line\t", 
+      "Datapath\t", 
+      "Template_library_file\t", 
+      "Platelist_file\t", 
+      "Plateconf_file\t", 
+      "Descrip_file\t", 
+      "report_html\t", 
+      "zscore_file\t", 
+      "summary_file\t", 
+      "zprime_file\t", 
+      "reportdir_file\t", 
+      "xls_file\t", 
+      "qc_file\t", 
+      "corr_file\n"; 
+  
+    print GUIDEFILE 
+      "$cell_line_name\t", 
+      "$file_path\t", 
+      "$templib_target\t", 
+      "$platelist_target\t", 
+      "$plateconf_target\t", 
+      "$screenDescription_filename\t", 
+      "TRUE\t", 
+      "$screen_dir_name"."_zscores.txt\t", 
+      "$screen_dir_name"."_summary.txt\t", 
+      "$screen_dir_name"."_zprime.txt\t", 
+      "$screen_dir_name"."_reportdir\t", 
+      "$screen_dir_name".".xls\t", 
+      "$screen_dir_name"."_controls_qc.png\t", 
+      "$screen_dir_name"."_corr.txt\n";  
+  
+    print "<p>Guide file created...</p>";
+    print "<p>Analysing...</p>"; 
       
-  close (GUIDEFILE); 
+    close (GUIDEFILE); 
+    }
+
+  ## Reanalysis ##
+  
+  if ($sicon1 eq 'ON') {
+    @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
+    $^I = "";
+    while (<>) {
+      s/(\s)siCON1([\n\r])/$1empty$2/g;
+      print;
+    }
+    print "<p>Reanalysing with updated plateconf file...</p>"; 
+  }
+  if ($sicon2 eq 'ON') {
+    @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
+    $^I = "";
+    while (<>) {
+      s/(\s)siCON2([\n\r])/$1empty$2/g;
+      print;
+    }
+    print "<p>Reanalysing with updated plateconf file...</p>"; 
+  }
+  if ($allstar eq 'ON') {
+    @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
+    $^I = "";
+    while (<>) {
+      s/(\s)allstar([\n\r])/$1empty$2/g;
+      print;
+    }
+    print "<p>Reanalysing with updated plateconf file...</p>"; 
+ }
   
   my $guide = $guide_file;
   
   ##  run RNAi screen analysis scripts by calling R ##  
   
-  my $run_analysis_scripts = `cd $FILE_PATH && R --vanilla < /home/agulati/scripts/run_analysis_script.R`;
+  my $run_analysis_scripts = `cd $file_path && R --vanilla < /home/agulati/scripts/run_analysis_script.R`;
    
-  ####[[[my $run_analysis_scripts = system("R --vanilla < /home/agulati/scripts/run_analysis_script.R");]]]
+  ####[[[Alternatively :- my $run_analysis_scripts = system("R --vanilla < /home/agulati/scripts/run_analysis_script.R"); ####]]]
 
-  ## rename index.html file and copy it to the /var/www/html... directory ##
+  ## rename index.html file and copy it to the /var/www/html/RNAi_screen_analysis_report_folders ##
 
-  my $rnai_screen_report_original_path = $FILE_PATH."/".$SCREEN_DIR_NAME."_reportdir";
+  my $rnai_screen_report_original_path = $file_path."/".$screen_dir_name."_reportdir";
   my $rnai_screen_report_original_file = $rnai_screen_report_original_path."/"."index.html";
   
-  my $rnai_screen_report_renamed_file = $rnai_screen_report_original_path."/".$SCREEN_DIR_NAME."_index.html";
+  my $rnai_screen_report_renamed_file = $rnai_screen_report_original_path."/".$screen_dir_name."_index.html";
   `cp $rnai_screen_report_original_file $rnai_screen_report_renamed_file`;
   
   my $rnai_screen_report_new_path = "/usr/local/www/html/RNAi_screen_analysis_report_folders";
@@ -974,26 +1084,40 @@ sub save_new_screen{
   
   ## Display the link to screen analysis report on the save new screen page ##
   
-  my $rnai_screen_link_to_report = "http://gft.icr.ac.uk/RNAi_screen_analysis_report_folders/".$SCREEN_DIR_NAME."_reportdir/";
+  my $rnai_screen_link_to_report = "http://gft.icr.ac.uk/RNAi_screen_analysis_report_folders/".$screen_dir_name."_reportdir/";
  
+  ## copy the file with qc plots to the /usr/local/www/html/RNAi_screen_analysis_qc_plots ##
+  
+  my $rnai_screen_qc_original_path = $file_path."/".$screen_dir_name."_controls_qc.png"; 
+  my $rnai_screen_qc_new_path = "/usr/local/www/html/RNAi_screen_analysis_qc_plots";
+  `cp -r $rnai_screen_qc_original_path $rnai_screen_qc_new_path`;
+  
+  ## Display the link to screen analysis qc plots on the save new screen page ##
+  
+  my $rnai_screen_link_to_qc_plots = "http://gft.icr.ac.uk/RNAi_screen_analysis_qc_plots/".$screen_dir_name."_controls_qc.png";
+  
+  #return $rnai_screen_link_to_qc_plots;
+  
+  my $zprime_file = $file_path."/".$screen_dir_name."_zprime.txt";
+  
+  ## Capture zprime value in a variable ##
+  
+  my $zp_value;
+  my $value;
+  
+  open IN, "< $zprime_file";
+  while(<IN>) {
+    $zp_value = $_;  
+    $zp_value =~ s/^Zprime://;
+  }
+  close IN;
+  
   print "<p>";
-  print "<p>Result files of analyzed RNAi screens stored in the database...</p>";
+  print "<p>Generated QC plots...</p>";
   print "</p>";
   
   print "<p>";
-  print "<p>ANALYSIS COMPLETE</p>";
-  print "</p>";
-  
-  print "View analysis report for the screen: ";
-  print "<a href = \"$rnai_screen_link_to_report\">'$SCREEN_DIR_NAME'</a>";
-  print "</p>";
- 
-  print "<p>";
-  print "<input type=\"submit\" id=\"show_all_screens\" value=\"Show all analysed RNAi screens\" name=\"show_all_screens\" />";
-  print "</p>";
-  
-  print "<p>";
-  print "<input type=\"submit\" id=\"test_configure_export\" value=\"Show all results\" name=\"test_configure_export\" />";
+  print "<p>Calculated correlation coefficient...</p>";
   print "</p>";
   
   # =====================
@@ -1056,13 +1180,13 @@ sub save_new_screen{
   #}
   #close FILE;
   
-  ## 2. Store New isogenic set entered by the user into the database ##
+  ## 2. Store new isogenic set entered by the user into the database ##
   
-  #first check if the screen isogenic and then check if the user hasn't selected a set from the drop down menu
+  #first check if the screen is isogenic and then check if the user hasn't selected a set from the drop down menu
   
-  if ($is_isogenic eq 'ON'){
+  if ($is_isogenic eq 'ON') {
     $is_isogenic_screen = "YES";
-    if($ISOGENIC_SET eq "Please select"){
+    if($ISOGENIC_SET eq "Please select") {
       my $query = $dbh->do("INSERT INTO Name_of_set_if_isogenic ( 
         Name_of_set_if_isogenic) 
         VALUES (
@@ -1072,7 +1196,7 @@ sub save_new_screen{
         $ISOGENIC_SET = $new_isogenic_set;
     } 
   }
-  else{
+  else {
     $is_isogenic_screen = "NO";
     $gene_name_if_isogenic = "NA";
     $isogenic_mutant_description = "NA";
@@ -1096,7 +1220,9 @@ sub save_new_screen{
     Rnai_template_library,    
     Plate_list_file_name,    
     Plate_conf_file_name,   
-    Rnai_screen_link_to_report,  
+    Rnai_screen_link_to_report,
+    Rnai_screen_link_to_qc_plots,
+    Zprime,  
     Notes,   
     Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID, 
     Instrument_used_Instrument_used_ID,   
@@ -1108,18 +1234,20 @@ sub save_new_screen{
     Template_library_Template_library_ID) 
     SELECT 
     '$cell_line_name',
-    '$SCREEN_DIR_NAME',
+    '$screen_dir_name',
     '$date_of_run', 
     '$operator',
     '$is_isogenic_screen',
     '$gene_name_if_isogenic',
     '$isogenic_mutant_description',
     '$method_of_isogenic_knockdown',
-    '$RNAi_SCREEN_QUALITY_CONTROL',
+    '$RNAI_SCREEN_QUALITY_CONTROL',
     '$templib',
     '$platelist',
     '$plateconf',
     '$rnai_screen_link_to_report',
+    '$rnai_screen_link_to_qc_plots',
+    '$zp_value',
     '$notes', 
     (SELECT Name_of_set_if_isogenic_ID FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic = '$ISOGENIC_SET'), 
     (SELECT Instrument_used_ID FROM Instrument_used WHERE Instrument_name = '$instrument'),
@@ -1132,13 +1260,15 @@ sub save_new_screen{
   
   my $query_handle = $dbh->prepare($query);
   $query_handle -> execute();
+  
+  #capture the last row ID for the rnai screen info table in the database
   my $last_rnai_screen_info_id = $dbh->{mysql_insertid};
   
   ## 4. Store excel file in the database ##
   
   ######### COMMENTED OUT TEMPORARILY #########
   
-  #open (FILE, $FILE_PATH."/".$SCREEN_DIR_NAME.".txt");
+  #open (FILE, $file_path."/".$screen_dir_name.".txt");
   
   #foreach $line(<FILE>){
    # chomp $line;
@@ -1165,20 +1295,12 @@ sub save_new_screen{
   ## 5. Store file with zscores in the database ##
   
   #Remove the header in zscore file#  
-  my $zscores_file_complete = $FILE_PATH."/".$SCREEN_DIR_NAME."_zscores.txt";
-  my $zscores_file_complete_wo_header = $FILE_PATH."/".$SCREEN_DIR_NAME."_zscores_wo_header.txt";
-  #my $tmp_file_for_zscores = "/home/agulati/data/tmp_file_for_zscores.txt";
-  #`sudo touch /home/agulati/data/Temp_zscores/temp_zscores.txt`;
-  `chmod 777 /home/agulati/data/Temp_zscores/temp_zscores.txt`;
-  `chown agulati:agulati /home/agulati/data/Temp_zscores/temp_zscores.txt`;
-  my $tmp_file_for_zscores = "/home/agulati/data/Temp_zscores/temp_zscores.txt";
+  my $zscores_file_complete = $file_path."/".$screen_dir_name."_zscores.txt";
+  my $zscores_file_wo_header = $file_path."/".$screen_dir_name."_zscores_wo_header.txt";
+  `cat $zscores_file_complete | grep -v ^Compound > $zscores_file_wo_header`;
   
-  #`chmod -R 777 $tmp_file_for_zscores`;
-  #`chown -R agulati:agulati $tmp_file_for_zscores`;
-  `cat $zscores_file_complete | grep -v ^Compound > $tmp_file_for_zscores | mv $tmp_file_for_zscores $zscores_file_complete_wo_header`;
-  
-  open (FILE, $zscores_file_complete_wo_header);
-  foreach $line(<FILE>){
+  open (FILE, $zscores_file_wo_header);
+  foreach $line(<FILE>) {
     chomp $line;
     ($compound, $plate_number_for_zscore, $well_number_for_zscore, $zscore) = split(/\t/,$line);
     
@@ -1204,21 +1326,32 @@ sub save_new_screen{
   ## 6. Store file with summary of result in the database ##
   
   #Remove the header in summary file#
-  my $summary_file_complete = $FILE_PATH."/".$SCREEN_DIR_NAME."_summary.txt"; 
-  my $summary_file_complete_wo_header = $FILE_PATH."/".$SCREEN_DIR_NAME."_summary_wo_header.txt";
-  #`sudo touch /home/agulati/data/Temp_summary_result/temp_summary.txt`;
-  `chmod 777 /home/agulati/data/Temp_summary_result/temp_summary.txt`;
-  `chown agulati:agulati /home/agulati/data/Temp_summary_result/temp_summary.txt`;
-  my $tmp_file_for_summary = "/home/agulati/data/Temp_summary_result/temp_summary.txt";
+  my $summary_file_complete = $file_path."/".$screen_dir_name."_summary.txt"; 
+  my $summary_file_wo_header = $file_path."/".$screen_dir_name."_summary_wo_header.txt";
+  `cat $summary_file_complete | grep -v ^plate > $summary_file_wo_header`;
   
-  #`chmod -R 777 $tmp_file_for_summary`;
-  #`chown -R agulati:agulati $tmp_file_for_summary`;
-  `cat $summary_file_complete | grep -v ^plate > $tmp_file_for_summary | mv $tmp_file_for_summary $summary_file_complete_wo_header`;
-  
-  open (FILE, $summary_file_complete_wo_header);
-  foreach $line(<FILE>){
+  open (FILE, $summary_file_wo_header);
+  foreach $line(<FILE>) {
     chomp $line;
-    ($plate_number_for_summary, $position, $zscore_summary, $well_number_for_summary, $well_anno, $final_well_anno, $raw_r1_ch1, $raw_r2_ch1, $raw_r3_ch1, $median_ch1, $average_ch1, $raw_plate_median_r1_ch1, $raw_plate_median_r2_ch1, $raw_plate_median_r3_ch1, $normalized_r1_ch1, $normalized_r2_ch1, $normalized_r3_ch1, $gene_id_summary, $precursor_summary) = split(/\t/,$line);
+    ($plate_number_for_summary, 
+    $position, 
+    $zscore_summary, 
+    $well_number_for_summary, 
+    $well_anno, 
+    $final_well_anno, 
+    $raw_r1_ch1, 
+    $raw_r2_ch1, 
+    $raw_r3_ch1, 
+    $median_ch1, 
+    $average_ch1, 
+    $raw_plate_median_r1_ch1, 
+    $raw_plate_median_r2_ch1, 
+    $raw_plate_median_r3_ch1, 
+    $normalized_r1_ch1, 
+    $normalized_r2_ch1, 
+    $normalized_r3_ch1, 
+    $gene_id_summary, 
+    $precursor_summary) = split(/\t/,$line);
     
     my $query = $dbh->do("INSERT INTO Summary_of_result (
       Plate_number_for_summary,
@@ -1270,6 +1403,30 @@ sub save_new_screen{
   }
   
   close FILE;
+  
+  print "<p>";
+  print "<p>Result files for the screen, $screen_dir_name, stored in the database...</p>";
+  print "</p>";
+ 
+  print "<p>";
+  print "<p>ANALYSIS COMPLETE</p>";
+  print "</p>";
+  
+  print "<p>";
+  print "<p>";
+  print "<p>";
+  
+  print "View analysis report for the screen: ";
+  print "<a href = \"$rnai_screen_link_to_report\">'$screen_dir_name'</a>";
+  print "</p>";
+  
+  print "View QC plots for the screen: ";
+  print "<a href=\"$rnai_screen_link_to_qc_plots\">'$screen_dir_name'</a>";
+  print "</p>";
+  
+  print "</p>";
+  print "</p>";
+  print "</p>";
   
   print "$page_footer";
   print $q -> end_html;
@@ -1393,10 +1550,6 @@ sub save_new_uploaded_plateconf_file {
     
     #print $q->redirect (-uri=>"http://www.gft.icr.ac.uk/cgi-bin/2_copy_rnaidb.pl?add_new_screen=1");
   
-    #if ($set_plateconf_error == 1 || $set_plateconf_error == 2 || $set_plateconf_error == 3 || $set_plateconf_error == 4 || $set_plateconf_error == 5 || $set_plateconf_error == 6 || $set_plateconf_error == 7) {
-     # $processing_status = 1;
-    #}
-    
   } #end of else statement loop
   
   my $warning_message_plateconf_1 = "ERROR: Cannot open $target";
@@ -1404,12 +1557,13 @@ sub save_new_uploaded_plateconf_file {
   my $warning_message_plateconf_3 = "ERROR: Cannot close $target";
   my $warning_message_plateconf_4 = "ERROR: Couldn't execute sql statement for adding new plateconf file location to the database";
   
-  my $file_upload_message = $q -> param(-name => 'file_upload_message',
-  			  							-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.');
+  #my $file_upload_message = $q -> param(-name => 'file_upload_message',
+  			  							#-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.');
 
   if ($processing_status == 0 && $set_plateconf_error == 0) {
       #my $message = "NOTE: Successfully added new plateconf file: $new_plateconf_file_renamed. It can now be selected for analysis from the dropdown menu.";
-      &add_new_screen($file_upload_message); 
+      #&add_new_screen($file_upload_message);
+      &add_new_screen; 
   }
   elsif ($processing_status == 1 && $set_plateconf_error == 1) {
     
@@ -1601,13 +1755,14 @@ sub save_new_uploaded_platelist_file{
   my $warning_message_platelist_3 = "ERROR: Cannot close $target";
   my $warning_message_platelist_4 = "ERROR: Couldn't execute sql statement for adding new platelist file location to the database";
   
-  my $file_upload_message = $q -> param(-name => 'file_upload_message',
-  			  							-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.');
+  #my $file_upload_message = $q -> param(-name => 'file_upload_message',
+  			  							#-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.');
 
   
   if ($processing_status == 0 && $set_platelist_error == 0) {
       #my $message = "NOTE: Successfully added new platelist file: $new_platelist_file_renamed. It can now be selected for analysis from the dropdown menu.";
-      &add_new_screen($file_upload_message); 
+      #&add_new_screen($file_upload_message); 
+      &add_new_screen;
   }
   elsif ($processing_status == 1 && $set_platelist_error == 1) {
     
@@ -1739,7 +1894,6 @@ sub save_new_uploaded_templib_file{
       open ($new_templib_file_renamed,'>',$target);
       if ($new_templib_file_renamed) {
         $set_templib_error = undef;
-        #$TEMPLIB_FILE_PATH = $target;
      }
       else { 
         $set_templib_error = 4;
@@ -1803,7 +1957,8 @@ sub save_new_uploaded_templib_file{
   
   if ($processing_status == 0 && $set_templib_error == 0) {
       #my $message = "NOTE: Successfully added new template library file: $new_templib_file_renamed. It can now be selected for analysis from the dropdown menu.";
-      &add_new_screen($file_upload_message); 
+      #&add_new_screen($file_upload_message); 
+      &add_new_screen;
   }
   elsif ($processing_status == 1 && $set_templib_error == 1) {
     
@@ -1889,55 +2044,25 @@ sub show_all_screens{
   print $q -> header ("text/html");
   print "$page_header";
   print "<h1>Available screens:</h1>";
-  
-  #my $query = "SELECT
-   # Rnai_screen_info.Rnai_screen_info_ID,
-   # Rnai_screen_info.Rnai_screen_name,
-   # Rnai_screen_info.Cell_line,
-   # Tissue_type.Tissue_of_origin,
-   # Rnai_screen_info.Operator,
-   # Rnai_screen_info.Date_of_run,
-   # Transfection_reagent_used.Transfection_reagent,
-   # Rnai_screen_info.Rnai_template_library,
-   # Rnai_screen_info.Plate_list_file_name,
-  #  Rnai_screen_info.Plate_conf_file_name,
-  #  Instrument_used.Instrument_name,
-  #  Rnai_screen_info.Is_isogenic,
-  #  Rnai_screen_info.Gene_name_if_isogenic,
-  #  (SELECT Name_of_set_if_isogenic.Name_of_set_if_isogenic FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic.Name_of_set_if_isogenic = 'NA' AND Name_of_set_if_isogenic.Name_of_set_if_isogenic_ID = '4' UNION ALL
-  #  SELECT Name_of_set_if_isogenic.Name_of_set_if_isogenic FROM Name_of_set_if_isogenic, Rnai_screen_info WHERE Name_of_set_if_isogenic.Name_of_set_if_isogenic_ID = Rnai_screen_info.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID),
-  #  Rnai_screen_info.Isogenic_mutant_description,
-  #  Rnai_screen_info.Method_of_isogenic_knockdown,
-  #  Rnai_screen_info.Rnai_screen_quality_control,
-  #  Rnai_screen_info.Rnai_screen_link_to_report FROM
-  #  Rnai_screen_info,
-  #  Transfection_reagent_used,
-  #  Instrument_used,
-  #  Tissue_type WHERE
-  #  Rnai_screen_info.Transfection_reagent_used_Transfection_reagent_used_ID = Transfection_reagent_used.Transfection_reagent_used_ID AND
-  #  Rnai_screen_info.Instrument_used_Instrument_used_ID = Instrument_used.Instrument_used_ID AND
-  #  Rnai_screen_info.Tissue_type_Tissue_type_ID = Tissue_type.Tissue_type_ID GROUP BY
-  #  Rnai_screen_info.Rnai_screen_info_ID";
-  
-   my $query = "SELECT
-    r.Rnai_screen_info_ID,
+
+  my $query = "SELECT
     r.Rnai_screen_name,
-    r.Cell_line,
     t.Tissue_of_origin,
-    r.Operator,
+    r.Cell_line, 
     r.Date_of_run,
+    r.Operator,
+    i.Instrument_name,
     u.Transfection_reagent,
     r.Rnai_template_library,
     r.Plate_list_file_name,
     r.Plate_conf_file_name,
-    i.Instrument_name,
     r.Is_isogenic,
     r.Gene_name_if_isogenic,
     (SELECT n.Name_of_set_if_isogenic FROM Name_of_set_if_isogenic n WHERE n.Name_of_set_if_isogenic = 'NA'),
     r.Isogenic_mutant_description,
     r.Method_of_isogenic_knockdown,
-    r.Rnai_screen_quality_control,
-    r.Rnai_screen_link_to_report FROM
+    r.Rnai_screen_link_to_report,
+    r.Zprime FROM
     Rnai_screen_info r,
     Transfection_reagent_used u,
     Instrument_used i,
@@ -1951,25 +2076,25 @@ sub show_all_screens{
     r.Isogenic_mutant_description = 'NA' AND
     r.Method_of_isogenic_knockdown = 'NA' AND
     r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = '4' GROUP BY
-    r.Rnai_screen_info_ID UNION ALL SELECT
-    r.Rnai_screen_info_ID,
+    r.Rnai_screen_info_ID UNION ALL 
+    SELECT
     r.Rnai_screen_name,
-    r.Cell_line,
     t.Tissue_of_origin,
-    r.Operator,
+    r.Cell_line,
     r.Date_of_run,
+    r.Operator,
+    i.Instrument_name,
     u.Transfection_reagent,
     r.Rnai_template_library,
     r.Plate_list_file_name,
     r.Plate_conf_file_name,
-    i.Instrument_name,
     r.Is_isogenic,
     r.Gene_name_if_isogenic,
     n.Name_of_set_if_isogenic,
     r.Isogenic_mutant_description,
     r.Method_of_isogenic_knockdown,
-    r.Rnai_screen_quality_control,
-    r.Rnai_screen_link_to_report FROM
+    r.Rnai_screen_link_to_report, 
+    r.Zprime FROM
     Rnai_screen_info r,
     Transfection_reagent_used u,
     Instrument_used i,
@@ -1992,15 +2117,11 @@ sub show_all_screens{
   print "<table>";
   
   print "<th>";
-  print "RNAi screen number";
-  print "</th>";
-  
-  print "<th>";
   print "RNAi screen name";
   print "</th>";
   
   print "<th>";
-  print "Cell line name";
+  print "Cell line";
   print "</th>";
   
   print "<th>";
@@ -2020,7 +2141,7 @@ sub show_all_screens{
   print "</th>";
   
   print "<th>";
-  print "Rnai_library name";
+  print "Rnai library name";
   print "</th>";
   
   print "<th>";
@@ -2056,14 +2177,18 @@ sub show_all_screens{
   print "</th>";
   
   print "<th>";
-  print "RNAi screen quality control";
+  print "Link to cellHTS2 analysis report";
   print "</th>";
   
   print "<th>";
-  print "Link to report";
+  print "Link to QC plots";
   print "</th>";
+  
+ print "<th>";
+  print "Zprime";
+  print "</th>"; 
  
-  while (my @row = $query_handle->fetchrow_array){
+  while (my @row = $query_handle->fetchrow_array) {
   
     print "<tr>";
    # print join("\t", @row), "\n";
@@ -2127,23 +2252,23 @@ sub show_all_screens{
     print "<td>";
     print "$row[14]";
     print "</td>";
+   
+    print "<td>";
+    print "<a href=\"$row[15]\" >Analysis report</a>";
+    print "</td>"; 
     
     print "<td>";
-    print "$row[15]";
+    print "<a href=\"http://gft.icr.ac.uk/cgi-bin/2_copy_rnaidb.pl?show_qc=1\&screen_dir_name=$row[0]\&plate_conf=$row[9]\">QC</a>";
     print "</td>"; 
     
     print "<td>";
     print "$row[16]";
-    print "</td>";   
-    
-    print "<td>";
-    print "<a href=\"$row[17]\" >'$row[17]'</a>";
     print "</td>"; 
     
     print "</tr>";
 
   } #end of while loop
-  
+
   print "</table>";
  
   print "$page_footer";
@@ -2152,20 +2277,14 @@ sub show_all_screens{
 } #end of show_all_screens subroutine
 
 
-# =======================
-# Test configure export
-# =======================
+# =================================
+# Subroutine for configuring export
+# =================================
 
-sub test_configure_export{
+sub configure_export{
   print $q -> header("text/html");
   print "$page_header";
-  print "<h1>Test_configure_export:</h1>";
-  
-  #print "<table>";
-  #print "<th>";
-  #print ;
-  #print "</th>";
-  #print "</table>";
+  print "<h1>Configure export:</h1>";
 
   ## retrieve library_gene names from the database and save them in a hash ##
   
@@ -2198,17 +2317,12 @@ sub test_configure_export{
   my @lib_genes;
   my $lib_gene;
   
-  while (@lib_genes = $query_handle->fetchrow_array){
+  while (@lib_genes = $query_handle->fetchrow_array) {
   
     $lib_gene_h{$lib_genes[0]} = 2;
     
   }
- #   print "<th>";
- #   print %lib_gene_h;
- #   print "</th>";
 
- # print "</table>";
-    
   ## retrieve cell lines from the database and save them in a hash ##
   
   my $query = ("SELECT 
@@ -2226,7 +2340,7 @@ sub test_configure_export{
   my %cell_line_h;
   my @cell_lines;
   my $cell_line;
-  while (@cell_lines = $query_handle->fetchrow_array){
+  while (@cell_lines = $query_handle->fetchrow_array) {
  
     $cell_line_h{$cell_lines[0]} = 3; 
     
@@ -2271,310 +2385,170 @@ sub test_configure_export{
   @lib_genes = keys %lib_gene_h;
   @cell_lines = keys %cell_line_h; 
   
-  open OUT, "> /home/agulati/data/New_screens_from_July_2014_onwards/configure_export.txt";
+  open OUT, "> /home/agulati/data/New_screens_from_July_2014_onwards/Rnai_screen_analysis_configure_export.txt";
   my @header = sort @lib_genes;
   print OUT "CELL LINE/TARGET\t"."@header\t";
   print OUT "\n";
   
-  while (@zscores = $query_handle->fetchrow_array){
+  while (@zscores = $query_handle->fetchrow_array) {
     $zscore_h{$zscores[0].$zscores[1]} = $zscores[2];
   }
-  foreach $cell_line(@cell_lines){
+  foreach $cell_line(@cell_lines) {
     print OUT "$cell_line\t";
-    foreach $lib_gene(sort @lib_genes){
-      if (exists ($zscore_h{$lib_gene.$cell_line})){
+    foreach $lib_gene(sort @lib_genes) {
+      if (exists ($zscore_h{$lib_gene.$cell_line})) {
         print OUT "$zscore_h{$lib_gene.$cell_line}\t"; 
       }
       else {
         print OUT "NA\t";
       }
     }
+    print OUT "\n";
   }
-  print "\n";
-  
-  print "$page_footer";
-  print $q -> end_html;
-  
-} #end of test_configure_export subroutine
 
-
-# =================================
-# Subroutine for configuring export  
-# =================================
-
-sub configure_export{
-  print $q -> header ("text/html");
-  print "$page_header";
-  print "<h1>Export options:</h1>";
+  close OUT;
   
-  # display a page with some
-  # export options and a button
-  # to run the export
+  my $configure_export_file_path = "/home/agulati/data/New_screens_from_July_2014_onwards/Rnai_screen_analysis_configure_export.txt";
   
-  ## retrieve zscores for each cell line from the database and save them in a hash ##
+  my $configure_export_new_file_path = "/usr/local/www/html/RNAi_screen_analysis_configure_export";
+  `cp $configure_export_file_path $configure_export_new_file_path`;
   
-  my $query = ("SELECT 
-    s.Zscore_summary FROM 
-    Rnai_screen_info r, 
-    Summary_of_result s, 
-    Template_library_file l WHERE 
-    r.Rnai_screen_info_ID = s.Rnai_screen_info_Rnai_screen_info_ID AND
-    r.Template_library_Template_library_ID = s.Template_library_Template_library_ID AND 
-    CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) = CONCAT(l.Sub_lib, '_', s.Gene_id_summary) AND
-    s.Zscore_summary != 'NA' AND
-    l.Gene_symbol_templib IS NOT NULL AND        
-    l.Gene_symbol_templib != 'unknown' AND           
-    l.Gene_symbol_templib != 'sicon1' AND           
-    l.Gene_symbol_templib != 'plk1' AND           
-    l.Gene_symbol_templib != 'Plk1' AND
-    l.Gene_symbol_templib != 'siPLK1' AND             
-    l.Gene_symbol_templib != 'MOCK' AND          
-    l.Gene_symbol_templib != 'sicon2' AND           
-    l.Gene_symbol_templib != 'siCON2' AND           
-    l.Gene_symbol_templib != 'allSTAR' AND            
-    l.Gene_symbol_templib != 'siCON1' AND            
-    l.Gene_symbol_templib != 'allstar' AND           
-    l.Gene_symbol_templib != 'empty' AND            
-    l.Gene_symbol_templib != 'NULL' AND
-    l.Sub_lib IS NOT NULL GROUP BY 
-    s.Summary_of_result_ID");
+  my $link_to_configure_export_file = "http://gft.icr.ac.uk/RNAi_screen_analysis_configure_export/";
   
-  my $query_handle = $dbh->prepare($query);
-  $query_handle -> execute();
-  
-  #print "<table>";
-  
-  my %zscore = ();
-  my @zscores;
-  my $zscore;
-  while (my @row = $query_handle->fetchrow_array){
-    push(@zscores, @row);
-    #@zscores = keys %zscores; 
-  }
- foreach $zscore(@zscores){
-   #$zscores{$zscore} = 4;
-      #print "<th>";
-      #print $zscores{$zscore};
-      $zscore = $zscore; 
-  }
-  
-  ## retrieve library_gene names from the database and save them in an array ##
-  
-  my $query = ("SELECT 
-    CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) FROM 
-    Template_library_file l WHERE 
-    l.Gene_symbol_templib IS NOT NULL AND        
-    l.Gene_symbol_templib != 'unknown' AND            
-    l.Gene_symbol_templib != 'sicon1' AND            
-    l.Gene_symbol_templib != 'plk1' AND           
-    l.Gene_symbol_templib != 'Plk1' AND
-    l.Gene_symbol_templib != 'siPLK1' AND            
-    l.Gene_symbol_templib != 'MOCK' AND            
-    l.Gene_symbol_templib != 'sicon2' AND            
-    l.Gene_symbol_templib != 'siCON2' AND           
-    l.Gene_symbol_templib != 'allSTAR' AND            
-    l.Gene_symbol_templib != 'siCON1' AND            
-    l.Gene_symbol_templib != 'allstar' AND            
-    l.Gene_symbol_templib != 'empty' AND            
-    l.Gene_symbol_templib != 'NULL' AND
-    l.Sub_lib IS NOT NULL GROUP BY  
-    CONCAT(Sub_lib, '_', Gene_symbol_templib)");
-  
-  my $query_handle = $dbh->prepare($query);
-  $query_handle -> execute();
-  
-  print "<table>";
-  
-  my %lib_genes = ();
-  my @lib_genes;
-  my $lib_genes;
-  while ($lib_genes = $query_handle->fetchrow_hashref){ 
-    for (keys %$lib_genes){
-    
-      print "<th>";
-      print "$zscore{$$lib_genes{$_}}\n";
-      print "</th>";
-    }
-  }
- #foreach $lib_gene(@lib_genes){
-   #$lib_genes{$lib_gene} = 1;
-   #print "<th>";
-   #print $lib_genes{$lib_gene};
-   #print "</th>";
-  #}
- 
-  #  $hash{$lib_genes} = $zscores;
-  #print "</table>";
-  #@lib_genes = keys %hash;
-  #@zscores = values %hash;
-  
-  #foreach $lib_genes(keys %hash){
-    #$zscores = $hash{$lib_genes};
-    #if(exists($hash{$lib_genes})){  
-      #print "<th>";
-      #print "$hash{$lib_genes}";
-      #print $zscores;
-      #print "</th>";
-    #}
-    #else {
-      #print "<th>";
-      #print "NA";
-      #print "</th>";
-    #}
-  #}
-  
-  ## retrieve cell lines from the database and save them in a hash ##
-  
-  my $query = ("SELECT 
-   r.Cell_line FROM 
-   Rnai_screen_info r, 
-   Summary_of_result s, 
-   Template_library t WHERE
-   r.Rnai_screen_info_ID = s.Rnai_screen_info_Rnai_screen_info_ID AND 
-   r.Template_library_Template_library_ID = t. Template_library_ID GROUP BY 
-   r. Rnai_screen_info_ID");
-   
-  my $query_handle = $dbh->prepare($query);
-  $query_handle -> execute();
-  
-  #print "<table>";
-  
-  my %cell_lines = ();
-  my @cell_lines;
-  my $cell_line;
-  
-  while (my @row = $query_handle->fetchrow_array){
-    push(@cell_lines, @row);
-    #@cell_lines = keys %cell_lines; 
-  }
-  foreach $cell_line(@cell_lines){
-    $cell_lines{$cell_line} = 2;
-      #print "<th>";
-      #print $cell_lines{$cell_line};
-      #print "</th>";
-  } 
-  
-  ## retrieve library_gene for each cell line from the database and save them in a hash ##
-  
-  my $query = ("SELECT 
-    CONCAT(l.Sub_lib, '_', s.Gene_id_summary) FROM 
-    Rnai_screen_info r, 
-    Summary_of_result s, 
-    Template_library_file l WHERE 
-    r.Rnai_screen_info_ID = s.Rnai_screen_info_Rnai_screen_info_ID AND
-    r.Template_library_Template_library_ID = s.Template_library_Template_library_ID AND 
-    CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) = CONCAT(l.Sub_lib, '_', s.Gene_id_summary) AND
-    s.Zscore_summary != 'NA' AND
-    l.Gene_symbol_templib IS NOT NULL AND        
-    l.Gene_symbol_templib != 'unknown' AND           
-    l.Gene_symbol_templib != 'sicon1' AND           
-    l.Gene_symbol_templib != 'plk1' AND           
-    l.Gene_symbol_templib != 'Plk1' AND
-    l.Gene_symbol_templib != 'siPLK1' AND             
-    l.Gene_symbol_templib != 'MOCK' AND          
-    l.Gene_symbol_templib != 'sicon2' AND           
-    l.Gene_symbol_templib != 'siCON2' AND           
-    l.Gene_symbol_templib != 'allSTAR' AND            
-    l.Gene_symbol_templib != 'siCON1' AND            
-    l.Gene_symbol_templib != 'allstar' AND           
-    l.Gene_symbol_templib != 'empty' AND            
-    l.Gene_symbol_templib != 'NULL' AND
-    l.Sub_lib IS NOT NULL GROUP BY 
-    s.Summary_of_result_ID");
-  
-  my $query_handle = $dbh->prepare($query);
-  $query_handle -> execute();
-  
-  #print "<table>";
-  
-  my %genes = ();
-  my @genes;
-  my $gene;
-  while (my @row = $query_handle->fetchrow_array){
-    push(@genes, @row); 
-    #@genes = keys %genes;
-  }
-  foreach $gene(@genes){
-    $genes{$gene} = 3;
-      #print "<th>";
-     # print $genes{$gene};
-      #print "</th>";
-  } 
-  
-  ##########################################################
-  ###################################
-  ##########################################################
-  
-  #print "<th>";
- # print @zscores;
- # print "</th>";
-  
- #foreach $zscore(@zscores){
-   #$zscores{$zscore} = 4;
-      #print "<th>";
-      #print $zscores{$zscore};
-      #print "</th>";
-  #} 
-  
-  my %hash = ();
-  #my $i;
-  #$hash{$lib_genes} = $zscores;
-  #my @lib_genes = keys %hash;
- # $hash{$lib_gene}{$cell_line} = $zscore;
-  
-  #for($i = 0; $i <= $lib_gene; $i++){
-    #$hash{$lib_gene[i]} = $zscore[i];
-    
-  #foreach $lib_gene(@lib_genes){
-    #if(exists ($zscores{$lib_gene})){
-      #print "<th>";
-      #print $hash{$lib_gene}{$cell_line};
-      #print "</th>";
-    #}
-  #}   
-  
-  my $i;
-  my $j;
-  #my %hash = ();
-  #for $i(0..$#genes){
-  #for($i = 0; $i <= $#genes; $i++){
-    #$hash{$genes[i]} = $zscores[i];
-    #keys (%hash) = @genes;
-    #values (%hash) = @zscores;
-   # $genes = @genes;
-    #$hash{$genes} = $zscores;
-    #$zscores = @zscores;
-  my $lib_genes;  
-  for($i = 0; $i <= keys(@lib_genes); $i++){
-    #for($j = 0; $j <= keys %cell_lines; $j++){ 
-        #$hash{$cell_lines[j]}{$genes[i]} = $zscores[i][j];
-    #$hash{$gene[i]} = $zscore[i];
-      #} 
-    #} 
-    #print "<th>"; 
-    #print %hash;
-    #print $lib_genes{$i};
-    #print "</th>";
-    #next;
-  
-  #foreach $genes($hash){
-    #if(exists($zscores{$genes})){
-      
-    #}
-   # else{
-     # print "<th>"; 
-    #  print "NA\t";
-    #  print "</th>"; 
-   # } 
- }
- # print "</table>";
-  
-  print "</table>";
+  print "<p>";
+  print "<a href = \"$link_to_configure_export_file\">Click here to download the file with analysis results for all the RNAi screens analysed.</a>";
+  print "</p>";
   
   print "$page_footer";
   print $q -> end_html;
   
 } #end of configure_export subroutine
+
+# ======================
+# Subroutine for show_qc
+# ======================
+
+sub show_qc{
+
+  print $q -> header("text/html");
+  print "$page_header";
+ 
+  print $q -> start_multipart_form(-method=>"POST"); 
+  
+  print "<table width = 100%>\n";
+  print "<tr>\n";
+  print "<td align=left valign=top>\n";
+
+  print "<h1>RNAi screen quality:</h1>";
+  
+  my $screen_dir_name = $q -> param( "screen_dir_name" );
+  my $plateconf = $q -> param( "plate_conf" );
+  
+  my $show_qc_page = "http://gft.icr.ac.uk/RNAi_screen_analysis_qc_plots/".$screen_dir_name."_controls_qc.png";
+  
+  print "<p>";
+  print "<img src=\"$show_qc_page\" alt=\"QC plots:\">";
+  print "</p>";
+
+  my $coco_file = "/home/agulati/data/New_screens_from_July_2014_onwards/".$screen_dir_name."/".$screen_dir_name."_corr.txt";
+  my $coco_file_wo_header = "/home/agulati/data/New_screens_from_July_2014_onwards/". $screen_dir_name."/coco_wo_header.txt";
+  
+  `cat $coco_file | grep -v ^Minimum_correlation > $coco_file_wo_header`;
+  
+  my @coco;
+  my $coco;
+  
+  open (IN, "< $coco_file_wo_header");
+  while (<IN>) {
+    @coco = $_;
+    foreach $coco(@coco) {
+      print "<br>";
+      print "<b>";
+      print "Minimum_correlation\t";
+      print "Maximum_correlation";
+      print "</b>";
+      print "</br>";
+
+      print "<p>";
+      print "$coco[0]\t";
+      print "</p>";
+      
+      print "<p>";
+      print "$coco[1]";
+      print "</p>"; 
+    }
+  }
+  close IN;
+  
+  print "</td>";
+  
+  print "<td align=left valign=top>\n";
+  
+  print "<p>";
+  print "<h2>Update plateconf file for reanalysis:</h2>";
+  print "</p>";
+  
+  ## replace 'siCON1' with 'empty' ##
+
+  print "<p>";
+  print "<p>";
+  
+  print $q -> checkbox( -name=>'sicon1_empty',
+    					-checked=>0,
+   					    -value=>'ON',
+    					-label=>'replace siCON1 with empty');
+
+  print "</p>";
+  print "</p>";
+  
+  ## replace 'siCON2' with 'empty' ##
+  
+  print "<p>";
+  
+  print $q -> checkbox( -name=>'sicon2_empty',
+    					-checked=>0,
+   					    -value=>'ON',
+    					-label=>'replace siCON2 with empty');
+
+  print "</p>";
+  
+  ## replace 'allstar' with 'empty' ##
+  
+  print "<p>";
+  
+  print $q -> checkbox( -name=>'allstar_empty',
+    					-checked=>0,
+   					    -value=>'ON',
+    					-label=>'replace allstar with empty');
+
+  print "</p>";
+  
+  print $q -> hidden (-name => 'screen_dir_name',
+  					  -value => $screen_dir_name);
+  					  
+  print $q -> hidden (-name => 'plate_conf',
+  					  -value => $plateconf);				  
+  
+ ## submit the updated plateconf file for re-analysis ##
+                                                
+  print "<p>";
+  print "<input type=\"submit\" id=\"save_new_screen\" value=\"Reanalyse\" name=\"save_new_screen\"/>";
+  print "</p>"; 
+  
+  print "</td>";
+  
+  print "</table>";
+  print "</tr>\n";
+  
+  print $q -> end_multipart_form(); 
+  
+  print "$page_footer";
+  print $q -> end_html;
+  
+} #end of show_qc subroutine 
+
+
+##########################################################################################
 
 
 sub run_export{
@@ -2590,10 +2564,10 @@ sub run_export{
 }
 
 
-#################################################################################################################
+##########################################################################################
 
 
-sub add_new_user{
+sub add_new_user {
   # get user, pass and oneTimePass, hash user.pass and store
   # set a cookie then redirect to view_all_projects
   my $q = shift;
@@ -2604,16 +2578,16 @@ sub add_new_user{
 #  my $correct_auth_code = md5_hex($user . $auth_code_salt);
 #  die "Failed login...\n" unless $auth_code eq $correct_auth_code;
   
-  unless($user =~ /^([A-Za-z0-9\._+]{1,1024})$/){
+  unless($user =~ /^([A-Za-z0-9\._+]{1,1024})$/) {
     &login("username must be alphanumeric (plus dots and underscores) and must not exceed 1024 characters");
     exit(1);
   }
-  unless($pass =~ /^.{1,4096}$/){
+  unless($pass =~ /^.{1,4096}$/) {
     &login("password must not exceed 4096 characters");
   }
   
   my $user_pass_hash = md5_hex($user . $pass . $auth_code_salt);
-  for(my $i = 0; $i <= $num_hash_itts; $i ++){
+  for(my $i = 0; $i <= $num_hash_itts; $i ++) {
     my $user_pass_hash = md5_hex($user_pass_hash);
   }
   #open USERS, ">> ./users.txt" or warn "can't append to the file with user names file: $!\n";
@@ -2630,7 +2604,7 @@ sub add_new_user{
   exit(0);
 }
   
-sub authenticate_login_key{
+sub authenticate_login_key {
   my $login_key = shift;
   open USERS, "< ./users.txt" or die "can't open the file with the list of user names: $!\n";
 
@@ -2642,7 +2616,7 @@ sub authenticate_login_key{
 #
 
   my $user = undef;
-  while (<USERS>){
+  while (<USERS>) {
     my ($stored_user, $stored_hash) = split(/[\t ]+/);
     chomp($stored_hash);
     if ($stored_hash eq /$login_key/){$user = $stored_user;}
@@ -2652,7 +2626,7 @@ sub authenticate_login_key{
   return $user;  
 }
  
-sub authenticate_user{
+sub authenticate_user {
   my $q = shift;
   my $user = $q -> param('user');
   my $pass = $q -> param('pass');

@@ -5,8 +5,26 @@
 
 #setwd(datapath)
 
-zScreen<-function(name, datapath, poscontrols="pos", 
-negcontrols="neg", annotate=TRUE, annotationfile="KS_TS_384_Template.txt", descripFile="Description.txt", plateconf="plateconf_384.txt", screenlog="Screenlog.txt", platelist="platelist_384.txt", reportHTML=TRUE, replicate_summary="median", summaryName="summary.txt", zscoreName="zscore.txt", zprimeName="zprime.txt", reportdirName="zscore"){
+#zScreen<-function(name, datapath, posControls, 
+#negControls, annotate, annotationfile, descripFile, plateconf, screenlog, platelist, reportHTML, replicate_summary, summaryName, zscoreName, zprimeName, reportdirName){
+
+zScreen<-function(name, 
+		  datapath, 
+		  poscontrols="pos",
+		  negcontrols="neg", 
+		  annotate=TRUE, 
+		  annotationfile="KS_TS_384_Template.txt", 
+		  descripFile="Description.txt", 
+		  plateconf="plateconf_384.txt", 
+		  screenlog="Screenlog.txt", 
+		  platelist="platelist_384.txt", 
+		  reportHTML=TRUE, 
+		  replicate_summary="median", 
+		  summaryName="summary.txt", 
+		  zscoreName="zscore.txt", 
+		  zprimeName="zprime.txt", 
+		  reportdirName="zscore"
+		  ){
 
 require(cellHTS2)
 
@@ -48,12 +66,9 @@ if(annotate){
 	compounds<-rep(NA,length(wells))
 }
 
-
 	# top table
 	
 	getTopTable(list("raw"=x, "normalized"=xn, "scored"=xsc), file=paste(datapath,summaryName, sep=""))
-
-
 
 ###########################################################	
 # write a QC report for zscores
@@ -94,7 +109,7 @@ return(zp);
 }
 
 zprimefile<-paste(datapath, zprimeName, sep="")
-cat("Zprime: ",zprime(xsc,poscontrols, negcontrols),file=zprimefile)
+cat("Zprime:",zprime(xsc,poscontrols, negcontrols),file=zprimefile)
 }
 
 
