@@ -18,7 +18,7 @@ guideFile<-list.files(pattern="^.*guide_file.*.txt$")
 
 ## check for the correct guide file ##
 
-write.table(guideFile, file="/home/agulati/scripts/res.txt", sep="\t")
+#write.table(guideFile, file="/home/agulati/scripts/res.txt", sep="\t")
 
 #guide <- read.table("/home/agulati/data/New_screens_from_July_2014_onwards/Breast_BT549_KS_TS_384_template_2014-07-01/Breast_BT549_KS_TS_384_template_2014-07-01_guide_file.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
 guide = read.table( guideFile, header=TRUE, sep="\t", stringsAsFactors=FALSE )

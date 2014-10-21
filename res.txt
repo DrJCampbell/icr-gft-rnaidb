@@ -1,2 +1,0 @@
-"x"
-"1"	"Breast_BT549_Kinome_template_2014-07-22_guide_file.txt"

@@ -134,17 +134,25 @@ hr {
   margin-top: 0px;
   }
 
+#Message {
+  font-family: Helvetica;
+  color: red;
+  border: 0;
+  width: auto;
+  height: auto;
+  margin: 0 auto 0 auto;
+  padding: 0;
+  text-align: left;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
+#Note {
+  font-family: Helvetica;
+  font-size: 0.85em;
+  border: 0;
+  width: auto;
+  height: auto;
+  margin: 0 auto 0 auto;
+  padding: 0;
+  text-align: left;
+}
 
