@@ -6,8 +6,6 @@ insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('KRAS-set'
 insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('PTEN-set');
 insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('NA');
 
-
-
 insert into Tissue_type (Tissue_of_origin) values ('ADRENAL_GLAND');
 insert into Tissue_type (Tissue_of_origin) values ('AUTONOMIC_GANGLIA');
 insert into Tissue_type (Tissue_of_origin) values ('BILIARY_TRACT');
@@ -86,7 +84,6 @@ insert into Template_library (Template_library_name) values ('KS_TS_DR_MT_PH_384
 insert into Template_library (Template_library_name) values ('KS_TS_CGC_384_template');
 insert into Template_library (Template_library_name) values ('KS_TS_CGC_WNT_384_template');
 select * from Template_library;
-UPDATE Template_library SET Template_library_name = 'KS_TS_CGC_384_template' WHERE Template_library_name = 'KS_TS_DR_CGC_384_template';
 
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/Epigenetics_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/Kinome_96_template.txt');
@@ -99,7 +96,6 @@ insert into Template_library_file_path (Template_library_file_location) values (
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_CGC_384_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_CGC_WNT_384_template.txt');
 select * from Template_library_file_path;
-UPDATE Template_library_file_path SET Template_library_file_location = '/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_CGC_384_template.txt' WHERE Template_library_file_location = '/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_CGC_384_template.txt';
 
 BEGIN;
 LOAD DATA LOCAL INFILE '/Users/wwei/icr-gft-rnaidb/template_library_folder/Epigenetics_template.txt' INTO TABLE Template_library_file FIELDS TERMINATED BY "\t" LINES TERMINATED BY "\n" IGNORE 1 LINES (@vPlate_templib, @vWell_templib, @vGene_symbol_templib, @vEntrez_gene_id_templib, @vSub_lib) SET Plate_templib = nullif(@vPlate_templib, ''), Well_templib = nullif(@vWell_templib,''), Gene_symbol_templib = nullif(@vGene_symbol_templib,''), Entrez_gene_id_templib = nullif(@vEntrez_gene_id_templib,''), Sub_lib = nullif(@vSub_lib,'');
