@@ -2770,8 +2770,8 @@ sub save_new_screen {
   my $normalized_r1_ch1;
   my $normalized_r2_ch1;
   my $normalized_r3_ch1;
-  my $gene_id_summary;
-  my $precursor_summary;
+  my $gene_symbol_summary;
+  my $entrez_gene_id_summary;
   
   ## 1. Store user info in the database ##
  
