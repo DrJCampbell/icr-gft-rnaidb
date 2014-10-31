@@ -4,9 +4,9 @@
 use strict;
 use CGI;
 use CGI qw( :standard );
-use CGI::Carp qw(fatalsToBrowser);
+use CGI::Carp qw ( fatalsToBrowser );
 use DBI;
-use Digest::MD5 qw(md5 md5_hex md5_base64);
+use Digest::MD5 qw ( md5 md5_hex md5_base64 );
 #use FileHandle;
 # for new file upload - fixes the error :- use string ("test_plateconf.txt") as a symbol ref while "strict refs" in use at...
 no strict 'refs';
@@ -32,7 +32,7 @@ my $ADD_NEW_FILES_LINK = "http://gft.icr.ac.uk/cgi-bin/rnaidb.pl?add_new_files=1
 
 #my $username;
 #my $password;
-
+ 
 #$| = 1;
 #$|++;
 
@@ -84,7 +84,7 @@ my $page_header_for_add_new_screen_sub = "<html>
 				    					  <script src=\"http://code.jquery.com/jquery-1.10.2.js\"></script>
 				   						  <script src=\"http://code.jquery.com/ui/1.11.1/jquery-ui.js\"></script>
 				   						  <script>
-										  \$(function() {
+										   \$(function() {
 	  										var availableTissues = [\"ADRENAL_GLAND\",
 																	\"AUTONOMIC_GANGLIA\",
 																	\"BILIARY_TRACT\",
@@ -1641,13 +1641,28 @@ my $page_header_for_add_new_screen_sub = "<html>
 																	\"YT\",
 																	\"ZR751\",
 																	\"ZR7530\" ];
-										    \$( \"#tissues\" ).autocomplete({
+										    \$( \"#tissues\" ).autocomplete ({
 										    source: availableTissues
 										    });
-										    \$( \"#celllines\" ).autocomplete({
+										    \$( \"#celllines\" ).autocomplete ({
 										    source: availableCellLines
 										    });
-										  });
+										  });									  
+										  function validateTissueType(form) {
+										    if ( form[\"tissue_type\"].value == \"Please select\" ) {
+										      alert (\"Please enter tissue type.\");
+										      return false;
+										    }
+										    return true;
+										  }
+										  function make_tissues_Blank() {
+										    var x = document.getElementById( \"tissues\" );
+										    x.value = \"\";
+										    }
+										  function make_cellLines_Blank() {
+										    var y = document.getElementById( \"celllines\" );
+										    y.value = \"\";
+										    }  
 										  </script>
 				   						  </head>
 				   						  <body>
@@ -1684,7 +1699,7 @@ my $q = new CGI;
 
 # either get a cookie or go to login page and exit
 #my $login_key = $q -> cookie("login_key") || &login($q) && exit(0);
-my $login_key = $q -> cookie("login_key");
+my $login_key = $q -> cookie ( "login_key" );
 
 # if we got a cookie, is it valid?
 #my $user = &authenticate_login_key($login_key);
@@ -1692,45 +1707,45 @@ my $login_key = $q -> cookie("login_key");
 
 # connect to the database
 my $dsn = "DBI:mysql:database=$sqldb_name;host=$sqldb_host;port=$sqldb_port";
-my $dbh = DBI->connect($dsn, $sqldb_user, $sqldb_pass, { RaiseError => 0, AutoCommit => 1 })
+my $dbh = DBI -> connect ( $dsn, $sqldb_user, $sqldb_pass, { RaiseError => 0, AutoCommit => 1 } )
   or die "Cannot connect to database: " . $DBI::errstr;
   
 
 # Decide what to do based on the params passed to the script
-if($q -> param( "logout" )){
+if( $q -> param ( "logout" ) ) {
   &logout ( $q );
 }
-elsif ($q -> param( "show_all_screens" )){
+elsif ( $q -> param( "show_all_screens" )) {
   &show_all_screens ( $q );
 }
-elsif ($q -> param( "add_new_screen" )){
+elsif ( $q -> param( "add_new_screen" )) {
   &add_new_screen ( $q );
 }
-elsif ($q -> param( "save_new_screen" )){
+elsif ( $q -> param( "save_new_screen" )) {
   &save_new_screen ( $q );
 }
-elsif ($q-> param( "add_new_files" )){
+elsif ( $q -> param( "add_new_files" )) {
   &add_new_files ( $q );
 }
-elsif ($q-> param( "save_new_uploaded_plateconf_file" )){
+elsif ( $q -> param( "save_new_uploaded_plateconf_file" )) {
   &save_new_uploaded_plateconf_file ( $q );
 }
-elsif ($q-> param( "save_new_uploaded_platelist_file" )){
+elsif ( $q -> param ( "save_new_uploaded_platelist_file" )) {
   &save_new_uploaded_platelist_file ( $q );
 }
-elsif ($q-> param( "save_new_uploaded_templib_file" )){
+elsif ( $q -> param ( "save_new_uploaded_templib_file" )) {
   &save_new_uploaded_templib_file ( $q );
 }
-elsif ($q -> param( "configure_export" )){
+elsif ( $q -> param ( "configure_export" )) {
   &configure_export ( $q );
 }
-elsif ($q -> param( "show_qc" )){
+elsif ( $q -> param ( "show_qc" )) {
   &show_qc ( $q );
 }
-elsif ($q -> param( "run_export" )){
+elsif ( $q -> param ( "run_export" )) {
   &run_export ( $q );
 }
-else{
+else {
  &home ( $q );
 }
 
@@ -1741,10 +1756,8 @@ else{
 # subroutine for home
 # ===================
 
-sub home{ 
-  print $q -> header (
-    -type => "text/html"
-    );
+sub home { 
+  print $q -> header ( "text/html" );
 #  my $user = $q -> param('user');
   print "$page_header";
 
@@ -1752,10 +1765,10 @@ sub home{
   # summary info about all screens
 
   print "<h1>Hello:</h1>";
-  if(defined($login_key)){
+  if ( defined ( $login_key ) ) {
     print "got cookie $login_key<br />";
   }
-  else{
+  else {
     print "Where's my cookie?"
   }
   
@@ -1772,33 +1785,29 @@ sub home{
 # subroutine for adding new screen
 # ================================
 
-sub add_new_screen{
-  print $q -> header ("text/html");
-  my $user = $q -> param('user');
+sub add_new_screen {
+  print $q -> header ( "text/html" );
+  my $user = $q -> param( 'user' );
   print "$page_header_for_add_new_screen_sub";
   print "<h1>Add new screen:</h1>";
   
-  print $q -> start_multipart_form(-method=>"POST"); 
+  print $q -> start_multipart_form ( -method => "POST",
+  								     -name => "tissue_type",
+  								     -onSubmit => "return validateTissueType(this)" ); 
   
   print "<table width = 100%>\n";
   print "<tr>\n";
   print "<td align=left valign=top>\n";
   
- ## print a message if a new plateconf/platelist/library file has been successfully uploaded and saved to the server ##
+  ## print a message if the new plateconf has been successfully uploaded and saved to the server ##
   
- #my $no_message = $q -> param(-name => 'no_message',
-  			  							#-value => '');
- 
- # my $message = shift;
- # if ( defined($message)) {
-  #  print "<div id=\"Message\"><p><b>$message</b></p></div>";
-  #my $file_upload_message = shift;
-  #if ( defined($file_upload_message)) {
-    #print "<div id=\"Message\"><p><b>$file_upload_message</b></p></div>";
-  #}
-  #else {
-    #print $no_message;
-  #}
+  my $file_upload_message = $q -> param ( "file_upload_message" );
+  
+  #$file_upload_message = shift;
+  if ( defined ( $file_upload_message ) ) {
+    print "<div id=\"Message\"><p><b>$file_upload_message</b></p></div>";
+  }
+  
   
   # =========================
   # add main screen info here
@@ -1811,37 +1820,40 @@ sub add_new_screen{
   
   print "<p>Plate excel file:<br />";
   
-  print $q -> filefield( -name=>'uploaded_excel_file',
+  print $q -> filefield ( -name=>'uploaded_excel_file',
                          -default=>'starting value',
                          -size=>35,
-                         -maxlength=>256);
+                         -maxlength=>256 );
   print "</p>";
 
   ## get the existing plateconf filenames from the database and display them in the popup menu ##
   
   my $query = "SELECT Plateconf_file_location FROM Plateconf_file_path";
-  my $query_handle = $dbh->prepare($query);
-  $query_handle->execute();
+  my $query_handle = $dbh -> prepare( $query );
+    				   #or die "Cannot prepare: " . $dbh -> errstr();
+  $query_handle -> execute();
+    #or die "SQL Error: ".$query_handle->errstr();
   
   my $plateconf_path;
   my $plateconf_file_dest;
   my $plateconf_name;
   my @plateconf_path;
   
-  while ($plateconf_path = $query_handle->fetchrow_array){
+  while ( $plateconf_path = $query_handle -> fetchrow_array ){
     $plateconf_file_dest = $plateconf_path;
     $plateconf_file_dest =~ s/.*\///;
     $plateconf_name = $plateconf_file_dest;
     $plateconf_name =~ s{\.[^.]+$}{};
     
-    push (@plateconf_path, $plateconf_name);
+    push ( @plateconf_path, $plateconf_name );
   }
-  unshift(@plateconf_path, "Please select");
+  #$query_handle -> finish();
+  unshift( @plateconf_path, "Please select" );
   print "<p>Plateconf file:<br />";
   
-  print $q -> popup_menu( -name=>'plate_conf',
+  print $q -> popup_menu ( -name=>'plate_conf',
   						  -value=>\@plateconf_path,
-  						  -default=>'Please select');							    		  
+  						  -default=>'Please select' );							    		  
   print " - OR";
   #link to the form for adding new plateconf file 
   print "<p>";
@@ -1852,29 +1864,31 @@ sub add_new_screen{
   ## get the existing platelist filenames from the database and display them in the popup menu ##
   
   $query = "SELECT Platelist_file_location FROM Platelist_file_path";
-  $query_handle = $dbh->prepare($query);
+  $query_handle = $dbh -> prepare ( $query );
+     				#or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle->execute();
-  
+    #or die "SQL Error: " . $query_handle -> errstr();
+    
   my $platelist_path;
   my $platelist_file_dest;
   my $platelist_name;
   my @platelist_path;
   
-  while ($platelist_path = $query_handle->fetchrow_array){
+  while ( $platelist_path = $query_handle -> fetchrow_array ) {
     $platelist_file_dest = $platelist_path;
     $platelist_file_dest =~ s/.*\///;
     $platelist_name = $platelist_file_dest;
     $platelist_name =~ s{\.[^.]+$}{};
-    push (@platelist_path, $platelist_name);
+    push ( @platelist_path, $platelist_name );
   }
-  
-  unshift(@platelist_path, "Please select");
+  #$query_handle -> finish();
+  unshift ( @platelist_path, "Please select" );
   
   print "<p>Platelist file:<br />";
   
-  print $q -> popup_menu( -name=>'plate_list',
-  						  -value=>\@platelist_path,
-   						  -default=>'Please select');
+  print $q -> popup_menu ( -name => 'plate_list',
+  						  -value => \@platelist_path,
+   						  -default => 'Please select' );
   
   print " - OR";
   #link to the form for adding new platelist file 
@@ -1886,28 +1900,32 @@ sub add_new_screen{
   ## get the existing template library filenames from the database and display them in the popup menu ##
   
   $query = "SELECT Template_library_file_location FROM Template_library_file_path";
-  $query_handle = $dbh->prepare($query);
+  $query_handle = $dbh -> prepare ( $query );
+   					#or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle->execute();
+    #or die "SQL Error: " . $query_handle -> errstr();
   
   my $templib_path;
   my $templib_file_dest;
   my $templib_name;
   my @templib_path;
   
-  while ($templib_path = $query_handle->fetchrow_array){
+  while ( $templib_path = $query_handle -> fetchrow_array ) {
     $templib_file_dest = $templib_path;
     $templib_file_dest =~ s/.*\///;
     $templib_name = $templib_file_dest;
     $templib_name =~ s{\.[^.]+$}{};
-    push (@templib_path, $templib_name);
+    push ( @templib_path, $templib_name );
   }
-  unshift(@templib_path, "Please select");
+ # $query_handle -> finish();
+  unshift( @templib_path, "Please select" );
+  
   
   print "<p>Template library:<br />";
   
-  print $q -> popup_menu( -name => 'template_library',
+  print $q -> popup_menu ( -name => 'template_library',
   						  -value => \@templib_path,
-   						  -default => 'Please select');
+   						  -default => 'Please select' );
   
   print " - OR";
   #link to the form for adding new template library file 
@@ -1920,10 +1938,11 @@ sub add_new_screen{
   
   print "Tissue of origin:<br />";
   print $q -> textfield ( -name => "tissue_type",
-                          -value => 'Enter tissue type',
+                          -value => 'Please select',
                           -size => "30",
                           -maxlength => "45",
-                          -id => "tissues");
+                          -onClick => "make_tissues_Blank()",
+                          -id => "tissues" );
   print "</p><p>";
 
   ## get the cell line name ##
@@ -1933,21 +1952,22 @@ sub add_new_screen{
                           -value => 'Enter cell line name',
                           -size => "30",
                           -maxlength => "45",
-                          -id => "celllines");
+                          -onClick => "make_cellLines_Blank()",
+                          -id => "celllines" );
   print "</p><p>";
 
   ## get the current date ##
   
-  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+  my ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime ( time );
   $year += 1900;
   $mon ++;
-  my $date = sprintf("%04u-%02u-%02u",$year,$mon,$mday); # set this to current date using localtime()
+  my $date = sprintf ( "%04u-%02u-%02u",$year,$mon,$mday ); # set this to current date using localtime()
   print "</p><p>";
   print "Date of screen:<br />";
   print $q -> textfield ( -name => "date_of_run",
                           -value => $date,
                           -size => "30",
-                          -maxlength => "45");
+                          -maxlength => "45" );
   print "</p><p>";
   
   ## get the user (who is logged in?) ##
@@ -1962,19 +1982,19 @@ sub add_new_screen{
     
   ## get the transfection_reagent name from the database ##
   
-  my @transfection_reagent = ("Please select", "Lipofectamine 2000", "Lipofectamine 3000", "Lipofectamine RNAi max", "Dharmafect 3", "Dharmafect 4", "Oligofectamine", "Effectene"); 
-  print $q -> popup_menu( -name => 'transfection_reagent',
+  my @transfection_reagent = ( "Please select", "Lipofectamine 2000", "Lipofectamine 3000", "Lipofectamine RNAi max", "Dharmafect 3", "Dharmafect 4", "Oligofectamine", "Effectene" ); 
+  print $q -> popup_menu ( -name => 'transfection_reagent',
   						  -value => \@transfection_reagent,
-  						  -default => 'Please select');
+  						  -default => 'Please select' );
   
   ## get the instrument name from the database ##
   
   print "</p><p>Instrument:<br />";
   
-  my @instrument = ("Please select", "1S10", "1C11"); 
-  print $q -> popup_menu( -name => 'instrument',
+  my @instrument = ( "Please select", "1S10", "1C11" ); 
+  print $q -> popup_menu ( -name => 'instrument',
   					      -values => \@instrument,
-  						  -default => 'Please select');
+  						  -default => 'Please select' );
 
   print "</td>\n";
 
@@ -1993,7 +2013,7 @@ sub add_new_screen{
   print $q -> checkbox( -name=>'is_isogenic',
     					-checked=>0,
    					    -value=>'ON',
-    					-label=>'this is an isogenic screen');
+    					-label=>'this is an isogenic screen' );
 
   print "</p><p>";
   
@@ -2003,22 +2023,23 @@ sub add_new_screen{
   print $q -> textfield ( -name => "gene_name_if_isogenic",
                           -value => 'Enter gene name',
                           -size => "30",
-                          -maxlength => "45");
+                          -maxlength => "45" );
   
   print "</p><p>";
    
  ## get the existing isogenic sets from the database and display them in the popup menu ##
  
- $ISOGENIC_SET = $dbh->selectcol_arrayref("SELECT Name_of_set_if_isogenic FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic != 'NA'");
- unshift($ISOGENIC_SET, "Please select");
+ $ISOGENIC_SET = $dbh -> selectcol_arrayref ( "SELECT Name_of_set_if_isogenic FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic != 'NA'" )
+                   or die "Cannot prepare: " . $dbh->errstr();
+ unshift( $ISOGENIC_SET, "Please select" );
  
   print "<p>";
 
   print "<p>Select isogenic set:<br />";
     
-  print $q -> popup_menu(-name =>'isogenicSet',
+  print $q -> popup_menu (-name =>'isogenicSet',
   						 -value => $ISOGENIC_SET,
-   	                     -default =>'Please select');
+   	                     -default =>'Please select' );
 
   print " - OR";
   print "<p>";
@@ -2030,7 +2051,7 @@ sub add_new_screen{
   print $q -> textfield ( -name => "name_of_set_if_isogenic",
                           -value => 'Enter isogenic set name',
                           -size => "30",
-                          -maxlength => "45");
+                          -maxlength => "45" );
                           
   print "</p><p>";
    
@@ -2040,7 +2061,7 @@ sub add_new_screen{
   print $q -> textfield ( -name => "isogenic_mutant_description",
                           -value => 'e.g. parental',
                           -size => "30",
-                          -maxlength => "45");
+                          -maxlength => "45" );
   
   print "</p><p>";  
   
@@ -2050,7 +2071,7 @@ sub add_new_screen{
   print $q -> textfield ( -name => "method_of_isogenic_knockdown",
                           -value => 'e.g. ZFN or shRNA',
                           -size => "30",
-                          -maxlength => "45");
+                          -maxlength => "45" );
    
   print "</p><p>";
   print "</td>\n";                        
@@ -2070,7 +2091,7 @@ sub add_new_screen{
   print $q -> checkbox( -name=>'is_drug_screen',
     					-checked=>0,
    					    -value=>'ON',
-    					-label=>'this is a drug screen');
+    					-label=>'this is a drug screen' );
 
   print "</p><p>";
   
@@ -2078,11 +2099,11 @@ sub add_new_screen{
   
   print "<p>";
   
-  my @CONTROL = ("Please select", "DMSO", "DNS"); # this should be read from a text file or from the SQL database
+  my @CONTROL = ( "Please select", "DMSO", "DNS" ); # this should be read from a text file or from the SQL database
   print "Control:<br />";
   print $q -> popup_menu( -name => 'Control',
   					      -value => \@CONTROL,
-  						  -default => 'Please select');
+  						  -default => 'Please select' );
   print "</p>";
   
   ## çompound used ##
@@ -2093,7 +2114,7 @@ sub add_new_screen{
   print $q -> textfield ( -name => "compound",
                           -value => 'e.g. drug A',
                           -size => "30",
-                          -maxlength => "45");
+                          -maxlength => "45" );
   
   print "</p>";
                           
@@ -2105,7 +2126,7 @@ sub add_new_screen{
   print $q -> textfield ( -name => "concentration",
                           -value => 'e.g. 100 ng',
                           -size => "30",
-                          -maxlength => "45"); 
+                          -maxlength => "45" ); 
                           
   print "</p>";
   
@@ -2117,7 +2138,7 @@ sub add_new_screen{
   print $q -> textfield ( -name => "dosing regime",
                           -value => 'e.g. 24 hrs after transfection',
                           -size => "30",
-                          -maxlength => "45"); 
+                          -maxlength => "45" ); 
     
   print "</p>";                       
   print "</td>\n";                       
@@ -2133,7 +2154,7 @@ sub add_new_screen{
   print $q -> textarea ( -name => "drug_screen_notes",
                          -default => 'write notes for drug screen',
                          -rows => "8",
-                         -columns => "40");     
+                         -columns => "40" );     
                           
   print "</p>";
   print "</td>\n";
@@ -2152,7 +2173,7 @@ sub add_new_screen{
   print $q -> textarea ( -name => "notes",
                          -default => 'write notes for Description.txt',
                          -rows => "8",
-                         -columns => "40");
+                         -columns => "40" );
                          
   ## submit the form ##
                                                 
@@ -2180,14 +2201,14 @@ sub add_new_screen{
   # Subroutine for downloading/uploading new/edited plateconf/platelist/library files
   # =================================================================================
 
-sub add_new_files{
-  print $q -> header ("text/html");
+sub add_new_files {
+  print $q -> header ( "text/html" );
   print "$page_header";
   print "<h1>Add new file(s):</h1>";
   
   ## Downloading/uploading plateconf file ##
   
-  print $q -> start_multipart_form(-method=>"POST"); 
+  print $q -> start_multipart_form ( -method => "POST" ); 
   
   print "<table width = 100%>\n";
   print "<tr>\n";
@@ -2218,10 +2239,10 @@ sub add_new_files{
   print "<p>Upload edited plateconf file:<br />";
   print "<p></p>";
   
-  print $q -> filefield( -name=>'new_uploaded_plateconf_file',
+  print $q -> filefield ( -name=>'new_uploaded_plateconf_file',
                          -default=>'starting value',
                          -size=>35,
-                         -maxlength=>256);
+                         -maxlength=>256 );
   print "</p>";
   
   ## enter new plateconf file name ##
@@ -2232,7 +2253,7 @@ sub add_new_files{
   print $q -> textfield ( -name => "new_plateconf_filename",
                           -value => 'e.g. plateconf_384_ver_02',
                           -size => "30",
-                          -maxlength => "45");
+                          -maxlength => "45" );
 
   print "<p></p>";
   
@@ -2256,7 +2277,7 @@ sub add_new_files{
   
   ## Downloading/uploading platelist file ## 
   
-  print $q -> start_multipart_form(-method=>"POST"); 
+  print $q -> start_multipart_form ( -method => "POST" ); 
   
   print "<table width = 100%>\n";
   print "<tr>\n";
@@ -2287,10 +2308,10 @@ sub add_new_files{
   print "<p>Upload new platelist file:<br />";
   print "<p></p>";
   
-  print $q -> filefield( -name=>"new_uploaded_platelist_file",
+  print $q -> filefield ( -name=>"new_uploaded_platelist_file",
                          -default=>'starting value',
                          -size=>35,
-                         -maxlength=>256);
+                         -maxlength=>256 );
   print "</p>";
   
   ## enter new platelist file name ##
@@ -2301,7 +2322,7 @@ sub add_new_files{
   print $q -> textfield ( -name => "new_platelist_filename",
                           -value => 'e.g. platelist_384_ver_02',
                           -size => "30",
-                          -maxlength => "45"); 
+                          -maxlength => "45" ); 
   print "<p></p>";
   
   print"<p><div id=\"Note\">NOTE: Please make sure that the name of the new uploaded platelist file is unique and different from the names of existing platelist files. The words in the filename must be joined with an underscore ( _ ). For example, an edited 'Platelist_384' file can be renamed as 'Platelist_384_ver_02' or 'Platelist_edited_384_Aug-2014'.</div></p>";
@@ -2370,7 +2391,7 @@ sub add_new_files{
   print $q -> filefield( -name=>'new_uploaded_templib_file',
                          -default=>'starting value',
                          -size=>35,
-                         -maxlength=>256);
+                         -maxlength=>256 );
   print "</p>";
   
   #enter new template library file name
@@ -2380,7 +2401,7 @@ sub add_new_files{
   print $q -> textfield ( -name => "new_templib_filename",
                           -value => 'e.g. KS_TS_DR_x_y_z_template', 
                           -size => "30",
-                          -maxlength => "45");  
+                          -maxlength => "45" );  
   print "<p></p>";
   
   print"<p><div id=\"Note\">NOTE: Please make sure that the name of the new uploaded library file is unique and different from the names of the existing library files. The words in the filename must be joined with an underscore ( _ ). For example, an edited 'Kinome_template' file can be renamed as 'Kinome_template_ver_02' and a new library file can be named as 'KS_TS_DR_x_y_z_template'.</div></p>";
@@ -2414,8 +2435,8 @@ sub add_new_files{
 # Subroutine for saving new screen
 # ================================
 
-sub save_new_screen{
-  print $q -> header ("text/html");
+sub save_new_screen {
+  print $q -> header ( "text/html" );
   print "$page_header";
   print "<h1>Saving new screen data:</h1>";
 
@@ -2466,19 +2487,18 @@ sub save_new_screen{
   my $screenDescription_filename;
   my $guide_file;
   
-  if (not defined ($screen_dir_name)) {
+  if ( not defined ( $screen_dir_name ) ) {
     $screen_dir_name = $tissue_type."_".$cell_line_name."_".$templib."_".$date_of_run;
   }
   my $screenDir_path = "/home/agulati/data/screen_data";
   my $file_path = "$screenDir_path/$screen_dir_name";
   
-  if (! -e $file_path) {
-      mkdir("$file_path");
+  if ( ! -e $file_path ) {
+      mkdir( "$file_path" );
       `chmod -R 777 $file_path`;
       `chown -R agulati:agulati $file_path`;
       
-      print "<p>Created new screen directory: $screen_dir_name...</p>"
-        or die "Cannot make new directory $screen_dir_name in $screenDir_path: $!"; 
+      print "<p>Created new screen directory: $screen_dir_name...</p>";
     
     ## add screen directory name as prefix to all the filenames in the selected platelist file ##
 
@@ -2524,33 +2544,44 @@ sub save_new_screen{
   
     ## Upload excel file and save it to new screen directory ##
   
-    my $lightweight_fh  = $q->upload('uploaded_excel_file');
-    #my $excelFile = $q->param( "uploaded_excel_file" );
+    my $lightweight_fh  = $q -> upload ( 'uploaded_excel_file' );
+    #unless ( $excelFile =~ /(xls)$/ ) {
+    #  `rm -r $file_path`;
+    #  print "<div id=\"Message\"><p>ERROR: Please upload a valid excel file for analysis.</p></div>";
+    #  print "<p>Deleted new screen directory: $screen_dir_name.</p>";
+     # die "Please upload a valid excel file for analysis.";
+      
+    #}
+
     my $target = $file_path."/".$excelFile;
     # undef may be returned if it's not a valid file handle
   
-    if (defined $lightweight_fh) {
+    if ( defined $lightweight_fh ) {
     # Upgrade the handle to one compatible with IO::Handle:
       my $io_handle = $lightweight_fh->handle;
  
-      open ($excelFile,'>',$target)
+      open ( $excelFile,'>',$target )
         or die "Cannot open '$target':$!";
         print "<p>Uploaded Excel file saved to the new screen directory...</p>";
     
       my $bytesread = undef;
       my $buffer = undef;
     
-      while ($bytesread = $io_handle->read($buffer,1024)) {
+      while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) {
         print $excelFile $buffer
           or die "Error writing '$target' : $!";
       }
       close $excelFile
         or die "Error writing '$target' : $!";
       }
+      else {
+        `rm -r $file_path`;
+        die "Please upload the excel file.";
+      }
     
       ## rename uploaded excel file ##
     
-      my $new_xls_file = rename($file_path."/".$excelFile, $file_path."/".$screen_dir_name.".xls") or die "Cannot rename $excelFile :$!";
+      my $new_xls_file = rename ( $file_path."/".$excelFile, $file_path."/".$screen_dir_name.".xls" ) or die "Cannot rename $excelFile :$!";
     
       print "<p>";
       print "<p>Excel file renamed...</p>";
@@ -2611,36 +2642,41 @@ sub save_new_screen{
       
     close (GUIDEFILE); 
     }
-
+    
+    
   ## Reanalysis ##
   
-  if ($sicon1 eq 'ON') {
-    @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
-    $^I = "";
-    while (<>) {
-      s/(\s)siCON1([\n\r])/$1empty$2/g;
-      print;
+    if ((-e $file_path) && ($sicon1 eq 'ON')) {
+      @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
+      $^I = "";
+      while ( <> ) {
+        s/(\s)siCON1([\n\r])/$1empty$2/g;
+        print;
+      }
+      print "<p>Reanalysing with updated plateconf file...</p>"; 
     }
-    print "<p>Reanalysing with updated plateconf file...</p>"; 
-  }
-  if ($sicon2 eq 'ON') {
-    @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
-    $^I = "";
-    while (<>) {
-      s/(\s)siCON2([\n\r])/$1empty$2/g;
-      print;
+    if ((-e $file_path) && ($sicon2 eq 'ON')) {
+      @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
+      $^I = "";
+      while ( <> ) {
+        s/(\s)siCON2([\n\r])/$1empty$2/g;
+        print;
+      }
+      print "<p>Reanalysing with updated plateconf file...</p>"; 
     }
+    if ((-e $file_path) && ($allstar eq 'ON')) {
+      @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
+      $^I = "";
+      while ( <> ) {
+        s/(\s)allstar([\n\r])/$1empty$2/g;
+        print;
+      }
     print "<p>Reanalysing with updated plateconf file...</p>"; 
-  }
-  if ($allstar eq 'ON') {
-    @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
-    $^I = "";
-    while (<>) {
-      s/(\s)allstar([\n\r])/$1empty$2/g;
-      print;
     }
-    print "<p>Reanalysing with updated plateconf file...</p>"; 
- }
+
+   #if ((-e $file_path) && ($sicon1 ne 'ON') && ($sicon2 ne 'ON') && ($allstar ne 'ON')) {
+     #die "Cannot make new directory $screen_dir_name in $screenDir_path: $!"; 
+   #}
   
   my $guide = $guide_file;
   
@@ -2685,7 +2721,7 @@ sub save_new_screen{
   my $value;
   
   open IN, "< $zprime_file";
-  while(<IN>) {
+  while ( <IN> ) {
     $zp_value = $_;  
     $zp_value =~ s/^Zprime://;
   }
@@ -2739,23 +2775,26 @@ sub save_new_screen{
   
   ## 1. Store user info in the database ##
  
- # open (FILE, "/usr/lib/cgi-bin/users.txt");
+ # open ( FILE, "/usr/lib/cgi-bin/users.txt" );
   
-  #foreach $line(<FILE>){
+  #foreach $line ( <FILE> ) {
   #  chomp $line;
-  #  ($username, $password) = split(/\t/,$line);
+  #  ( $username, $password ) = split( /\t/,$line );
     
-   # $query_handle = $dbh->do("INSERT INTO User_info (
+   # $query_handle = $dbh -> do ( "INSERT INTO User_info (
 	#User_info_ID, 
     #Username, 
    # Password) 
   #  VALUES (
  #   DEFAULT, 
 #    '$username', 
- #   '$password')");
+ #   '$password' ) ");
     
-    #$query_handle = $dbh->prepare($query);
-    #$query_handle -> execute();
+    #$query_handle = $dbh -> prepare ( $query );
+       					#or die "Cannot prepare: " . $dbh -> errstr();
+  #$query_handle -> execute()
+    #or die "SQL Error: " . $query_handle -> errstr();
+    #$query_handle -> finish();
   #}
   #close FILE;
   
@@ -2765,16 +2804,19 @@ sub save_new_screen{
   
   if ($is_isogenic eq 'ON') {
     $is_isogenic_screen = "YES";
-    if($ISOGENIC_SET eq "Please select") {
-      my $query = $dbh->do("INSERT INTO 
+    if ( $ISOGENIC_SET eq "Please select" ) {
+      my $query = $dbh -> do ( "INSERT INTO 
       						Name_of_set_if_isogenic ( 
         					Name_of_set_if_isogenic) 
         					VALUES (
-        					'$new_isogenic_set')");
-      my $query_handle = $dbh->prepare($query);
+        					'$new_isogenic_set' )" );
+      my $query_handle = $dbh -> prepare ( $query );
+   					      # or die "Cannot prepare: " . $dbh -> errstr();
       $query_handle -> execute();
+        #or die "SQL Error: ".$query_handle -> errstr();    
       $ISOGENIC_SET = $new_isogenic_set;
-    } 
+      #$query_handle->finish();
+    }
   }
   else {
     $is_isogenic_screen = "NO";
@@ -2787,7 +2829,7 @@ sub save_new_screen{
 
   ## 3. Store new Rnai screen metadata in the database ##
   
-  my $query = $dbh->do("INSERT INTO Rnai_screen_info (      
+  my $query = $dbh -> do( "INSERT INTO Rnai_screen_info (      
     Cell_line,    
     Rnai_screen_name,    
     Date_of_run,    
@@ -2810,7 +2852,7 @@ sub save_new_screen{
     Template_library_file_path_Template_library_file_path_ID,
     Plateconf_file_path_Plateconf_file_path_ID,
     Platelist_file_path_Platelist_file_path_ID,
-    Template_library_Template_library_ID) 
+    Template_library_Template_library_ID ) 
     SELECT 
     '$cell_line_name',
     '$screen_dir_name',
@@ -2827,46 +2869,59 @@ sub save_new_screen{
     '$rnai_screen_link_to_qc_plots',
     '$zp_value',
     '$notes', 
-    (SELECT Name_of_set_if_isogenic_ID FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic = '$ISOGENIC_SET'), 
-    (SELECT Instrument_used_ID FROM Instrument_used WHERE Instrument_name = '$instrument'),
-    (SELECT Tissue_type_ID FROM Tissue_type WHERE Tissue_of_origin = '$tissue_type'), 
-    (SELECT Transfection_reagent_used_ID FROM Transfection_reagent_used WHERE Transfection_reagent = '$transfection_reagent'), 
-    (SELECT Template_library_file_path_ID FROM Template_library_file_path WHERE Template_library_file_location = '$templib_file_path'),
-    (SELECT Plateconf_file_path_ID FROM Plateconf_file_path WHERE Plateconf_file_location = '$plateconf_file_path'),
-    (SELECT Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$platelist_file_path'),
-    (SELECT Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')");
+    ( SELECT Name_of_set_if_isogenic_ID FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic = '$ISOGENIC_SET' ), 
+    ( SELECT Instrument_used_ID FROM Instrument_used WHERE Instrument_name = '$instrument' ),
+    ( SELECT Tissue_type_ID FROM Tissue_type WHERE Tissue_of_origin = '$tissue_type' ), 
+    ( SELECT Transfection_reagent_used_ID FROM Transfection_reagent_used WHERE Transfection_reagent = '$transfection_reagent' ), 
+    ( SELECT Template_library_file_path_ID FROM Template_library_file_path WHERE Template_library_file_location = '$templib_file_path' ),
+    ( SELECT Plateconf_file_path_ID FROM Plateconf_file_path WHERE Plateconf_file_location = '$plateconf_file_path' ),
+    ( SELECT Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$platelist_file_path' ),
+    ( SELECT Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )");
   
-  my $query_handle = $dbh->prepare($query);
-  $query_handle -> execute();
+  my $query_handle = $dbh->prepare( $query );
+   					    #or die "Cannot prepare: " . $dbh -> errstr();
+  $query_handle -> execute(); 
+    #or die "SQL Error: " . $query_handle -> errstr();
+  #if ($test) {
+    #print "works";
+  #}
+  #else {
+   # print "error";
+  #}
   
   #capture the last row ID for the rnai screen info table in the database
-  my $last_rnai_screen_info_id = $dbh->{mysql_insertid};
+  my $last_rnai_screen_info_id = $dbh -> { mysql_insertid };
+  print $last_rnai_screen_info_id;
+  #$query_handle -> finish();
   
   ## 4. Store excel file in the database ##
   
   ######### COMMENTED OUT TEMPORARILY #########
   
-  #open (FILE, $file_path."/".$screen_dir_name.".txt");
+  #open ( FILE, $file_path."/".$screen_dir_name.".txt" );
   
-  #foreach $line(<FILE>){
+  #foreach $line( <FILE> ){
    # chomp $line;
-    #($plate_number_xls_file, $well_number_xls_file, $raw_score_xls_file) = split(/\t/,$line);
+    #( $plate_number_xls_file, $well_number_xls_file, $raw_score_xls_file ) = split ( /\t/,$line );
     
-    #$query_handle = $dbh->do("INSERT INTO Plate_excel_file_as_text (
+    #$query_handle = $dbh -> do ( "INSERT INTO Plate_excel_file_as_text (
     #Plate_excel_file_as_text_ID, 
     #Plate_number_xls_file, 
     #Well_number_xls_file, 
     #Raw_score_xls_file,
-    #Rnai_screen_info_Rnai_screen_info_ID) 
+    #Rnai_screen_info_Rnai_screen_info_ID ) 
     #VALUES (
     #DEFAULT, 
     #'$plate_number_xls_file', 
     #'$well_number_xls_file', 
     #'$raw_score_xls_file',
-    #'$last_rnai_screen_info_id')");
+    #'$last_rnai_screen_info_id' ) ");
     
-    #$query_handle = $dbh->prepare($query);
-    #$query_handle -> execute();
+    #$query_handle = $dbh -> prepare ( $query );
+       				    #or die "Cannot prepare: " . $dbh->errstr();
+  #$query_handle -> execute()
+    #or die "SQL Error: ".$query_handle -> errstr();
+    #$query_handle -> finish();
   #}
   #close FILE;
   
@@ -2877,27 +2932,30 @@ sub save_new_screen{
   my $zscores_file_wo_header = $file_path."/".$screen_dir_name."_zscores_wo_header.txt";
   `cat $zscores_file_complete | grep -v ^Compound > $zscores_file_wo_header`;
   
-  open (FILE, $zscores_file_wo_header);
-  foreach $line(<FILE>) {
+  open ( FILE, $zscores_file_wo_header );
+  foreach $line ( <FILE> ) {
     chomp $line;
-    ($compound, $plate_number_for_zscore, $well_number_for_zscore, $zscore) = split(/\t/,$line);
+    ( $compound, $plate_number_for_zscore, $well_number_for_zscore, $zscore ) = split( /\t/,$line );
     
-    my $query = $dbh->do("INSERT INTO Zscores_result(
+    my $query = $dbh -> do( "INSERT INTO Zscores_result (
       Compound, 
       Plate_number_for_zscore, 
       Well_number_for_zscore,
       Zscore,
       Rnai_screen_info_Rnai_screen_info_ID,
-      Template_library_Template_library_ID) 
+      Template_library_Template_library_ID ) 
       SELECT 
       '$compound', 
       '$plate_number_for_zscore',
       '$well_number_for_zscore', 
       '$zscore',
       '$last_rnai_screen_info_id',
-      (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')");
-    my $query_handle = $dbh->prepare($query);
+      ( SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )" );
+    my $query_handle = $dbh -> prepare ( $query );
+   					    # or die "Cannot prepare: " . $dbh -> errstr();
     $query_handle -> execute();
+      #or die "SQL Error: ".$query_handle->errstr();
+    #$query_handle->finish();
   }
   close FILE;
   
@@ -2908,8 +2966,8 @@ sub save_new_screen{
   my $summary_file_wo_header = $file_path."/".$screen_dir_name."_summary_wo_header.txt";
   `cat $summary_file_complete | grep -v ^plate > $summary_file_wo_header`;
   
-  open (FILE, $summary_file_wo_header);
-  foreach $line(<FILE>) {
+  open ( FILE, $summary_file_wo_header );
+  foreach $line( <FILE> ) {
     chomp $line;
     ($plate_number_for_summary, 
     $position, 
@@ -2928,56 +2986,59 @@ sub save_new_screen{
     $normalized_r1_ch1, 
     $normalized_r2_ch1, 
     $normalized_r3_ch1, 
-    $gene_id_summary, 
-    $precursor_summary) = split(/\t/,$line);
+    $gene_symbol_summary, 
+    $entrez_gene_id_summary ) = split( /\t/,$line );
     
-    my $query = $dbh->do("INSERT INTO Summary_of_result (
-      Plate_number_for_summary,
-      Position,
-      Zscore_summary, 
-      Well_number_for_summary,
-      Well_anno,
-      Final_well_anno,
-      Raw_r1_ch1,
-      Raw_r2_ch1,
-      Raw_r3_ch1,
-      Median_ch1,
-      Average_ch1,
-      Raw_plate_median_r1_ch1,
-      Raw_plate_median_r2_ch1,
-      Raw_plate_median_r3_ch1,
-      Normalized_r1_ch1,
-      Normalized_r2_ch1,
-      Normalized_r3_ch1,
-      Gene_id_summary,
-      Precursor_summary,
-      Rnai_screen_info_Rnai_screen_info_ID, 
-      Template_library_Template_library_ID) 
-      SELECT 
-      '$plate_number_for_summary',
-	  '$position',
-	  '$zscore_summary', 
-	  '$well_number_for_summary', 
-	  '$well_anno',
-      '$final_well_anno',
-	  '$raw_r1_ch1',
-	  '$raw_r2_ch1',
-	  '$raw_r3_ch1',
-	  '$median_ch1',
-	  '$average_ch1',
-	  '$raw_plate_median_r1_ch1',
-	  '$raw_plate_median_r2_ch1', 
-	  '$raw_plate_median_r3_ch1',
-	  '$normalized_r1_ch1',
-	  '$normalized_r2_ch1',
-	  '$normalized_r3_ch1',
-	  '$gene_id_summary',
- 	  '$precursor_summary',
-      '$last_rnai_screen_info_id',
-      (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')");
+    my $query = $dbh -> do ( "INSERT INTO Summary_of_result (
+							 Plate_number_for_summary,
+							 Position,
+							 Zscore_summary, 
+							 Well_number_for_summary,
+							 Well_anno,
+							 Final_well_anno,
+						     Raw_r1_ch1,
+						     Raw_r2_ch1,
+						     Raw_r3_ch1,
+						     Median_ch1,
+						     Average_ch1,
+						     Raw_plate_median_r1_ch1,
+						     Raw_plate_median_r2_ch1,
+						     Raw_plate_median_r3_ch1,
+						     Normalized_r1_ch1,
+							 Normalized_r2_ch1,
+							 Normalized_r3_ch1,
+							 Gene_symbol_summary,
+							 Entrez_gene_id_summary,
+							 Rnai_screen_info_Rnai_screen_info_ID, 
+							 Template_library_Template_library_ID ) 
+							 SELECT 
+							 '$plate_number_for_summary',
+							 '$position',
+							 '$zscore_summary', 
+							 '$well_number_for_summary', 
+							 '$well_anno',
+							  '$final_well_anno',
+							  '$raw_r1_ch1',
+							  '$raw_r2_ch1',
+							  '$raw_r3_ch1',
+							  '$median_ch1',
+							  '$average_ch1',
+							  '$raw_plate_median_r1_ch1',
+							  '$raw_plate_median_r2_ch1', 
+							  '$raw_plate_median_r3_ch1',
+							  '$normalized_r1_ch1',
+							  '$normalized_r2_ch1',
+							  '$normalized_r3_ch1',
+							  '$gene_symbol_summary',
+							  '$entrez_gene_id_summary',
+							  '$last_rnai_screen_info_id',
+							  ( SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )" );
     
-    my $query_handle = $dbh->prepare($query);
-    $query_handle -> execute();
+    my $query_handle = $dbh -> prepare( $query );
+   					    # or die "Cannot prepare: " . $dbh -> errstr();
+    $query_handle->execute();
+     # or die "SQL Error: " . $query_handle -> errstr();
+    #$query_handle -> finish();
   }
   
   close FILE;
@@ -3024,7 +3085,7 @@ sub save_new_screen{
 
 sub save_new_uploaded_plateconf_file {
   
-  my $lightweight_fh = $q->upload('new_uploaded_plateconf_file');
+  my $lightweight_fh = $q -> upload ( 'new_uploaded_plateconf_file' );
   my $new_uploaded_plateconf_file = $q -> param( "new_uploaded_plateconf_file" );
   my $plateconf_folder = "/home/agulati/data/plate_conf_folder";
   my $target= "";
@@ -3038,7 +3099,7 @@ sub save_new_uploaded_plateconf_file {
   my $processing_status = undef;
   
   #rename the newly uploaded plateconf file
-  my $new_plateconf_filename = $q->param("new_plateconf_filename");
+  my $new_plateconf_filename = $q -> param ( "new_plateconf_filename" );
   
   if ( !$new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. plateconf_384_ver_02" ) {
     #displayErrorMessage($q, $error_message_templib);
@@ -3053,7 +3114,7 @@ sub save_new_uploaded_plateconf_file {
     $set_plateconf_error = 3;
     $processing_status = 1;
   }
-  else{
+  else {
     $set_plateconf_error = 0;
     my $new_plateconf_filename_wo_spaces = $new_plateconf_filename;
     $new_plateconf_filename_wo_spaces =~ s/\s+/_/g;
@@ -3065,13 +3126,13 @@ sub save_new_uploaded_plateconf_file {
     my $tmpfile_path = $plateconf_folder."/tmpfile.txt";
     
     # undef may be returned if it's not a valid file handle
-    if (defined $lightweight_fh) {
+    if ( defined $lightweight_fh ) {
       # Upgrade the handle to one compatible with IO::Handle
       my $io_handle = $lightweight_fh->handle;
     
       #save the uploaded file on the server
-      open ($new_plateconf_file_renamed,'>', $target);
-      if ($new_plateconf_file_renamed) {
+      open ( $new_plateconf_file_renamed,'>', $target );
+      if ( $new_plateconf_file_renamed ) {
         $set_plateconf_error = undef;
       }
       else { 
@@ -3080,9 +3141,9 @@ sub save_new_uploaded_plateconf_file {
       }	    
       my $bytesread = undef;
       my $buffer = undef;
-      while ($bytesread = $io_handle->read($buffer,1024)) {
+      while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) {
         my $print_plateconf = print $new_plateconf_file_renamed $buffer;
-        if ($print_plateconf) {
+        if ( $print_plateconf ) {
           $set_plateconf_error = undef;
         }
         else {
@@ -3092,7 +3153,7 @@ sub save_new_uploaded_plateconf_file {
       }
       close $new_plateconf_file_renamed;
       #check the current position of the filehandle and set a flag if it's still in the file
-      if (tell($new_plateconf_file_renamed) ne -1) { 
+      if ( tell( $new_plateconf_file_renamed ) ne -1 ) { 
        $set_plateconf_error = 6;
        $processing_status = 1;
       }   
@@ -3103,21 +3164,23 @@ sub save_new_uploaded_plateconf_file {
     `cp $tmpfile_path $target`;
     open IN, "<$tmpfile_path";
     open OUT, ">$target";
-    while (<IN>){
-      if(/\S/){
+    while ( <IN> ){
+      if( /\S/ ){
         print OUT $_;
         }
       }
     close IN;
     close OUT;
    
-    my $query = $dbh->do("INSERT INTO Plateconf_file_path (
-      Plateconf_file_location)
-      VALUES (
-      '$target')");
-    my $query_handle = $dbh->prepare($query);
+    my $query = $dbh -> do ( "INSERT INTO Plateconf_file_path (
+      					  Plateconf_file_location )
+     					  VALUES (
+      					  '$target' )" );
+    my $query_handle = $dbh -> prepare ( $query );
+       					 #or die "Cannot prepare: " . $dbh -> errstr();
     $query_handle -> execute();
-    if ($query_handle) {
+      #or die "SQL Error: ".$query_handle -> errstr();
+    if ( $query_handle ) {
       $set_plateconf_error = undef;
       #$PLATECONF_FILE_PATH = $target;
     }
@@ -3125,7 +3188,7 @@ sub save_new_uploaded_plateconf_file {
       $set_plateconf_error = 7;
       $processing_status = 1;
     }
-    
+   # $query_handle -> finish();
     #print $q->redirect (-uri=>"http://www.gft.icr.ac.uk/cgi-bin/rnaidb.pl?add_new_screen=1");
   
   } #end of else statement loop
@@ -3135,17 +3198,17 @@ sub save_new_uploaded_plateconf_file {
   my $warning_message_plateconf_3 = "ERROR: Cannot close $target";
   my $warning_message_plateconf_4 = "ERROR: Couldn't execute sql statement for adding new plateconf file location to the database";
   
-  #my $file_upload_message = $q -> param(-name => 'file_upload_message',
-  			  							#-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.');
+  my $file_upload_message = $q -> param ( -name => 'file_upload_message',
+  			  							  -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
 
-  if ($processing_status == 0 && $set_plateconf_error == 0) {
+  if ( $processing_status == 0 && $set_plateconf_error == 0 ) {
       #my $message = "NOTE: Successfully added new plateconf file: $new_plateconf_file_renamed. It can now be selected for analysis from the dropdown menu.";
-      #&add_new_screen($file_upload_message);
-      &add_new_screen; 
+      &add_new_screen( $file_upload_message );
+      #&add_new_screen; 
   }
-  elsif ($processing_status == 1 && $set_plateconf_error == 1) {
+  elsif ( $processing_status == 1 && $set_plateconf_error == 1 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$error_message_plateconf_1</b></p></div>";
@@ -3154,9 +3217,9 @@ sub save_new_uploaded_plateconf_file {
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_plateconf_error == 2) {
+  elsif ( $processing_status == 1 && $set_plateconf_error == 2 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$error_message_plateconf_2</b></p></div>";
@@ -3165,9 +3228,9 @@ sub save_new_uploaded_plateconf_file {
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_plateconf_error == 3) {
+  elsif ( $processing_status == 1 && $set_plateconf_error == 3 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$error_message_plateconf_3</b></p></div>";
@@ -3176,9 +3239,9 @@ sub save_new_uploaded_plateconf_file {
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_plateconf_error == 4) {
+  elsif ( $processing_status == 1 && $set_plateconf_error == 4 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_plateconf_1</b></p></div>";
@@ -3186,9 +3249,9 @@ sub save_new_uploaded_plateconf_file {
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_plateconf_error == 5) {
+  elsif ( $processing_status == 1 && $set_plateconf_error == 5 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_plateconf_2</b></p></div>";
@@ -3196,9 +3259,9 @@ sub save_new_uploaded_plateconf_file {
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_plateconf_error == 6) {
+  elsif ( $processing_status == 1 && $set_plateconf_error == 6 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_plateconf_3</b></p></div>";
@@ -3206,9 +3269,9 @@ sub save_new_uploaded_plateconf_file {
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_plateconf_error == 7) {
+  elsif ( $processing_status == 1 && $set_plateconf_error == 7 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_plateconf_4</b></p></div>";
@@ -3216,6 +3279,8 @@ sub save_new_uploaded_plateconf_file {
     print "$page_footer";
     print $q -> end_html;
   }
+  print $q -> hidden ( -name => 'file_upload_message',
+  					   -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
 } #end of save_new_uploaded_plateconf_file subroutine 
   
   
@@ -3223,9 +3288,9 @@ sub save_new_uploaded_plateconf_file {
   # Save new uploaded platelist file
   # ================================
 
-sub save_new_uploaded_platelist_file{
+sub save_new_uploaded_platelist_file {
 
-  my $lightweight_fh  = $q->upload('new_uploaded_platelist_file');
+  my $lightweight_fh  = $q -> upload ( 'new_uploaded_platelist_file' );
   my $new_uploaded_platelist_file = $q -> param( "new_uploaded_platelist_file" );
   my $platelist_folder = "/home/agulati/data/plate_list_folder";
   my $target = "";
@@ -3239,7 +3304,7 @@ sub save_new_uploaded_platelist_file{
   my $processing_status = undef;
        
   #rename the newly uploaded plateconf file
-  my $new_platelist_filename = $q->param("new_platelist_filename");
+  my $new_platelist_filename = $q -> param ( "new_platelist_filename" );
   
   if ( !$new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_384_ver_02" ) {
     $set_platelist_error = 1;
@@ -3265,13 +3330,13 @@ sub save_new_uploaded_platelist_file{
     my $tmpfile_path = $platelist_folder."/tmpfile.txt";
    
     # undef may be returned if it's not a valid file handle
-    if (defined $lightweight_fh) {
+    if ( defined $lightweight_fh ) {
       # Upgrade the handle to one compatible with IO::Handle:
-      my $io_handle = $lightweight_fh->handle;
+      my $io_handle = $lightweight_fh -> handle;
 
       #save the uploaded file on the server
-      open ($new_platelist_file_renamed,'>',$target);
-      if ($new_platelist_file_renamed) {
+      open ( $new_platelist_file_renamed,'>',$target );
+      if ( $new_platelist_file_renamed ) {
         $set_platelist_error = undef;
       }
       else { 
@@ -3280,9 +3345,9 @@ sub save_new_uploaded_platelist_file{
       }	    
       my $bytesread = undef;
       my $buffer = undef;
-      while ($bytesread = $io_handle->read($buffer,1024)) {
+      while ( $bytesread = $io_handle -> read ( $buffer,1024 )) {
         my $print_platelist = print $new_platelist_file_renamed $buffer;
-        if ($print_platelist) {
+        if ( $print_platelist ) {
           $set_platelist_error = undef;
         }
         else {
@@ -3292,7 +3357,7 @@ sub save_new_uploaded_platelist_file{
       }
       close $new_platelist_file_renamed;
       #check the current position of the filehandle and set a flag if it's still in the file
-      if (tell($new_platelist_file_renamed) ne -1) { 
+      if ( tell ( $new_platelist_file_renamed ) ne -1 ) { 
           $set_platelist_error = 6;
           $processing_status = 1;
       }
@@ -3302,8 +3367,8 @@ sub save_new_uploaded_platelist_file{
     `tr '\r' '\n'  < $target > $tmpfile_path`;
     open IN, "<$tmpfile_path";
     open OUT, ">$target";
-    while (<IN>){
-      if(/\S/){
+    while ( <IN> ) {
+      if( /\S/ ) {
         print OUT $_;
         }
       }
@@ -3312,13 +3377,15 @@ sub save_new_uploaded_platelist_file{
     
    # `cp $tmpfile_path $target`;
   
-    my $query = $dbh->do("INSERT INTO Platelist_file_path (
-      Platelist_file_location)
-      VALUES (
-      '$target')");
-    my $query_handle = $dbh->prepare($query);
+    my $query = $dbh -> do ( "INSERT INTO Platelist_file_path (
+      					     Platelist_file_location )
+      					     VALUES (
+      					     '$target' )");
+    my $query_handle = $dbh -> prepare ( $query );
+   					     #or die "Cannot prepare: " . $dbh -> errstr();
     $query_handle -> execute();
-    if ($query_handle) {
+      #or die "SQL Error: ".$query_handle -> errstr();
+    if ( $query_handle ) {
       $set_platelist_error = undef;
       #$PLATELIST_FILE_PATH = $target;
     }
@@ -3326,6 +3393,7 @@ sub save_new_uploaded_platelist_file{
       $set_platelist_error = 7;
       $processing_status = 1;
     }
+   # $query_handle -> finish();
    } #end of else loop
   
   my $warning_message_platelist_1 = "ERROR: Cannot open $target";
@@ -3333,18 +3401,15 @@ sub save_new_uploaded_platelist_file{
   my $warning_message_platelist_3 = "ERROR: Cannot close $target";
   my $warning_message_platelist_4 = "ERROR: Couldn't execute sql statement for adding new platelist file location to the database";
   
-  #my $file_upload_message = $q -> param(-name => 'file_upload_message',
-  			  							#-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.');
-
+  my $file_upload_message = $q -> param ( -name => 'file_upload_message',
+  			  							  -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
   
-  if ($processing_status == 0 && $set_platelist_error == 0) {
-      #my $message = "NOTE: Successfully added new platelist file: $new_platelist_file_renamed. It can now be selected for analysis from the dropdown menu.";
-      #&add_new_screen($file_upload_message); 
-      &add_new_screen;
+  if ( $processing_status == 0 && $set_platelist_error == 0 ) {
+      &add_new_screen($file_upload_message); 
   }
-  elsif ($processing_status == 1 && $set_platelist_error == 1) {
+  elsif ( $processing_status == 1 && $set_platelist_error == 1 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$error_message_platelist_1</b></p></div>";
@@ -3353,9 +3418,9 @@ sub save_new_uploaded_platelist_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_platelist_error == 2) {
+  elsif ( $processing_status == 1 && $set_platelist_error == 2 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$error_message_platelist_2</b></p></div>";
@@ -3364,9 +3429,9 @@ sub save_new_uploaded_platelist_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_platelist_error == 3) {
+  elsif ( $processing_status == 1 && $set_platelist_error == 3 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$error_message_platelist_3</b></p></div>";
@@ -3375,9 +3440,9 @@ sub save_new_uploaded_platelist_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_platelist_error == 4) {
+  elsif ( $processing_status == 1 && $set_platelist_error == 4 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_platelist_1</b></p></div>";
@@ -3385,9 +3450,9 @@ sub save_new_uploaded_platelist_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_platelist_error == 5) {
+  elsif ( $processing_status == 1 && $set_platelist_error == 5 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_platelist_2</b></p></div>";
@@ -3395,9 +3460,9 @@ sub save_new_uploaded_platelist_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_platelist_error == 6) {
+  elsif ( $processing_status == 1 && $set_platelist_error == 6 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_platelist_3</b></p></div>";
@@ -3405,9 +3470,9 @@ sub save_new_uploaded_platelist_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_platelist_error == 7) {
+  elsif ( $processing_status == 1 && $set_platelist_error == 7 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_platelist_4</b></p></div>";
@@ -3415,6 +3480,8 @@ sub save_new_uploaded_platelist_file{
     print "$page_footer";
     print $q -> end_html;
   }
+  print $q -> hidden ( -name => 'file_upload_message',
+  					   -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
 } #end of save_new_uploaded_platelist_file subroutine
   
   
@@ -3422,9 +3489,9 @@ sub save_new_uploaded_platelist_file{
   # Save new uploaded library file
   # ================================
        
-sub save_new_uploaded_templib_file{
+sub save_new_uploaded_templib_file {
 
-  my $lightweight_fh  = $q->upload('new_uploaded_templib_file');
+  my $lightweight_fh  = $q -> upload( 'new_uploaded_templib_file' );
   my $new_uploaded_templib_file = $q -> param( "new_uploaded_templib_file" );
   my $templib_folder = "/home/agulati/data/template_library_folder";
   my $target = "";
@@ -3438,7 +3505,7 @@ sub save_new_uploaded_templib_file{
   my $processing_status = undef;
   
   #rename the newly uploaded plateconf file
-  my $new_templib_filename = $q->param("new_templib_filename");
+  my $new_templib_filename = $q->param( "new_templib_filename" );
   
   if ( !$new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_DR_x_y_z_template" ) {
     $set_templib_error = 1;
@@ -3464,13 +3531,13 @@ sub save_new_uploaded_templib_file{
     my $tmpfile_path = $templib_folder."/tmpfile.txt";  
 
     # undef may be returned if it's not a valid file handle
-    if (defined $lightweight_fh) {
+    if ( defined $lightweight_fh ) {
       # Upgrade the handle to one compatible with IO::Handle:
       my $io_handle = $lightweight_fh->handle;
       
       #save the uploaded file on the server
-      open ($new_templib_file_renamed,'>',$target);
-      if ($new_templib_file_renamed) {
+      open ( $new_templib_file_renamed,'>',$target );
+      if ( $new_templib_file_renamed ) {
         $set_templib_error = undef;
      }
       else { 
@@ -3479,9 +3546,9 @@ sub save_new_uploaded_templib_file{
       }	      
       my $bytesread = undef;
       my $buffer = undef;
-      while ($bytesread = $io_handle->read($buffer,1024)) {
+      while ( $bytesread = $io_handle->read( $buffer,1024 ) ) {
         my $print_templib = print $new_templib_file_renamed $buffer;
-        if ($print_templib) {
+        if ( $print_templib ) {
           $set_templib_error = undef;
         }
         else {
@@ -3491,7 +3558,7 @@ sub save_new_uploaded_templib_file{
       }
       close $new_templib_file_renamed;
       #check the current position of the filehandle and set a flag if it's still in the file
-      if (tell($new_templib_file_renamed) ne -1) { 
+      if ( tell ( $new_templib_file_renamed ) ne -1 ) { 
         $set_templib_error = 6;
         $processing_status = 1;
       }    
@@ -3501,21 +3568,23 @@ sub save_new_uploaded_templib_file{
     `tr '\r' '\n'  < $target > $tmpfile_path`;
     open IN, "< $tmpfile_path";
     open OUT, "> $target";
-    while (<IN>){
-      if(/\S/){
+    while ( <IN> ) {
+      if( /\S/ ) {
         print OUT $_;
         }
       }
     close IN;
     close OUT;
   
-    my $query = $dbh->do("INSERT INTO Template_library_file_path (
-      Template_library_file_location)
-      VALUES (
-      '$target')");
-    my $query_handle = $dbh->prepare($query);
+    my $query = $dbh -> do ( "INSERT INTO Template_library_file_path (
+      					     Template_library_file_location)
+      					     VALUES (
+      					     '$target' )" );
+    my $query_handle = $dbh->prepare( $query );
+       					 #or die "Cannot prepare: " . $dbh -> errstr();
     $query_handle -> execute();
-    if ($query_handle) {
+      #or die "SQL Error: " . $query_handle -> errstr();
+    if ($ query_handle ) {
       $set_templib_error = undef;
       #$TEMPLIB_FILE_PATH = $target;
     }
@@ -3523,6 +3592,7 @@ sub save_new_uploaded_templib_file{
       $set_templib_error = 7;
       $processing_status = 1;
     }
+    #$query_handle -> finish();
   } #end of else loop
   
   my $warning_message_templib_1 = "ERROR: Cannot open $target";
@@ -3530,17 +3600,15 @@ sub save_new_uploaded_templib_file{
   my $warning_message_templib_3 = "ERROR: Cannot close $target";
   my $warning_message_templib_4 = "ERROR: Couldn't execute sql statement for adding new template library file location to the database";
   
-  my $file_upload_message = $q -> param(-name => 'file_upload_message',
-  			  							-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.');
+  my $file_upload_message = $q -> param( -name => 'file_upload_message',
+  			  							-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
   
-  if ($processing_status == 0 && $set_templib_error == 0) {
-      #my $message = "NOTE: Successfully added new template library file: $new_templib_file_renamed. It can now be selected for analysis from the dropdown menu.";
-      #&add_new_screen($file_upload_message); 
-      &add_new_screen;
+  if ( $processing_status == 0 && $set_templib_error == 0 ) {
+      &add_new_screen( $file_upload_message ); 
   }
-  elsif ($processing_status == 1 && $set_templib_error == 1) {
+  elsif ($ processing_status == 1 && $set_templib_error == 1 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$error_message_templib_1</b></p></div>";
@@ -3549,9 +3617,9 @@ sub save_new_uploaded_templib_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_templib_error == 2) {
+  elsif ( $processing_status == 1 && $set_templib_error == 2 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$error_message_templib_2</b></p></div>";
@@ -3560,9 +3628,9 @@ sub save_new_uploaded_templib_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_templib_error == 3) {
+  elsif ( $processing_status == 1 && $set_templib_error == 3 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$error_message_templib_3</b></p></div>";
@@ -3571,9 +3639,9 @@ sub save_new_uploaded_templib_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_templib_error == 4) {
+  elsif ( $processing_status == 1 && $set_templib_error == 4 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<p><b><div id=\"Message\">$warning_message_templib_1</b></p></div>";
@@ -3581,9 +3649,9 @@ sub save_new_uploaded_templib_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_templib_error == 5) {
+  elsif ( $processing_status == 1 && $set_templib_error == 5 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_templib_2</b></p></div>";
@@ -3591,9 +3659,9 @@ sub save_new_uploaded_templib_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_templib_error == 6) {
+  elsif ( $processing_status == 1 && $set_templib_error == 6 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_templib_3</b></p></div>";
@@ -3601,9 +3669,9 @@ sub save_new_uploaded_templib_file{
     print "$page_footer";
     print $q -> end_html;
   }
-  elsif ($processing_status == 1 && $set_templib_error == 7) {
+  elsif ( $processing_status == 1 && $set_templib_error == 7 ) {
     
-    print $q -> header ("text/html");
+    print $q -> header ( "text/html" );
     print "$page_header";
   
     print "<div id=\"Message\"><p><b>$warning_message_templib_4</b></p></div>";
@@ -3611,6 +3679,8 @@ sub save_new_uploaded_templib_file{
     print "$page_footer";
     print $q -> end_html;
   }
+  print $q -> hidden ( -name => 'file_upload_message',
+  					   -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
 } #end of save_new_uploaded_templib_file subroutine
   
 
@@ -3618,8 +3688,8 @@ sub save_new_uploaded_templib_file{
 # Subroutine for showing all screens
 # ==================================
  
-sub show_all_screens{ 
-  print $q -> header ("text/html");
+sub show_all_screens { 
+  print $q -> header ( "text/html" );
   print "$page_header";
   print "<h1>Available screens:</h1>";
 
@@ -3689,8 +3759,10 @@ sub show_all_screens{
     r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = n.Name_of_set_if_isogenic_ID GROUP BY 
     r.Rnai_screen_info_ID";
     
-  my $query_handle = $dbh->prepare($query);
+  my $query_handle = $dbh -> prepare ( $query );
+   					   #or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle -> execute();
+   # or die "SQL Error: ".$query_handle -> errstr();
     
   print "<table>";
   
@@ -3766,7 +3838,7 @@ sub show_all_screens{
   print "Zprime";
   print "</th>"; 
  
-  while (my @row = $query_handle->fetchrow_array) {
+  while ( my @row = $query_handle -> fetchrow_array ) {
   
     print "<tr>";
    # print join("\t", @row), "\n";
@@ -3846,6 +3918,8 @@ sub show_all_screens{
     print "</tr>";
 
   } #end of while loop
+  
+ # $query_handle -> finish();
 
   print "</table>";
  
@@ -3859,14 +3933,14 @@ sub show_all_screens{
 # Subroutine for configuring export
 # =================================
 
-sub configure_export{
-  print $q -> header("text/html");
+sub configure_export {
+  print $q -> header ( "text/html" );
   print "$page_header";
   print "<h1>Configure export:</h1>";
 
   ## retrieve library_gene names from the database and save them in a hash ##
   
-  my $query = ("SELECT 
+  my $query = ( "SELECT 
     CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) FROM 
     Template_library_file l WHERE 
     l.Gene_symbol_templib IS NOT NULL AND        
@@ -3884,79 +3958,85 @@ sub configure_export{
     l.Gene_symbol_templib != 'empty' AND            
     l.Gene_symbol_templib != 'NULL' AND
     l.Sub_lib IS NOT NULL GROUP BY  
-    CONCAT(Sub_lib, '_', Gene_symbol_templib)");
+    CONCAT( Sub_lib, '_', Gene_symbol_templib )" );
   
-  my $query_handle = $dbh->prepare($query);
+  my $query_handle = $dbh -> prepare ( $query );
+   					 #  or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle -> execute();
-  
+   # or die "SQL Error: ".$query_handle -> errstr();
  # print "<table>";
   
   my %lib_gene_h;
   my @lib_genes;
   my $lib_gene;
   
-  while (@lib_genes = $query_handle->fetchrow_array) {
+  while ( @lib_genes = $query_handle -> fetchrow_array ) {
   
-    $lib_gene_h{$lib_genes[0]} = 2;
+    $lib_gene_h { $lib_genes[0] } = 2;
     
   }
+  #$query_handle -> finish();
 
   ## retrieve cell lines from the database and save them in a hash ##
   
-  my $query = ("SELECT 
-   r.Cell_line FROM 
-   Rnai_screen_info r, 
-   Summary_of_result s, 
-   Template_library t WHERE
-   r.Rnai_screen_info_ID = s.Rnai_screen_info_Rnai_screen_info_ID AND 
-   r.Template_library_Template_library_ID = t.Template_library_ID GROUP BY 
-   r. Rnai_screen_info_ID");
+  my $query = ( "SELECT 
+   				r.Cell_line FROM 
+   				Rnai_screen_info r, 
+   				Summary_of_result s, 
+  				Template_library t WHERE
+   				r.Rnai_screen_info_ID = s.Rnai_screen_info_Rnai_screen_info_ID AND 
+   				r.Template_library_Template_library_ID = t.Template_library_ID GROUP BY 
+   				r. Rnai_screen_info_ID" );
    
-  my $query_handle = $dbh->prepare($query);
+  my $query_handle = $dbh -> prepare ( $query );
+   					   #or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle -> execute();
+    #or die "SQL Error: " . $query_handle -> errstr();
   
   my %cell_line_h;
   my @cell_lines;
   my $cell_line;
-  while (@cell_lines = $query_handle->fetchrow_array) {
+  while ( @cell_lines = $query_handle -> fetchrow_array ) {
  
-    $cell_line_h{$cell_lines[0]} = 3; 
+    $cell_line_h{ $cell_lines[0] } = 3; 
     
- } 
+  } 
+  #$query_handle -> finish();
   
   ## retrieve zscores for each cell line from the database and save them in a hash ##
   
-  my $query = ("SELECT
-    CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib),
-    r.Cell_line, 
-    s.Zscore_summary FROM 
-    Rnai_screen_info r, 
-    Summary_of_result s, 
-    Template_library_file l WHERE 
-    r.Rnai_screen_info_ID = s.Rnai_screen_info_Rnai_screen_info_ID AND
-    r.Template_library_Template_library_ID = s.Template_library_Template_library_ID AND 
-    CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) = CONCAT(l.Sub_lib, '_', s.Gene_id_summary) AND
-    s.Zscore_summary != 'NA' AND
-    l.Gene_symbol_templib IS NOT NULL AND        
-    l.Gene_symbol_templib != 'unknown' AND           
-    l.Gene_symbol_templib != 'sicon1' AND           
-    l.Gene_symbol_templib != 'plk1' AND           
-    l.Gene_symbol_templib != 'Plk1' AND
-    l.Gene_symbol_templib != 'siPLK1' AND             
-    l.Gene_symbol_templib != 'MOCK' AND          
-    l.Gene_symbol_templib != 'sicon2' AND           
-    l.Gene_symbol_templib != 'siCON2' AND           
-    l.Gene_symbol_templib != 'allSTAR' AND            
-    l.Gene_symbol_templib != 'siCON1' AND            
-    l.Gene_symbol_templib != 'allstar' AND           
-    l.Gene_symbol_templib != 'empty' AND            
-    l.Gene_symbol_templib != 'NULL' AND
-    l.Sub_lib IS NOT NULL GROUP BY 
-    s.Summary_of_result_ID");
+  my $query = ( "SELECT
+    			CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib),
+    			r.Cell_line, 
+    			s.Zscore_summary FROM 
+				Rnai_screen_info r, 
+				Summary_of_result s, 
+				Template_library_file l WHERE 
+				r.Rnai_screen_info_ID = s.Rnai_screen_info_Rnai_screen_info_ID AND
+				r.Template_library_Template_library_ID = s.Template_library_Template_library_ID AND 
+				CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) = CONCAT(l.Sub_lib, '_', s.Gene_id_summary) AND
+				s.Zscore_summary != 'NA' AND
+				l.Gene_symbol_templib IS NOT NULL AND        
+				l.Gene_symbol_templib != 'unknown' AND           
+				l.Gene_symbol_templib != 'sicon1' AND           
+				l.Gene_symbol_templib != 'plk1' AND           
+				l.Gene_symbol_templib != 'Plk1' AND
+				l.Gene_symbol_templib != 'siPLK1' AND             
+				l.Gene_symbol_templib != 'MOCK' AND          
+				l.Gene_symbol_templib != 'sicon2' AND           
+				l.Gene_symbol_templib != 'siCON2' AND           
+				l.Gene_symbol_templib != 'allSTAR' AND            
+				l.Gene_symbol_templib != 'siCON1' AND            
+				l.Gene_symbol_templib != 'allstar' AND           
+				l.Gene_symbol_templib != 'empty' AND            
+				l.Gene_symbol_templib != 'NULL' AND
+				l.Sub_lib IS NOT NULL GROUP BY 
+				s.Summary_of_result_ID" );
   
-  my $query_handle = $dbh->prepare($query);
+  my $query_handle = $dbh -> prepare ( $query );
+   					   #or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle -> execute();
-
+   # or die "SQL Error: " . $query_handle -> errstr();
   my %zscore_h;
   my @zscores;
  
@@ -3968,13 +4048,15 @@ sub configure_export{
   print OUT "CELL LINE/TARGET\t"."@header\t";
   print OUT "\n";
   
-  while (@zscores = $query_handle->fetchrow_array) {
-    $zscore_h{$zscores[0].$zscores[1]} = $zscores[2];
+  while ( @zscores = $query_handle -> fetchrow_array ) {
+    $zscore_h { $zscores[0].$zscores[1] } = $zscores[2];
   }
-  foreach $cell_line(@cell_lines) {
+ # $query_handle->finish();
+  
+  foreach $cell_line ( @cell_lines ) {
     print OUT "$cell_line\t";
-    foreach $lib_gene(sort @lib_genes) {
-      if (exists ($zscore_h{$lib_gene.$cell_line})) {
+    foreach $lib_gene ( sort @lib_genes ) {
+      if ( exists ( $zscore_h { $lib_gene.$cell_line } ) ) {
         print OUT "$zscore_h{$lib_gene.$cell_line}\t"; 
       }
       else {
@@ -4006,12 +4088,12 @@ sub configure_export{
 # Subroutine for show_qc
 # ======================
 
-sub show_qc{
+sub show_qc {
 
-  print $q -> header("text/html");
+  print $q -> header ( "text/html" );
   print "$page_header";
  
-  print $q -> start_multipart_form(-method=>"POST"); 
+  print $q -> start_multipart_form ( -method=>"POST" ); 
   
   print "<table width = 100%>\n";
   print "<tr>\n";
@@ -4019,8 +4101,8 @@ sub show_qc{
 
   print "<h1>RNAi screen quality:</h1>";
   
-  my $screen_dir_name = $q -> param( "screen_dir_name" );
-  my $plateconf = $q -> param( "plate_conf" );
+  my $screen_dir_name = $q -> param ( "screen_dir_name" );
+  my $plateconf = $q -> param ( "plate_conf" );
   
   my $show_qc_page = "http://gft.icr.ac.uk/RNAi_screen_analysis_qc_plots/".$screen_dir_name."_controls_qc.png";
   
@@ -4036,8 +4118,8 @@ sub show_qc{
   my @coco;
   my $coco;
   
-  open (IN, "< $coco_file_wo_header");
-  while (<IN>) {
+  open ( IN, "< $coco_file_wo_header" );
+  while ( <IN> ) {
     @coco = $_;
     foreach $coco(@coco) {
       print "<br>";
@@ -4074,7 +4156,7 @@ sub show_qc{
   print $q -> checkbox( -name=>'sicon1_empty',
     					-checked=>0,
    					    -value=>'ON',
-    					-label=>'replace siCON1 with empty');
+    					-label=>'replace siCON1 with empty' );
 
   print "</p>";
   print "</p>";
@@ -4086,7 +4168,7 @@ sub show_qc{
   print $q -> checkbox( -name=>'sicon2_empty',
     					-checked=>0,
    					    -value=>'ON',
-    					-label=>'replace siCON2 with empty');
+    					-label=>'replace siCON2 with empty' );
 
   print "</p>";
   
@@ -4097,15 +4179,15 @@ sub show_qc{
   print $q -> checkbox( -name=>'allstar_empty',
     					-checked=>0,
    					    -value=>'ON',
-    					-label=>'replace allstar with empty');
+    					-label=>'replace allstar with empty' );
 
   print "</p>";
   
-  print $q -> hidden (-name => 'screen_dir_name',
-  					  -value => $screen_dir_name);
+  print $q -> hidden ( -name => 'screen_dir_name',
+  					   -value => $screen_dir_name );
   					  
-  print $q -> hidden (-name => 'plate_conf',
-  					  -value => $plateconf);				  
+  print $q -> hidden ( -name => 'plate_conf',
+  					   -value => $plateconf );				  
   
  ## submit the updated plateconf file for re-analysis ##
                                                 
@@ -4129,8 +4211,8 @@ sub show_qc{
 ##########################################################################################
 
 
-sub run_export{
-  print $q -> header ("text/html");
+sub run_export {
+  print $q -> header ( "text/html" );
   print "$page_header";
   print "<h1>Your data:</h1>";
   
