@@ -26,90 +26,77 @@ zScreen<-function(name,
 		  reportdirName="zscore"
 		  ){
 
-require(cellHTS2)
+  require(cellHTS2)
 
-# add a trailing slash if necessary
-datapath=paste(datapath,"/", sep="")
+  # add a trailing slash if necessary
+  datapath=paste(datapath,"/", sep="")
 
-# keep this very compact
-# raw data
-x<-readPlateList(platelist, name=name, path=datapath);
-#	configure
-cat("-----",name,"------ Z score\n")
-# check if we have a screenlog 
-if (file.exists( paste(datapath,screenlog,sep="") )){
+  # keep this very compact
+  # raw data
+  x<-readPlateList(platelist, name=name, path=datapath);
+  #	configure
+  cat("-----",name,"------ Z score\n")
+  # check if we have a screenlog 
+  if (file.exists( paste(datapath,screenlog,sep="") )){
 	cat("Screenlog found.\n")
 	x<-configure(x, descripFile=descripFile, confFile=plateconf, logFile=screenlog, path=datapath);
-} else{
+  } else{
 	cat("No Screenlog found. Proceeding without.\n")
 	x<-configure(x, descripFile=descripFile, confFile=plateconf, path=datapath);
-}
+  }
 
 
-###########################################################	
-# normalize	
-xn<-normalizePlates(x,scale="multiplicative", log=TRUE, method="median", varianceAdjust = "none", negControls=negcontrols, posControls=poscontrols);
+  ###########################################################	
+  # normalize	
+  xn<-normalizePlates(x,scale="multiplicative", log=TRUE, method="median", varianceAdjust = "none", negControls=negcontrols, posControls=poscontrols);
 
-###########################################################	
-# calculate zscores
-xsc <- scoreReplicates(xn, method="zscore", sign="+")
-xsc<-summarizeReplicates(xsc, summary=replicate_summary)
+  ###########################################################	
+  # calculate zscores
+  xsc <- scoreReplicates(xn, method="zscore", sign="+")
+  xsc<-summarizeReplicates(xsc, summary=replicate_summary)
 
-###########################################################	
-# annotate
-if(annotate){
-# annotate the genes (not entirely necessary)
-#cat("Annotating from", annotationfile, "\n")
+  ###########################################################	
+  # annotate
+  if(annotate){
+  # annotate the genes (not entirely necessary)
+  #cat("Annotating from", annotationfile, "\n")
 	xsc<-cellHTS2::annotate(xsc, geneIDFile=annotationfile, path=datapath)
 	compounds<-geneAnno(xsc)
-}else{
+  }else{
 	compounds<-rep(NA,length(wells))
-}
+  }
 
 	# top table
 	
-	getTopTable(list("raw"=x, "normalized"=xn, "scored"=xsc), file=paste(datapath,summaryName, sep=""))
+  summary_info<-getTopTable(list("raw"=x, "normalized"=xn, "scored"=xsc), file=paste(datapath,summaryName, sep=""))
 
-###########################################################	
-# write a QC report for zscores
-if(reportHTML){
-reportdir<-paste(datapath, reportdirName, sep="")
-writeReport(raw=x, normalized=xn, scored=xsc, outdir=reportdir, force=TRUE, posControls=poscontrols, negControls=negcontrols, mainScriptFile="/home/agulati/scripts/zScreen.R")
-}
+  ###########################################################	
+  # write a QC report for zscores
+  if(reportHTML){
+  reportdir<-paste(datapath, reportdirName, sep="")
+  writeReport(raw=x, normalized=xn, scored=xsc, outdir=reportdir, force=TRUE, posControls=poscontrols, negControls=negcontrols, mainScriptFile="/home/agulati/scripts/zScreen.R")
+  }
 
-###########################################################
-# write z scores for this screen in the same folder
-scorefile<-paste(datapath, zscoreName, sep="")
+  ###########################################################
+  # write z scores for this screen in the same folder
+  scorefile<-paste(datapath, zscoreName, sep="")
 
-plates<-plate(xsc)
-wells<-well(xsc)
-scores<-Data(xsc)
-# prepare a simple text report
-combinedz<-data.frame(compound=compounds, plate=plates, well=wells, zscore=scores)
-names(combinedz)<-c("Compound", "Plate", "Well", "Zscore")
-write.table(combinedz, scorefile, sep="\t", quote=FALSE, row.names=FALSE)
+  plates<-plate(xsc)
+  wells<-well(xsc)
+  scores<-Data(xsc)
+  # prepare a simple text report
+  combinedz<-data.frame(compound=compounds, plate=plates, well=wells, zscore=scores)
+  names(combinedz)<-c("Compound", "Plate", "Well", "Zscore")
+  write.table(combinedz, scorefile, sep="\t", quote=FALSE, row.names=FALSE)
 
-###########################################################
-# write zprime for this screen in the same folder	
-zprime<-function(cellhts, poscontrol,negcontrol){
+  ###########################################################
+  # write zprime for this screen in the same folder	
+  zp <- getZfactor(xn,
+           posControls=poscontrols,
+           negControls=negcontrols)     
 
-idx_pos<-which(wellAnno(cellhts)==poscontrol)
-idx_neg<-which(wellAnno(cellhts)==negcontrol)	
-
-posdata<-Data(cellhts)[idx_pos]
-negdata<-Data(cellhts)[idx_neg]
-
-SPosCon<-sd(posdata);
-SNegCon<-sd(negdata);
-MPosCon<-mean(posdata);
-MNegCon<-mean(negdata);
-
-zp<-1- (3*(SPosCon+SNegCon)/abs(MPosCon-MNegCon));
-return(zp);
-}
-
-zprimefile<-paste(datapath, zprimeName, sep="")
-cat("Zprime:",zprime(xsc,poscontrols, negcontrols),file=zprimefile)
+  zprimefile<-paste(datapath, zprimeName, sep="")
+  write.table(zp, zprimefile, sep = "\t", row.names=FALSE)
 }
 
 
