@@ -1,5 +1,6 @@
 insert into Instrument_used (Instrument_name) values ('1S10');
 insert into Instrument_used (Instrument_name) values ('1C11');
+insert into Instrument_used (Instrument_name) values ('NA');
 
 insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('ARID1A-set');
 insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('KRAS-set');
@@ -47,6 +48,7 @@ insert into Transfection_reagent_used (Transfection_reagent) values ('Dharmafect
 insert into Transfection_reagent_used (Transfection_reagent) values ('Dharmafect 4');
 insert into Transfection_reagent_used (Transfection_reagent) values ('Oligofectamine');
 insert into Transfection_reagent_used (Transfection_reagent) values ('Effectene');
+insert into Transfection_reagent_used (Transfection_reagent) values ('NA');
 
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/icr-gft-rnaidb/plate_conf_folder/Kinome_96_plateconf.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/icr-gft-rnaidb/plate_conf_folder/Kinome_96_validation_plateconf.txt');
