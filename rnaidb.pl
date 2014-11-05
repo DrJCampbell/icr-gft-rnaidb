@@ -1663,6 +1663,14 @@ my $page_header_for_add_new_screen_sub = "<html>
 										    var y = document.getElementById( \"celllines\" );
 										    y.value = \"\";
 										    }  
+										  function codename() {
+										    if(document.formname.checkboxname.checked) {
+										      document.formname.textname.disabled = false;
+										    }
+										    else {
+										      document.formname.textname.disabled = true;
+										    }
+										  } 
 										  </script>
 				   						  </head>
 				   						  <body>
@@ -2473,6 +2481,7 @@ sub save_new_screen {
   my $platelist = $q -> param( "plate_list" );
   my $platelist_file_path;
   my $platelist_target;
+  my $platelist_tmp_file;
   my $platelist_prefix;
 
   ## match templib name, selected from the drop down menu, to the file and store it in a variable ##
@@ -2498,7 +2507,7 @@ sub save_new_screen {
       `chmod -R 777 $file_path`;
       `chown -R agulati:agulati $file_path`;
       
-      print "<p>Created new screen directory: $screen_dir_name...</p>";
+      print "<p><div id=\"Note\">Created new screen directory: $screen_dir_name...</div></p>";
     
     ## add screen directory name as prefix to all the filenames in the selected platelist file ##
 
@@ -2506,22 +2515,22 @@ sub save_new_screen {
     $plateconf_target = $file_path."/".$screen_dir_name."_".$plateconf.".txt";
     `cp $plateconf_file_path $plateconf_target`;
     
-    print "<p>Selected plateconf file saved in the new screen directory...</p>";  
+    print "<p><div id=\"Note\">Selected plateconf file saved in the new screen directory...</div></p>";  
   
     ## match platelist name, selected from the drop down menu, to the file and store it in a variable ##   
       
     $platelist_file_path = "/home/agulati/data/plate_list_folder/".$platelist.".txt";
     $platelist_target = $file_path."/".$screen_dir_name."_".$platelist.".txt";
-    `cp /home/agulati/data/plate_list_folder/tmp_platelist_file.txt $platelist_target`; 
+    `cp $platelist_file_path $platelist_target`;
+    $platelist_tmp_file = $file_path."/tmp_platelist_file.txt";
     
-    print "<p>Selected platelist file saved in the new screen directory...</p>";  
+    print "<p><div id=\"Note\">Selected platelist file saved in the new screen directory...</div></p>";  
   
     $platelist_prefix = $screen_dir_name."_";
   
-    open IN, "< $platelist_file_path";
-    open OUT, "> /home/agulati/data/plate_list_folder/tmp_platelist_file.txt";
-    while (<IN>)
-    {
+    open IN, "< $platelist_target";
+    open OUT, "> $platelist_tmp_file";
+    while (<IN>) {
       if ($_ =~ /^Filename/) {
         print OUT $_;
       }
@@ -2531,6 +2540,7 @@ sub save_new_screen {
     }
     close IN;
     close OUT; 
+    `cp $platelist_tmp_file $platelist_target`;
     
     ## match templib name, selected from the drop down menu, to the file and store it in a variable ##
 
@@ -2538,7 +2548,7 @@ sub save_new_screen {
     $templib_target = $file_path."/".$screen_dir_name."_".$templib.".txt"; 
     `cp $templib_file_path $templib_target`; 
     
-    print "<p>Selected template library file saved in the new screen directory...</p>";  
+    print "<p><div id=\"Note\">Selected template library file saved in the new screen directory...</div></p>";  
   
   ############################################[[[probably need to copy $temp_file_path somewhere safe and give it to an R script to convert]]]
   
@@ -2562,7 +2572,7 @@ sub save_new_screen {
  
       open ( $excelFile,'>',$target )
         or die "Cannot open '$target':$!";
-        print "<p>Uploaded Excel file saved to the new screen directory...</p>";
+        print "<p><div id=\"Note\">Uploaded Excel file saved to the new screen directory...</div></p>";
     
       my $bytesread = undef;
       my $buffer = undef;
@@ -2584,7 +2594,7 @@ sub save_new_screen {
       my $new_xls_file = rename ( $file_path."/".$excelFile, $file_path."/".$screen_dir_name.".xls" ) or die "Cannot rename $excelFile :$!";
     
       print "<p>";
-      print "<p>Excel file renamed...</p>";
+      print "<p><div id=\"Note\">Excel file renamed...</div></p>";
       print "</p>"; 
     
   ###############################################[[[either copy the platelist/palteconf/library etc to the new screen folder or use symlinks to point to the templates]]]
@@ -2597,7 +2607,7 @@ sub save_new_screen {
       $screenDescription_filename = $screen_dir_name."_Description.txt";
     close NOTES;
     
-    print "<p>Created 'Description.txt' file in the new screen directory...</p>";  
+    print "<p><div id=\"Note\">Created 'Description.txt' file in the new screen directory...</div></p>";  
   
     ## Add new screen info to Guide file ##
   
@@ -2637,8 +2647,8 @@ sub save_new_screen {
       "$screen_dir_name"."_controls_qc.png\t", 
       "$screen_dir_name"."_corr.txt\n";  
   
-    print "<p>Guide file created...</p>";
-    print "<p>Analysing...</p>"; 
+    print "<p><div id=\"Note\">Guide file created...</div></p>";
+    print "<p><div id=\"Note\">Analysing...</div></p>"; 
       
     close (GUIDEFILE); 
     }
@@ -2653,7 +2663,7 @@ sub save_new_screen {
         s/(\s)siCON1([\n\r])/$1empty$2/g;
         print;
       }
-      print "<p>Reanalysing with updated plateconf file...</p>"; 
+      print "<p><div id=\"Note\">Reanalysing with updated plateconf file...</div></p>"; 
     }
     if ((-e $file_path) && ($sicon2 eq 'ON')) {
       @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
@@ -2662,7 +2672,7 @@ sub save_new_screen {
         s/(\s)siCON2([\n\r])/$1empty$2/g;
         print;
       }
-      print "<p>Reanalysing with updated plateconf file...</p>"; 
+      print "<p><div id=\"Note\">Reanalysing with updated plateconf file...</div></p>"; 
     }
     if ((-e $file_path) && ($allstar eq 'ON')) {
       @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
@@ -2671,7 +2681,7 @@ sub save_new_screen {
         s/(\s)allstar([\n\r])/$1empty$2/g;
         print;
       }
-    print "<p>Reanalysing with updated plateconf file...</p>"; 
+    print "<p><div id=\"Note\">Reanalysing with updated plateconf file...</div></p>"; 
     }
 
    #if ((-e $file_path) && ($sicon1 ne 'ON') && ($sicon2 ne 'ON') && ($allstar ne 'ON')) {
@@ -2713,26 +2723,31 @@ sub save_new_screen {
   
   #return $rnai_screen_link_to_qc_plots;
   
-  my $zprime_file = $file_path."/".$screen_dir_name."_zprime.txt";
+  my $zPrime = $file_path."/".$screen_dir_name."_zprime.txt";
   
   ## Capture zprime value in a variable ##
   
-  my $zp_value;
-  my $value;
-  
-  open IN, "< $zprime_file";
-  while ( <IN> ) {
-    $zp_value = $_;  
-    $zp_value =~ s/^Zprime://;
+  my $zp_value = '';
+  open IN, "< $zPrime" or die "Can't read z-prime values from $zPrime: $!\n";
+  my $rep_count = 0;
+  while(<IN>) {
+    if ($_ =~ /Channel/) {
+      next;
+    }
+    my $value = $_;
+    chomp $value;
+    $value = sprintf "%.2f", $value;
+    $rep_count ++;
+    $zp_value = $zp_value . "Rep" . $rep_count . "(" . $value  . "),";
   }
-  close IN;
+  close IN; 
   
   print "<p>";
-  print "<p>Generated QC plots...</p>";
+  print "<p><div id=\"Note\">Generated QC plots...</div></p>";
   print "</p>";
   
   print "<p>";
-  print "<p>Calculated correlation coefficient...</p>";
+  print "<p><div id=\"Note\">Calculated correlation coefficient...</div></p>";
   print "</p>";
   
   # =====================
@@ -2891,7 +2906,6 @@ sub save_new_screen {
   
   #capture the last row ID for the rnai screen info table in the database
   my $last_rnai_screen_info_id = $dbh -> { mysql_insertid };
-  print $last_rnai_screen_info_id;
   #$query_handle -> finish();
   
   ## 4. Store excel file in the database ##
@@ -3017,22 +3031,22 @@ sub save_new_screen {
 							 '$zscore_summary', 
 							 '$well_number_for_summary', 
 							 '$well_anno',
-							  '$final_well_anno',
-							  '$raw_r1_ch1',
-							  '$raw_r2_ch1',
-							  '$raw_r3_ch1',
-							  '$median_ch1',
-							  '$average_ch1',
-							  '$raw_plate_median_r1_ch1',
-							  '$raw_plate_median_r2_ch1', 
-							  '$raw_plate_median_r3_ch1',
-							  '$normalized_r1_ch1',
-							  '$normalized_r2_ch1',
-							  '$normalized_r3_ch1',
-							  '$gene_symbol_summary',
-							  '$entrez_gene_id_summary',
-							  '$last_rnai_screen_info_id',
-							  ( SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )" );
+							 '$final_well_anno',
+							 '$raw_r1_ch1',
+							 '$raw_r2_ch1',
+							 '$raw_r3_ch1',
+							 '$median_ch1',
+							 '$average_ch1',
+							 '$raw_plate_median_r1_ch1',
+							 '$raw_plate_median_r2_ch1', 
+						     '$raw_plate_median_r3_ch1',
+						     '$normalized_r1_ch1',
+							 '$normalized_r2_ch1',
+							 '$normalized_r3_ch1',
+							 '$gene_symbol_summary',
+							 '$entrez_gene_id_summary',
+							 '$last_rnai_screen_info_id',
+							 ( SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )" );
     
     my $query_handle = $dbh -> prepare( $query );
    					    # or die "Cannot prepare: " . $dbh -> errstr();
@@ -3044,7 +3058,7 @@ sub save_new_screen {
   close FILE;
   
   print "<p>";
-  print "<p>Result files for the screen, $screen_dir_name, stored in the database...</p>";
+  print "<p><div id=\"Note\">Result files for the screen, $screen_dir_name, stored in the database...</div></p>";
   print "</p>";
  
   print "<p>";
