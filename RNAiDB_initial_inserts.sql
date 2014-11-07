@@ -87,8 +87,8 @@ insert into Template_library (Template_library_name) values ('Kinome_96_template
 insert into Template_library (Template_library_name) values ('Kinome_96_validation_template');
 insert into Template_library (Template_library_name) values ('KS_TS_384_template');
 insert into Template_library (Template_library_name) values ('KS_TS_DR_384_template');
+insert into Template_library (Template_library_name) values ('KS_TS_DR_MT_PH_384_template');
 insert into Template_library (Template_library_name) values ('KS_TS_DR_MT_PH_384_template1');
-insert into Template_library (Template_library_name) values ('KS_TS_DR_MT_PH_384_template2');
 insert into Template_library (Template_library_name) values ('KS_TS_DR_MT_PH_384_template3');
 insert into Template_library (Template_library_name) values ('KS_TS_CGC_384_template');
 insert into Template_library (Template_library_name) values ('KS_TS_CGC_WNT_384_template');
@@ -99,8 +99,8 @@ insert into Template_library_file_path (Template_library_file_location) values (
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/Kinome_96_validation_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_384_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_384_template.txt');
+insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template1.txt');
-insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template2.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template3.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_CGC_384_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_CGC_WNT_384_template.txt');
