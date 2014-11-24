@@ -63,6 +63,7 @@ insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/ic
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/icr-gft-rnaidb/plate_conf_folder/KS_TS_384_plateconf5.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/icr-gft-rnaidb/plate_conf_folder/KS_TS_384_plateconf6.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/icr-gft-rnaidb/plate_conf_folder/KS_TS_384_plateconf7.txt');
+insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/icr-gft-rnaidb/plate_conf_folder/KS_TS_384_plateconf_SaraCav.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/icr-gft-rnaidb/plate_conf_folder/KS_TS_DR_384_plateconf1.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/icr-gft-rnaidb/plate_conf_folder/KS_TS_DR_384_plateconf2.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Users/wwei/icr-gft-rnaidb/plate_conf_folder/KS_TS_DR_384_plateconf3.txt');
@@ -94,6 +95,7 @@ insert into Template_library (Template_library_name) values ('Kinome_96_validati
 insert into Template_library (Template_library_name) values ('KS_TS_384_template_alt1');
 insert into Template_library (Template_library_name) values ('KS_TS_384_template_alt2');
 insert into Template_library (Template_library_name) values ('KS_TS_384_template');
+insert into Template_library (Template_library_name) values ('KS_TS_384_template_SaraCav');
 insert into Template_library (Template_library_name) values ('KS_TS_CGC_384_template');
 insert into Template_library (Template_library_name) values ('KS_TS_CGC_WNT_384_template');
 insert into Template_library (Template_library_name) values ('KS_TS_DR_384_template');
@@ -109,6 +111,7 @@ insert into Template_library_file_path (Template_library_file_location) values (
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_384_template_alt1.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_384_template_alt2.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_384_template.txt');
+insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_384_template_SaraCav.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_CGC_384_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_CGC_WNT_384_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_384_template.txt');
@@ -151,6 +154,12 @@ COMMIT;
 
 BEGIN;
 LOAD DATA LOCAL INFILE '/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_384_template.txt' INTO TABLE Template_library_file FIELDS TERMINATED BY "\t" LINES TERMINATED BY "\n" IGNORE 1 LINES (@vPlate_templib, @vWell_templib, @vGene_symbol_templib, @vEntrez_gene_id_templib, @vSub_lib) SET Plate_templib = nullif(@vPlate_templib, ''), Well_templib = nullif(@vWell_templib,''), Gene_symbol_templib = nullif(@vGene_symbol_templib,''), Entrez_gene_id_templib = nullif(@vEntrez_gene_id_templib,''), Sub_lib = nullif(@vSub_lib,'');
+UPDATE Template_library_file SET Template_library_Template_library_ID = (select Template_library_ID from Template_library where Template_library_name='KS_TS_384_template') WHERE Template_library_Template_library_ID IS NULL;
+select * from Template_library_file where Well_templib='A03';
+COMMIT;
+
+BEGIN;
+LOAD DATA LOCAL INFILE '/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_384_template_SaraCav.txt' INTO TABLE Template_library_file FIELDS TERMINATED BY "\t" LINES TERMINATED BY "\n" IGNORE 1 LINES (@vPlate_templib, @vWell_templib, @vGene_symbol_templib, @vEntrez_gene_id_templib, @vSub_lib) SET Plate_templib = nullif(@vPlate_templib, ''), Well_templib = nullif(@vWell_templib,''), Gene_symbol_templib = nullif(@vGene_symbol_templib,''), Entrez_gene_id_templib = nullif(@vEntrez_gene_id_templib,''), Sub_lib = nullif(@vSub_lib,'');
 UPDATE Template_library_file SET Template_library_Template_library_ID = (select Template_library_ID from Template_library where Template_library_name='KS_TS_384_template') WHERE Template_library_Template_library_ID IS NULL;
 select * from Template_library_file where Well_templib='A03';
 COMMIT;
