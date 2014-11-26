@@ -61,6 +61,7 @@ li {
 
 img {
   margin-top: 5px;
+  margin-left: 5px;
   }
 
 
@@ -92,12 +93,11 @@ hr {
   }
 
 #screen_info{
-  
-position: relative;
-height: 400px;
-top: 20px;
+  position: relative;
+  height: 400px;
+  top: 20px;
 
-border: 3;
+  border: 3;
   width: 600px;
   height: auto;
   margin: 0 auto 0 auto;
@@ -116,11 +116,9 @@ border: 3;
   font-weight: normal;
 }
 
-
-
 #Box {
   border: 0;
-  width: 720px;
+  width: 1000px;
   height: auto;
   margin: 0 auto 0 auto;
   padding: 0;

@@ -7,13 +7,17 @@ use CGI qw( :standard );
 use CGI::Carp qw ( fatalsToBrowser );
 use DBI;
 use Digest::MD5 qw ( md5 md5_hex md5_base64 );
-#use FileHandle;
+use FileHandle;
 # for new file upload - fixes the error :- use string ("test_plateconf.txt") as a symbol ref while "strict refs" in use at...
 no strict 'refs';
 # to check if an error is due to dbi or not
 use Data::Dumper;
-use LWP::Simple;
-#use File::Fetch;
+
+# Get the name of the script from $0
+$0 =~ /([^\/]+)$/;
+
+my $script_name = $1;
+
 
 ## stuff to configure when moving... ##
 
@@ -28,12 +32,12 @@ my $sqldb_pass = '1nt3rnal';
 ## Declare variables globally ##
 
 my $ISOGENIC_SET;
-my $ADD_NEW_FILES_LINK = "http://gft.icr.ac.uk/cgi-bin/rnaidb.pl?add_new_files=1";
+my $ADD_NEW_FILES_LINK = "http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1";
 
 #my $username;
 #my $password;
  
-#$| = 1;
+$| = 1;
 #$|++;
 
 #STDOUT->autoflush(1);
@@ -67,12 +71,28 @@ my $page_header = "<html>
 				   <div id=\"Box\"></div><div id=\"MainFullWidth\">
 				   <a href=\"http://gft.icr.ac.uk\"><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>
 				   <p>
-				   <a href=\"/cgi-bin/rnaidb.pl?add_new_screen=1\">Add new screen</a>\&nbsp;\&nbsp;
-				   <a href=\"/cgi-bin/rnaidb.pl?show_all_screens=1\">Show all screens</a>\&nbsp;\&nbsp;
-				   <a href=\"/cgi-bin/rnaidb.pl?configure_export=1\">Configure export</a>\&nbsp;\&nbsp;
+				   <a href=\"/cgi-bin/$script_name?add_new_screen=1\">Add new screen</a>\&nbsp;\&nbsp;
+				   <a href=\"/cgi-bin/$script_name?show_all_screens=1\">Show all screens</a>\&nbsp;\&nbsp;
+				   <a href=\"/cgi-bin/$script_name?configure_export=1\">Configure export</a>\&nbsp;\&nbsp;
 				   </p>";
 
 # HTML strings used in add new screen:
+
+my $tissue_file = "/home/agulati/data/screen_data/tissue_type.txt";
+my $tissue_list;
+open (IN, "< $tissue_file")
+  or die "Cannot open $tissue_file:$!\n";
+while (<IN>) {
+    $tissue_list = $_;
+} 
+
+my $cell_line_file = "/home/agulati/data/screen_data/cell_lines.txt";
+my $cell_line_list;
+open (IN, "< $cell_line_file")
+  or die "Cannot open $cell_line_file:$!\n";
+while (<IN>) {
+  $cell_line_list = $_;
+} 
 
 my $page_header_for_add_new_screen_sub = "<html>
 				   						  <head>
@@ -85,1562 +105,8 @@ my $page_header_for_add_new_screen_sub = "<html>
 				   						  <script src=\"http://code.jquery.com/ui/1.11.1/jquery-ui.js\"></script>
 				   						  <script>
 										   \$(function() {
-	  										var availableTissues = [\"ADRENAL_GLAND\",
-																	\"AUTONOMIC_GANGLIA\",
-																	\"BILIARY_TRACT\",
-																	\"BONE\",
-																	\"BREAST\",
-																	\"CENTRAL_NERVOUS_SYSTEM\",
-																	\"CERVICAL\",
-																	\"ENDOMETRIUM\",
-																	\"HAEMATOPOIETIC_AND_LYMPHOID_TISSUE\",
-																	\"HEADNECK\",
-																	\"KIDNEY\",
-																	\"LARGE_INTESTINE\",
-																	\"LIVER\",
-																	\"LUNG\",
-																	\"LYMPHOBLASTOMA\",
-																	\"OESOPHAGUS\",
-																	\"OVARY\",
-																	\"PANCREAS\",
-																	\"PLACENTA\",
-																	\"PLEURA\",
-																	\"PROSTATE\",
-																	\"SALIVARY_GLAND\",
-																	\"SKIN\",
-																	\"SMALL_INTESTINE\",
-																	\"SOFT_TISSUE\",
-																	\"STOMACH\",
-																	\"TESTIS\",
-																	\"THYROID\",
-																	\"UPPER_AERODIGESTIVE_TRACT\",
-																	\"URINARY_TRACT\",
-																	\"VULVA\" ];
-									      var availableCellLines = [\"1321N1\",
-																	\"A1207\",
-																	\"A172\",
-																	\"A204\",
-																	\"A2058\",
-																	\"A253\",
-																	\"A2780\",
-																	\"A375\",
-																	\"A388\",
-																	\"A3KAW\",
-																	\"A427\",
-																	\"A431\",
-																	\"A498\",
-																	\"A4FUK\",
-																	\"A549\",
-																	\"A673\",
-																	\"A704\",
-																	\"ABC1\",
-																	\"AC216\",
-																	\"AC295\",
-																	\"AC375\",
-																	\"ACC419\",
-																	\"ACC83\",
-																	\"ACCMESO1\",
-																	\"ACCS\",
-																	\"ACHN\",
-																	\"ACN\",
-																	\"AGS\",
-																	\"AHEZ\",
-																	\"ALEXANDERCELLS\",
-																	\"ALLPO\",
-																	\"ALLSIL\",
-																	\"AM38\",
-																	\"AML193\",
-																	\"AMO1\",
-																	\"AN3CA\",
-																	\"ARH77\",
-																	\"ASH3\",
-																	\"ASPC1\",
-																	\"ATN1\",
-																	\"AU565\",
-																	\"AZ521\",
-																	\"B0097\",
-																	\"B0118\",
-																	\"B01261\",
-																	\"BALL1\",
-																	\"BB30HNC\",
-																	\"BB49HNC\",
-																	\"BB65RCC\",
-																	\"BC1\",
-																	\"BC3\",
-																	\"BC3C\",
-																	\"BCP1\",
-																	\"BCPAP\",
-																	\"BDCM\",
-																	\"BE13\",
-																	\"BE2M17\",
-																	\"BECKER\",
-																	\"BEN\",
-																	\"BFTC905\",
-																	\"BFTC909\",
-																	\"BHT101\",
-																	\"BHY\",
-																	\"BICR10\",
-																	\"BICR16\",
-																	\"BICR18\",
-																	\"BICR22\",
-																	\"BICR31\",
-																	\"BICR56\",
-																	\"BICR6\",
-																	\"BICR78\",
-																	\"BJHTERT\",
-																	\"BL41\",
-																	\"BL70\",
-																	\"BOKU\",
-																	\"BONNA12\",
-																	\"BPH1\",
-																	\"BT20\",
-																	\"BT474\",
-																	\"BT483\",
-																	\"BT549\",
-																	\"BV173\",
-																	\"BXPC3\",
-																	\"C2BBE1\",
-																	\"C32\",
-																	\"C33A\",
-																	\"C392\",
-																	\"C3A\",
-																	\"C47\",
-																	\"C4I\",
-																	\"C4II\",
-																	\"C8166\",
-																	\"CA46\",
-																	\"CA922\",
-																	\"CADOES1\",
-																	\"CAKI1\",
-																	\"CAKI2\",
-																	\"CAL120\",
-																	\"CAL12T\",
-																	\"CAL148\",
-																	\"CAL27\",
-																	\"CAL29\",
-																	\"CAL33\",
-																	\"CAL39\",
-																	\"CAL51\",
-																	\"CAL54\",
-																	\"CAL62\",
-																	\"CAL72\",
-																	\"CAL78\",
-																	\"CAL851\",
-																	\"CALU1\",
-																	\"CALU3\",
-																	\"CALU6\",
-																	\"CAMA1\",
-																	\"CAOV3\",
-																	\"CAOV4\",
-																	\"CAPAN1\",
-																	\"CAPAN2\",
-																	\"CAR1\",
-																	\"CAS1\",
-																	\"CASKI\",
-																	\"CC197\",
-																	\"CC38\",
-																	\"CCFSTTG1\",
-																	\"CCK81\",
-																	\"CCRFCEM\",
-																	\"CESS\",
-																	\"CFPAC1\",
-																	\"CGTHW1\",
-																	\"CH157MN\",
-																	\"CHAGOK1\",
-																	\"CHL1\",
-																	\"CHP126\",
-																	\"CHP134\",
-																	\"CHP212\",
-																	\"CHSA0011\",
-																	\"CHSA0108\",
-																	\"CHSA8926\",
-																	\"CI1\",
-																	\"CJM\",
-																	\"CL11\",
-																	\"CL14\",
-																	\"CL34\",
-																	\"CL40\",
-																	\"CMK\",
-																	\"CMK115\",
-																	\"CMK86\",
-																	\"CMLT1\",
-																	\"COLO201\",
-																	\"COLO205\",
-																	\"COLO320\",
-																	\"COLO668\",
-																	\"COLO677\",
-																	\"COLO678\",
-																	\"COLO679\",
-																	\"COLO680N\",
-																	\"COLO684\",
-																	\"COLO704\",
-																	\"COLO741\",
-																	\"COLO741\",
-																	\"COLO775\",
-																	\"COLO783\",
-																	\"COLO783\",
-																	\"COLO792\",
-																	\"COLO800\",
-																	\"COLO818\",
-																	\"COLO824\",
-																	\"COLO829\",
-																	\"COLO849\",
-																	\"CORL105\",
-																	\"CORL23\",
-																	\"CORL24\",
-																	\"CORL279\",
-																	\"CORL303\",
-																	\"CORL311\",
-																	\"CORL32\",
-																	\"CORL321\",
-																	\"CORL47\",
-																	\"CORL51\",
-																	\"CORL88\",
-																	\"CORL95\",
-																	\"COV318\",
-																	\"COV362\",
-																	\"COV434\",
-																	\"COV504\",
-																	\"COV644\",
-																	\"CP50MELB\",
-																	\"CP66MEL\",
-																	\"CP67MEL\",
-																	\"CPCN\",
-																	\"CROAP2\",
-																	\"CROE33\",
-																	\"CS1\",
-																	\"CTB1\",
-																	\"CTV1\",
-																	\"CW2\",
-																	\"D245MG\",
-																	\"D247MG\",
-																	\"D263MG\",
-																	\"D283MED\",
-																	\"D336MG\",
-																	\"D341MED\",
-																	\"D392MG\",
-																	\"D423MG\",
-																	\"D502MG\",
-																	\"D542MG\",
-																	\"D566MG\",
-																	\"DANG\",
-																	\"DAOY\",
-																	\"DAUDI\",
-																	\"DB\",
-																	\"DBTRG05MG\",
-																	\"DEL\",
-																	\"DETROIT562\",
-																	\"DFCI024\",
-																	\"DG75\",
-																	\"DIFI\",
-																	\"DJM1\",
-																	\"DKMG\",
-																	\"DLD1\",
-																	\"DM3\",
-																	\"DMS114\",
-																	\"DMS153\",
-																	\"DMS273\",
-																	\"DMS454\",
-																	\"DMS53\",
-																	\"DMS79\",
-																	\"DND41\",
-																	\"DOHH2\",
-																	\"DOK\",
-																	\"DOTC24510\",
-																	\"DOV13\",
-																	\"DSH1\",
-																	\"DU145\",
-																	\"DU4475\",
-																	\"DV90\",
-																	\"EB1\",
-																	\"EB2\",
-																	\"EB3\",
-																	\"EBC1\",
-																	\"ECC10\",
-																	\"ECC12\",
-																	\"ECC4\",
-																	\"ECGI10\",
-																	\"EFE184\",
-																	\"EFM19\",
-																	\"EFM192A\",
-																	\"EFO21\",
-																	\"EFO27\",
-																	\"EGI1\",
-																	\"EHEB\",
-																	\"EJM\",
-																	\"EKVX\",
-																	\"EM2\",
-																	\"EMCBAC1\",
-																	\"EMCBAC2\",
-																	\"EN\",
-																	\"EOL1\",
-																	\"EPLC272H\",
-																	\"ES1\",
-																	\"ES2\",
-																	\"ES3\",
-																	\"ES4\",
-																	\"ES5\",
-																	\"ES6\",
-																	\"ES7\",
-																	\"ES8\",
-																	\"ESO26\",
-																	\"ESO51\",
-																	\"ESS1\",
-																	\"ETK1\",
-																	\"EVSAT\",
-																	\"EW1\",
-																	\"EW11\",
-																	\"EW12\",
-																	\"EW13\",
-																	\"EW16\",
-																	\"EW18\",
-																	\"EW22\",
-																	\"EW24\",
-																	\"EW3\",
-																	\"EW7\",
-																	\"EW8\",
-																	\"EWS502\",
-																	\"F36P\",
-																	\"F5\",
-																	\"FADU\",
-																	\"FARAGE\",
-																	\"FLO1\",
-																	\"FTC133\",
-																	\"FTC238\",
-																	\"FU97\",
-																	\"FUOV1\",
-																	\"G292\",
-																	\"G361\",
-																	\"G401\",
-																	\"G402\",
-																	\"GA10\",
-																	\"GAK\",
-																	\"GAMG\",
-																	\"GB1\",
-																	\"GCIY\",
-																	\"GCT\",
-																	\"GDM1\",
-																	\"GI1\",
-																	\"GIMEN\",
-																	\"GMEL\",
-																	\"GMS10\",
-																	\"GOS3\",
-																	\"GOTO\",
-																	\"GP2D\",
-																	\"GP5D\",
-																	\"GRANTA519\",
-																	\"GRM\",
-																	\"GRST\",
-																	\"GSS\",
-																	\"GSU\",
-																	\"GT3TKB\",
-																	\"H1048\",
-																	\"H1092\",
-																	\"H1105\",
-																	\"H1155\",
-																	\"H11581\",
-																	\"H1184\",
-																	\"H128\",
-																	\"H1299\",
-																	\"H1304\",
-																	\"H1339\",
-																	\"H1341\",
-																	\"H1341\",
-																	\"H1355\",
-																	\"H1373\",
-																	\"H1385\",
-																	\"H1395\",
-																	\"H1417\",
-																	\"H1435\",
-																	\"H1435\",
-																	\"H1436\",
-																	\"H1437\",
-																	\"H146\",
-																	\"H1522\",
-																	\"H1563\",
-																	\"H1568\",
-																	\"H1568\",
-																	\"H1573\",
-																	\"H1581\",
-																	\"H1618\",
-																	\"H1618\",
-																	\"H1623\",
-																	\"H1648\",
-																	\"H1650\",
-																	\"H1651\",
-																	\"H1666\",
-																	\"H1688\",
-																	\"H1693\",
-																	\"H1694\",
-																	\"H1703\",
-																	\"H1734\",
-																	\"H1755\",
-																	\"H1770\",
-																	\"H1781\",
-																	\"H1781\",
-																	\"H1792\",
-																	\"H1793\",
-																	\"H1836\",
-																	\"H1836\",
-																	\"H1838\",
-																	\"H1869\",
-																	\"H1869\",
-																	\"H187\",
-																	\"H1876\",
-																	\"H1876\",
-																	\"H1915\",
-																	\"H1915\",
-																	\"H1930\",
-																	\"H1944\",
-																	\"H1944\",
-																	\"H196\",
-																	\"H196\",
-																	\"H1963\",
-																	\"H1975\",
-																	\"H1993\",
-																	\"H2009\",
-																	\"H2023\",
-																	\"H2023\",
-																	\"H2029\",
-																	\"H2030\",
-																	\"H2052\",
-																	\"H2066\",
-																	\"H2066\",
-																	\"H2073\",
-																	\"H2081\",
-																	\"H2085\",
-																	\"H2087\",
-																	\"H209\",
-																	\"H2106\",
-																	\"H2107\",
-																	\"H211\",
-																	\"H211\",
-																	\"H2110\",
-																	\"H2110\",
-																	\"H2122\",
-																	\"H2126\",
-																	\"H2135\",
-																	\"H2141\",
-																	\"H2170\",
-																	\"H2171\",
-																	\"H2172\",
-																	\"H2172\",
-																	\"H2196\",
-																	\"H2227\",
-																	\"H2228\",
-																	\"H226\",
-																	\"H2286\",
-																	\"H2291\",
-																	\"H23\",
-																	\"H2342\",
-																	\"H2347\",
-																	\"H2369\",
-																	\"H2373\",
-																	\"H2405\",
-																	\"H2444\",
-																	\"H2444\",
-																	\"H2452\",
-																	\"H2461\",
-																	\"H250\",
-																	\"H2591\",
-																	\"H2595\",
-																	\"H2722\",
-																	\"H2731\",
-																	\"H2795\",
-																	\"H28\",
-																	\"H2803\",
-																	\"H2804\",
-																	\"H2810\",
-																	\"H2818\",
-																	\"H2869\",
-																	\"H290\",
-																	\"H292\",
-																	\"H3118\",
-																	\"H3122\",
-																	\"H322\",
-																	\"H322M\",
-																	\"H3255\",
-																	\"H3255\",
-																	\"H345\",
-																	\"H358\",
-																	\"H378\",
-																	\"H4\",
-																	\"H441\",
-																	\"H446\",
-																	\"H460\",
-																	\"H508\",
-																	\"H510\",
-																	\"H510A\",
-																	\"H513\",
-																	\"H520\",
-																	\"H522\",
-																	\"H524\",
-																	\"H526\",
-																	\"H596\",
-																	\"H630\",
-																	\"H64\",
-																	\"H647\",
-																	\"H647\",
-																	\"H650\",
-																	\"H660\",
-																	\"H661\",
-																	\"H69\",
-																	\"H716\",
-																	\"H720\",
-																	\"H727\",
-																	\"H740\",
-																	\"H747\",
-																	\"H748\",
-																	\"H810\",
-																	\"H82\",
-																	\"H835\",
-																	\"H838\",
-																	\"H841\",
-																	\"H841\",
-																	\"H847\",
-																	\"H854\",
-																	\"H889\",
-																	\"H889\",
-																	\"H9\",
-																	\"H929\",
-																	\"HA7RCC\",
-																	\"HAL01\",
-																	\"HARA\",
-																	\"HC1\",
-																	\"HCC1143\",
-																	\"HCC1171\",
-																	\"HCC1187\",
-																	\"HCC1195\",
-																	\"HCC1359\",
-																	\"HCC1395\",
-																	\"HCC1419\",
-																	\"HCC1428\",
-																	\"HCC1438\",
-																	\"HCC15\",
-																	\"HCC1500\",
-																	\"HCC1569\",
-																	\"HCC1588\",
-																	\"HCC1599\",
-																	\"HCC1806\",
-																	\"HCC1833\",
-																	\"HCC1897\",
-																	\"HCC1937\",
-																	\"HCC1954\",
-																	\"HCC202\",
-																	\"HCC2108\",
-																	\"HCC2157\",
-																	\"HCC2218\",
-																	\"HCC2279\",
-																	\"HCC2814\",
-																	\"HCC2935\",
-																	\"HCC2998\",
-																	\"HCC33\",
-																	\"HCC364\",
-																	\"HCC366\",
-																	\"HCC38\",
-																	\"HCC4006\",
-																	\"HCC44\",
-																	\"HCC56\",
-																	\"HCC70\",
-																	\"HCC78\",
-																	\"HCC827\",
-																	\"HCC827GR5\",
-																	\"HCC95\",
-																	\"HCE4\",
-																	\"HCET\",
-																	\"HCH1\",
-																	\"HCT116\",
-																	\"HCT15\",
-																	\"HCT8\",
-																	\"HDLM2\",
-																	\"HDMYZ\",
-																	\"HDQP1\",
-																	\"HEC1\",
-																	\"HEC108\",
-																	\"HEC151\",
-																	\"HEC1A\",
-																	\"HEC1B\",
-																	\"HEC251\",
-																	\"HEC265\",
-																	\"HEC50B\",
-																	\"HEC59\",
-																	\"HEC6\",
-																	\"HEKTE\",
-																	\"HEL\",
-																	\"HEL9217\",
-																	\"HELA\",
-																	\"HEMCSS\",
-																	\"HEP3B217\",
-																	\"HEPG2\",
-																	\"HEY\",
-																	\"HEYA8\",
-																	\"HGC27\",
-																	\"HH\",
-																	\"HK2\",
-																	\"HL60\",
-																	\"HLC1\",
-																	\"HLE\",
-																	\"HLF\",
-																	\"HLFA\",
-																	\"HMC18\",
-																	\"HMCB\",
-																	\"HMEL\",
-																	\"HMT3552\",
-																	\"HMVII\",
-																	\"HN\",
-																	\"HO1N1\",
-																	\"HO1U1\",
-																	\"HOP62\",
-																	\"HOP92\",
-																	\"HOS\",
-																	\"HOSMNNG\",
-																	\"HPAC\",
-																	\"HPAFII\",
-																	\"HPBALL\",
-																	\"HRT18\",
-																	\"HS172T\",
-																	\"HS229T\",
-																	\"HS255T\",
-																	\"HS274T\",
-																	\"HS281T\",
-																	\"HS294T\",
-																	\"HS343T\",
-																	\"HS445\",
-																	\"HS571T\",
-																	\"HS578T\",
-																	\"HS600T\",
-																	\"HS604T\",
-																	\"HS606T\",
-																	\"HS611T\",
-																	\"HS616T\",
-																	\"HS618T\",
-																	\"HS633T\",
-																	\"HS675T\",
-																	\"HS683\",
-																	\"HS688AT\",
-																	\"HS695T\",
-																	\"HS698T\",
-																	\"HS706T\",
-																	\"HS729\",
-																	\"HS737T\",
-																	\"HS739T\",
-																	\"HS742T\",
-																	\"HS746T\",
-																	\"HS751T\",
-																	\"HS766T\",
-																	\"HS819T\",
-																	\"HS821T\",
-																	\"HS822T\",
-																	\"HS834T\",
-																	\"HS839T\",
-																	\"HS840T\",
-																	\"HS852T\",
-																	\"HS863T\",
-																	\"HS870T\",
-																	\"HS888T\",
-																	\"HS895T\",
-																	\"HS934T\",
-																	\"HS936T\",
-																	\"HS939T\",
-																	\"HS940T\",
-																	\"HS944T\",
-																	\"HSC2\",
-																	\"HSC3\",
-																	\"HSC39\",
-																	\"HSC4\",
-																	\"HT\",
-																	\"HT1080\",
-																	\"HT115\",
-																	\"HT1197\",
-																	\"HT1376\",
-																	\"HT144\",
-																	\"HT29\",
-																	\"HT3\",
-																	\"HT55\",
-																	\"HTCC3\",
-																	\"HTK\",
-																	\"HUCCT1\",
-																	\"HUG1N\",
-																	\"HUH1\",
-																	\"HUH28\",
-																	\"HUH6\",
-																	\"HUH7\",
-																	\"HUNS1\",
-																	\"HUO3N1\",
-																	\"HUO9\",
-																	\"HUPT3\",
-																	\"HUPT4\",
-																	\"HUT102\",
-																	\"HUT78\",
-																	\"HUTU80\",
-																	\"IALM\",
-																	\"IGR1\",
-																	\"IGR37\",
-																	\"IGR39\",
-																	\"IGROV1\",
-																	\"IHH4\",
-																	\"IM9\",
-																	\"IM95\",
-																	\"IMR32\",
-																	\"IMR5\",
-																	\"IOMMLEE\",
-																	\"IPC298\",
-																	\"ISHIKAWAHERAKLIO02ER\",
-																	\"ISTMEL1\",
-																	\"ISTMES1\",
-																	\"ISTMES2\",
-																	\"ISTSL1\",
-																	\"ISTSL2\",
-																	\"J82\",
-																	\"JAR\",
-																	\"JEG3\",
-																	\"JEKO1\",
-																	\"JHADESO1\",
-																	\"JHESOAD1\",
-																	\"JHH1\",
-																	\"JHH2\",
-																	\"JHH4\",
-																	\"JHH5\",
-																	\"JHH6\",
-																	\"JHH7\",
-																	\"JHOC5\",
-																	\"JHOM1\",
-																	\"JHOM2B\",
-																	\"JHOS2\",
-																	\"JHOS3\",
-																	\"JHOS4\",
-																	\"JHU011\",
-																	\"JHU022\",
-																	\"JHU028\",
-																	\"JHU029\",
-																	\"JHUEM1\",
-																	\"JHUEM2\",
-																	\"JHUEM3\",
-																	\"JHUEM7\",
-																	\"JIMT1\",
-																	\"JIYOYEP2003\",
-																	\"JJN3\",
-																	\"JK1\",
-																	\"JL1\",
-																	\"JM1\",
-																	\"JMSU1\",
-																	\"JRT3T35\",
-																	\"JSC1\",
-																	\"JURKAT\",
-																	\"JURLMK1\",
-																	\"JVM2\",
-																	\"JVM3\",
-																	\"K029AX\",
-																	\"K052\",
-																	\"K2\",
-																	\"K5\",
-																	\"K562\",
-																	\"KALS1\",
-																	\"KARPAS1106P\",
-																	\"KARPAS231\",
-																	\"KARPAS299\",
-																	\"KARPAS422\",
-																	\"KARPAS45\",
-																	\"KARPAS620\",
-																	\"KASUMI1\",
-																	\"KASUMI2\",
-																	\"KASUMI6\",
-																	\"KATOIII\",
-																	\"KCIMOH1\",
-																	\"KCL22\",
-																	\"KE37\",
-																	\"KE39\",
-																	\"KE97\",
-																	\"KELLY\",
-																	\"KG1\",
-																	\"KG1C\",
-																	\"KGN\",
-																	\"KHM1B\",
-																	\"KIJK\",
-																	\"KINGS1\",
-																	\"KK\",
-																	\"KLE\",
-																	\"KLM1\",
-																	\"KM12\",
-																	\"KMBC2\",
-																	\"KMH2\",
-																	\"KMM1\",
-																	\"KMOE2\",
-																	\"KMRC1\",
-																	\"KMRC2\",
-																	\"KMRC20\",
-																	\"KMRC3\",
-																	\"KMS11\",
-																	\"KMS12BM\",
-																	\"KMS12PE\",
-																	\"KMS18\",
-																	\"KMS20\",
-																	\"KMS21BM\",
-																	\"KMS26\",
-																	\"KMS27\",
-																	\"KMS28BM\",
-																	\"KMS34\",
-																	\"KNS42\",
-																	\"KNS60\",
-																	\"KNS62\",
-																	\"KNS81\",
-																	\"KNS81FD\",
-																	\"KO52\",
-																	\"KOC7C\",
-																	\"KON\",
-																	\"KOPN8\",
-																	\"KOSC2\",
-																	\"KP1N\",
-																	\"KP1NL\",
-																	\"KP2\",
-																	\"KP3\",
-																	\"KP4\",
-																	\"KPD\",
-																	\"KPL1\",
-																	\"KPNRTBM1\",
-																	\"KPNSI9S\",
-																	\"KPNYN\",
-																	\"KPNYS\",
-																	\"KS1\",
-																	\"KU1919\",
-																	\"KU812\",
-																	\"KURAMOCHI\",
-																	\"KY821\",
-																	\"KYAE1\",
-																	\"KYM1\",
-																	\"KYO1\",
-																	\"KYSE140\",
-																	\"KYSE150\",
-																	\"KYSE180\",
-																	\"KYSE220\",
-																	\"KYSE270\",
-																	\"KYSE30\",
-																	\"KYSE410\",
-																	\"KYSE450\",
-																	\"KYSE50\",
-																	\"KYSE510\",
-																	\"KYSE520\",
-																	\"KYSE70\",
-																	\"L1236\",
-																	\"L1942\",
-																	\"L33\",
-																	\"L363\",
-																	\"L428\",
-																	\"L540\",
-																	\"LAMA84\",
-																	\"LAN6\",
-																	\"LB1047RCC\",
-																	\"LB2241RCC\",
-																	\"LB2518MEL\",
-																	\"LB373MELD\",
-																	\"LB647SCLC\",
-																	\"LB771HNC\",
-																	\"LB831BLC\",
-																	\"LB996RCC\",
-																	\"LC1F\",
-																	\"LC1SQ\",
-																	\"LC1SQSF\",
-																	\"LC2AD\",
-																	\"LC41\",
-																	\"LCLC103H\",
-																	\"LCLC97TM1\",
-																	\"LI7\",
-																	\"LK2\",
-																	\"LM7\",
-																	\"LMSU\",
-																	\"LN18\",
-																	\"LN215\",
-																	\"LN229\",
-																	\"LN235\",
-																	\"LN319\",
-																	\"LN340\",
-																	\"LN382\",
-																	\"LN405\",
-																	\"LN428\",
-																	\"LN443\",
-																	\"LN464\",
-																	\"LNCAPCLONEFGC\",
-																	\"LNZ308\",
-																	\"LNZTA3WT4\",
-																	\"LOUCY\",
-																	\"LOUNH91\",
-																	\"LOVO\",
-																	\"LOXIMVI\",
-																	\"LP1\",
-																	\"LS1034\",
-																	\"LS123\",
-																	\"LS180\",
-																	\"LS411N\",
-																	\"LS513\",
-																	\"LU134A\",
-																	\"LU135\",
-																	\"LU139\",
-																	\"LU165\",
-																	\"LU65\",
-																	\"LU99\",
-																	\"LU99A\",
-																	\"LUDLU1\",
-																	\"LXF289\",
-																	\"M00921\",
-																	\"M059J\",
-																	\"M059K\",
-																	\"M07E\",
-																	\"M1203273\",
-																	\"M14\",
-																	\"M980513\",
-																	\"MALME3M\",
-																	\"MB157\",
-																	\"MC116\",
-																	\"MCAS\",
-																	\"MCCAR\",
-																	\"MCF10A\",
-																	\"MCF12A\",
-																	\"MCF7\",
-																	\"MCIXC\",
-																	\"MDAH2774\",
-																	\"MDAMB134VI\",
-																	\"MDAMB157\",
-																	\"MDAMB175VII\",
-																	\"MDAMB231\",
-																	\"MDAMB330\",
-																	\"MDAMB361\",
-																	\"MDAMB415\",
-																	\"MDAMB435S\",
-																	\"MDAMB436\",
-																	\"MDAMB453\",
-																	\"MDAMB468\",
-																	\"MDAPCA2B\",
-																	\"MDST8\",
-																	\"ME1\",
-																	\"ME180\",
-																	\"MEC1\",
-																	\"MEC2\",
-																	\"MEG01\",
-																	\"MELHO\",
-																	\"MELJUSO\",
-																	\"MESSA\",
-																	\"MET2B\",
-																	\"MEWO\",
-																	\"MFE280\",
-																	\"MFE296\",
-																	\"MFE319\",
-																	\"MFHINO\",
-																	\"MFM223\",
-																	\"MG63\",
-																	\"MGHU3\",
-																	\"MHHCALL2\",
-																	\"MHHCALL3\",
-																	\"MHHCALL4\",
-																	\"MHHES1\",
-																	\"MHHNB11\",
-																	\"MHHPREB1\",
-																	\"MHM\",
-																	\"MIAPACA2\",
-																	\"MINO\",
-																	\"MJ\",
-																	\"MKN1\",
-																	\"MKN28\",
-																	\"MKN45\",
-																	\"MKN7\",
-																	\"MKN74\",
-																	\"ML1\",
-																	\"ML2\",
-																	\"MLMA\",
-																	\"MM1S\",
-																	\"MMACSF\",
-																	\"MN60\",
-																	\"MOGGCCM\",
-																	\"MOGGUVW\",
-																	\"MOLM13\",
-																	\"MOLM16\",
-																	\"MOLM6\",
-																	\"MOLP2\",
-																	\"MOLP8\",
-																	\"MOLT13\",
-																	\"MOLT16\",
-																	\"MOLT4\",
-																	\"MONOMAC1\",
-																	\"MONOMAC6\",
-																	\"MORCPR\",
-																	\"MOT\",
-																	\"MOTN1\",
-																	\"MPP89\",
-																	\"MRKNU1\",
-																	\"MS1\",
-																	\"MS751\",
-																	\"MSTO211H\",
-																	\"MUTZ3\",
-																	\"MUTZ5\",
-																	\"MV411\",
-																	\"MYM12\",
-																	\"MZ1PC\",
-																	\"MZ2MEL\",
-																	\"MZ7MEL\",
-																	\"N87\",
-																	\"NALM1\",
-																	\"NALM19\",
-																	\"NALM6\",
-																	\"NAMALWA\",
-																	\"NB1\",
-																	\"NB10\",
-																	\"NB12\",
-																	\"NB13\",
-																	\"NB14\",
-																	\"NB17\",
-																	\"NB4\",
-																	\"NB5\",
-																	\"NB6\",
-																	\"NB69\",
-																	\"NB7\",
-																	\"NBSUSSR\",
-																	\"NBTU110\",
-																	\"NCC010\",
-																	\"NCC021\",
-																	\"NCCIT\",
-																	\"NCCSTCK140\",
-																	\"NCIH2052\",
-																	\"NCIH2452\",
-																	\"NCIH28\",
-																	\"NCIH508\",
-																	\"NCIH660\",
-																	\"NCIH684\",
-																	\"NCIH716\",
-																	\"NCIH747\",
-																	\"NCIH929\",
-																	\"NCIN87\",
-																	\"NCO2\",
-																	\"NEC8\",
-																	\"NH12\",
-																	\"NH6\",
-																	\"NIHOVCAR3\",
-																	\"NK92MI\",
-																	\"NKM1\",
-																	\"NMCG1\",
-																	\"NO10\",
-																	\"NO11\",
-																	\"NOMO1\",
-																	\"NOS1\",
-																	\"NS\",
-																	\"NTERA2CLD1\",
-																	\"NUDHL1\",
-																	\"NUDUL1\",
-																	\"NUGC2\",
-																	\"NUGC3\",
-																	\"NUGC4\",
-																	\"NY\",
-																	\"OACM51\",
-																	\"OACP4C\",
-																	\"OAW28\",
-																	\"OAW42\",
-																	\"OC314\",
-																	\"OC315\",
-																	\"OC316\",
-																	\"OCIAML2\",
-																	\"OCIAML3\",
-																	\"OCIAML5\",
-																	\"OCILY10\",
-																	\"OCILY19\",
-																	\"OCILY3\",
-																	\"OCILY7\",
-																	\"OCIM1\",
-																	\"OCUBM\",
-																	\"OCUM1\",
-																	\"OCUM2M\",
-																	\"OE19\",
-																	\"OE21\",
-																	\"OE33\",
-																	\"OELE\",
-																	\"OHSN\",
-																	\"OMC1\",
-																	\"ONCODG1\",
-																	\"ONS76\",
-																	\"OPM2\",
-																	\"OS25HAL\",
-																	\"OSC19\",
-																	\"OSC20\",
-																	\"OSRC2\",
-																	\"OUMS23\",
-																	\"OUMS27\",
-																	\"OV17R\",
-																	\"OV56\",
-																	\"OV7\",
-																	\"OV90\",
-																	\"OVAS\",
-																	\"OVCA420\",
-																	\"OVCA433\",
-																	\"OVCAR3\",
-																	\"OVCAR4\",
-																	\"OVCAR5\",
-																	\"OVCAR8\",
-																	\"OVISE\",
-																	\"OVK18\",
-																	\"OVKATE\",
-																	\"OVMANA\",
-																	\"OVMIU\",
-																	\"OVSAHO\",
-																	\"OVSAYO\",
-																	\"OVTOKO\",
-																	\"P12ICHIKAWA\",
-																	\"P30OHK\",
-																	\"P31FUJ\",
-																	\"P32ISH\",
-																	\"P3HR1\",
-																	\"PA1\",
-																	\"PACADD119\",
-																	\"PACADD135\",
-																	\"PACADD137\",
-																	\"PACADD159\",
-																	\"PACADD161\",
-																	\"PACADD183\",
-																	\"PANC\",
-																	\"PANC0203\",
-																	\"PANC0213\",
-																	\"PANC0327\",
-																	\"PANC0403\",
-																	\"PANC0504\",
-																	\"PANC0813\",
-																	\"PANC1\",
-																	\"PANC1005\",
-																	\"PATU8902\",
-																	\"PATU8988S\",
-																	\"PATU8988T\",
-																	\"PC14\",
-																	\"PC3\",
-																	\"PC3JPC3\",
-																	\"PCI15A\",
-																	\"PCI30\",
-																	\"PCI38\",
-																	\"PCI4B\",
-																	\"PCI6A\",
-																	\"PCM6\",
-																	\"PECAPJ15\",
-																	\"PECAPJ34CLONEC12\",
-																	\"PECAPJ41CLONED2\",
-																	\"PECAPJ49\",
-																	\"PEER\",
-																	\"PEO1\",
-																	\"PEO14\",
-																	\"PF382\",
-																	\"PFEIFFER\",
-																	\"PFSK1\",
-																	\"PK1\",
-																	\"PK45H\",
-																	\"PK59\",
-																	\"PL18\",
-																	\"PL21\",
-																	\"PL4\",
-																	\"PL45\",
-																	\"PL5\",
-																	\"PLCPRF5\",
-																	\"PRECLH\",
-																	\"PSN1\",
-																	\"PWR1E\",
-																	\"QGP1\",
-																	\"QIMRWIL\",
-																	\"RAJI\",
-																	\"RAMOS2G64C10\",
-																	\"RCB0989\",
-																	\"RCC10RGB\",
-																	\"RCC4\",
-																	\"RCCAB\",
-																	\"RCCER\",
-																	\"RCCFG2\",
-																	\"RCCJF\",
-																	\"RCCJW\",
-																	\"RCCMF\",
-																	\"RCHACV\",
-																	\"RCK8\",
-																	\"RCM1\",
-																	\"RD\",
-																	\"RDES\",
-																	\"REC1\",
-																	\"REH\",
-																	\"RERFGC1B\",
-																	\"RERFLCAD1\",
-																	\"RERFLCAD2\",
-																	\"RERFLCAI\",
-																	\"RERFLCFM\",
-																	\"RERFLCKJ\",
-																	\"RERFLCMS\",
-																	\"RERFLCSQ1\",
-																	\"RES186\",
-																	\"RES259\",
-																	\"RF48\",
-																	\"RH1\",
-																	\"RH18\",
-																	\"RH30\",
-																	\"RH41\",
-																	\"RI1\",
-																	\"RKN\",
-																	\"RKO\",
-																	\"RL\",
-																	\"RL2321\",
-																	\"RL952\",
-																	\"RMGI\",
-																	\"RMUGS\",
-																	\"RO82W1\",
-																	\"ROS50\",
-																	\"RPMI2650\",
-																	\"RPMI6666\",
-																	\"RPMI7951\",
-																	\"RPMI8226\",
-																	\"RPMI8402\",
-																	\"RPMI8866\",
-																	\"RS411\",
-																	\"RS5\",
-																	\"RT112\",
-																	\"RT11284\",
-																	\"RT112M\",
-																	\"RT4\",
-																	\"RVH421\",
-																	\"RXF393\",
-																	\"S\",
-																	\"S117\",
-																	\"SACRL5920\",
-																	\"SAHTB111\",
-																	\"SALE\",
-																	\"SAOS2\",
-																	\"SAS\",
-																	\"SAT\",
-																	\"SBC1\",
-																	\"SBC3\",
-																	\"SBC5\",
-																	\"SC1\",
-																	\"SCABER\",
-																	\"SCC003\",
-																	\"SCC15\",
-																	\"SCC25\",
-																	\"SCC3\",
-																	\"SCC36\",
-																	\"SCC4\",
-																	\"SCC47\",
-																	\"SCC9\",
-																	\"SCC90\",
-																	\"SCH\",
-																	\"SCLC21H\",
-																	\"SD\",
-																	\"SEM\",
-																	\"SET2\",
-																	\"SF126\",
-																	\"SF172\",
-																	\"SF188\",
-																	\"SF268\",
-																	\"SF295\",
-																	\"SF539\",
-																	\"SF767\",
-																	\"SH10TC\",
-																	\"SH4\",
-																	\"SHP77\",
-																	\"SHSY5Y\",
-																	\"SIGM5\",
-																	\"SIHA\",
-																	\"SIMA\",
-																	\"SISO\",
-																	\"SJRH30\",
-																	\"SJSA1\",
-																	\"SKBR3\",
-																	\"SKCO1\",
-																	\"SKES1\",
-																	\"SKGIIIA\",
-																	\"SKGT2\",
-																	\"SKGT4\",
-																	\"SKHEP1\",
-																	\"SKLMS1\",
-																	\"SKLU1\",
-																	\"SKM1\",
-																	\"SKMEL1\",
-																	\"SKMEL2\",
-																	\"SKMEL24\",
-																	\"SKMEL28\",
-																	\"SKMEL3\",
-																	\"SKMEL30\",
-																	\"SKMEL31\",
-																	\"SKMEL5\",
-																	\"SKMES1\",
-																	\"SKMG1\",
-																	\"SKMM2\",
-																	\"SKN\",
-																	\"SKN3\",
-																	\"SKNAS\",
-																	\"SKNBE2\",
-																	\"SKNDZ\",
-																	\"SKNEP1\",
-																	\"SKNFI\",
-																	\"SKNMC\",
-																	\"SKNSH\",
-																	\"SKOV3\",
-																	\"SKPNDW\",
-																	\"SKRC20\",
-																	\"SKRC31\",
-																	\"SKUT1\",
-																	\"SLR20\",
-																	\"SLR21\",
-																	\"SLR23\",
-																	\"SLR24\",
-																	\"SLR25\",
-																	\"SLR26\",
-																	\"SLVL\",
-																	\"SMOV2\",
-																	\"SN12C\",
-																	\"SNB19\",
-																	\"SNB75\",
-																	\"SNGM\",
-																	\"SNU1\",
-																	\"SNU1033\",
-																	\"SNU1040\",
-																	\"SNU1041\",
-																	\"SNU1066\",
-																	\"SNU1076\",
-																	\"SNU1077\",
-																	\"SNU1079\",
-																	\"SNU1105\",
-																	\"SNU119\",
-																	\"SNU1196\",
-																	\"SNU1197\",
-																	\"SNU1214\",
-																	\"SNU1272\",
-																	\"SNU16\",
-																	\"SNU175\",
-																	\"SNU182\",
-																	\"SNU201\",
-																	\"SNU213\",
-																	\"SNU216\",
-																	\"SNU245\",
-																	\"SNU283\",
-																	\"SNU308\",
-																	\"SNU324\",
-																	\"SNU349\",
-																	\"SNU387\",
-																	\"SNU398\",
-																	\"SNU407\",
-																	\"SNU410\",
-																	\"SNU423\",
-																	\"SNU449\",
-																	\"SNU46\",
-																	\"SNU466\",
-																	\"SNU475\",
-																	\"SNU478\",
-																	\"SNU489\",
-																	\"SNU5\",
-																	\"SNU503\",
-																	\"SNU520\",
-																	\"SNU601\",
-																	\"SNU61\",
-																	\"SNU620\",
-																	\"SNU626\",
-																	\"SNU668\",
-																	\"SNU685\",
-																	\"SNU719\",
-																	\"SNU738\",
-																	\"SNU761\",
-																	\"SNU8\",
-																	\"SNU81\",
-																	\"SNU840\",
-																	\"SNU869\",
-																	\"SNU878\",
-																	\"SNU886\",
-																	\"SNU899\",
-																	\"SNUC1\",
-																	\"SNUC2A\",
-																	\"SNUC2B\",
-																	\"SNUC4\",
-																	\"SNUC5\",
-																	\"SQ1\",
-																	\"SR\",
-																	\"SR786\",
-																	\"ST486\",
-																	\"STELLATE\",
-																	\"STS0421\",
-																	\"SU8686\",
-																	\"SUDHL1\",
-																	\"SUDHL10\",
-																	\"SUDHL16\",
-																	\"SUDHL4\",
-																	\"SUDHL5\",
-																	\"SUDHL6\",
-																	\"SUDHL8\",
-																	\"SUIT2\",
-																	\"SUM149\",
-																	\"SUM159\",
-																	\"SUM44\",
-																	\"SUM52\",
-																	\"SUPB15\",
-																	\"SUPB8\",
-																	\"SUPHD1\",
-																	\"SUPM2\",
-																	\"SUPT1\",
-																	\"SUPT11\",
-																	\"SW1088\",
-																	\"SW1116\",
-																	\"SW1271\",
-																	\"SW13\",
-																	\"SW1353\",
-																	\"SW1417\",
-																	\"SW1463\",
-																	\"SW156\",
-																	\"SW1573\",
-																	\"SW1710\",
-																	\"SW1783\",
-																	\"SW1990\",
-																	\"SW403\",
-																	\"SW48\",
-																	\"SW480\",
-																	\"SW579\",
-																	\"SW620\",
-																	\"SW626\",
-																	\"SW684\",
-																	\"SW756\",
-																	\"SW780\",
-																	\"SW837\",
-																	\"SW872\",
-																	\"SW900\",
-																	\"SW948\",
-																	\"SW954\",
-																	\"SW962\",
-																	\"SW982\",
-																	\"T173\",
-																	\"T24\",
-																	\"T3M10\",
-																	\"T3M4\",
-																	\"T47D\",
-																	\"T84\",
-																	\"T98G\",
-																	\"TALL1\",
-																	\"TASK1\",
-																	\"TC32\",
-																	\"TC71\",
-																	\"TCCPAN2\",
-																	\"TCCSUP\",
-																	\"TCYIK\",
-																	\"TE1\",
-																	\"TE10\",
-																	\"TE11\",
-																	\"TE12\",
-																	\"TE125T\",
-																	\"TE14\",
-																	\"TE15\",
-																	\"TE159T\",
-																	\"TE4\",
-																	\"TE441T\",
-																	\"TE5\",
-																	\"TE6\",
-																	\"TE617T\",
-																	\"TE8\",
-																	\"TE9\",
-																	\"TEN\",
-																	\"TF1\",
-																	\"TGBC11TKB\",
-																	\"TGBC1TKB\",
-																	\"TGBC24TKB\",
-																	\"TGW\",
-																	\"THP1\",
-																	\"TI73\",
-																	\"TIG3TD\",
-																	\"TK\",
-																	\"TK10\",
-																	\"TKCC02\",
-																	\"TKCC02\",
-																	\"TKCC03\",
-																	\"TKCC04\",
-																	\"TKCC05\",
-																	\"TKCC05\",
-																	\"TKCC06\",
-																	\"TKCC06\",
-																	\"TKCC07\",
-																	\"TKCC07\",
-																	\"TKCC08\",
-																	\"TKCC09\",
-																	\"TKCC09\",
-																	\"TKCC10\",
-																	\"TKCC10\",
-																	\"TKCC12\",
-																	\"TKCC14\",
-																	\"TKCC14\",
-																	\"TKCC15\",
-																	\"TKCC16\",
-																	\"TKCC16\",
-																	\"TKCC17\",
-																	\"TKCC17\",
-																	\"TKCC18\",
-																	\"TKCC22\",
-																	\"TM31\",
-																	\"TMK1\",
-																	\"TO175T\",
-																	\"TOLEDO\",
-																	\"TOV112D\",
-																	\"TOV21G\",
-																	\"TT\",
-																	\"TT2609C02\",
-																	\"TUHR10TKB\",
-																	\"TUHR14TKB\",
-																	\"TUHR4TKB\",
-																	\"TUR\",
-																	\"TYKNU\",
-																	\"U031\",
-																	\"U118MG\",
-																	\"U138MG\",
-																	\"U178\",
-																	\"U251\",
-																	\"U251MG\",
-																	\"U266\",
-																	\"U266B1\",
-																	\"U2OS\",
-																	\"U343\",
-																	\"U698M\",
-																	\"U87MG\",
-																	\"U937\",
-																	\"UACC257\",
-																	\"UACC62\",
-																	\"UACC812\",
-																	\"UACC893\",
-																	\"UBLC1\",
-																	\"UCH2\",
-																	\"UMC11\",
-																	\"UMRC2\",
-																	\"UMRC6\",
-																	\"UMUC1\",
-																	\"UMUC3\",
-																	\"UOK101\",
-																	\"USAHTB111\",
-																	\"UT7\",
-																	\"UW479\",
-																	\"UWB1289\",
-																	\"VAESBJ\",
-																	\"VAL\",
-																	\"VCAP\",
-																	\"VMCUB1\",
-																	\"VMRCLCD\",
-																	\"VMRCLCP\",
-																	\"VMRCMELG\",
-																	\"VMRCRCW\",
-																	\"VMRCRCZ\",
-																	\"VP229\",
-																	\"WIL2NS\",
-																	\"WM115\",
-																	\"WM1552C\",
-																	\"WM1799\",
-																	\"WM2664\",
-																	\"WM278\",
-																	\"WM35\",
-																	\"WM793\",
-																	\"WM793B\",
-																	\"WM88\",
-																	\"WM983B\",
-																	\"WSUDLCL2\",
-																	\"WSUNHL\",
-																	\"X977\",
-																	\"YAPC\",
-																	\"YD10B\",
-																	\"YD15\",
-																	\"YD38\",
-																	\"YD8\",
-																	\"YH13\",
-																	\"YKG1\",
-																	\"YMB1\",
-																	\"YMB1E\",
-																	\"YT\",
-																	\"ZR751\",
-																	\"ZR7530\" ];
+	  									  var availableTissues = $tissue_list;
+									      var availableCellLines = $cell_line_list;
 										    \$( \"#tissues\" ).autocomplete ({
 										    source: availableTissues
 										    });
@@ -1648,38 +114,59 @@ my $page_header_for_add_new_screen_sub = "<html>
 										    source: availableCellLines
 										    });
 										  });									  
-										  function validateTissueType(form) {
-										    if ( form[\"tissue_type\"].value == \"Please select\" ) {
-										      alert (\"Please enter tissue type.\");
-										      return false;
-										    }
-										    return true;
-										  }
 										  function make_tissues_Blank() {
-										    var x = document.getElementById( \"tissues\" );
-										    x.value = \"\";
+										    var a = document.getElementById( \"tissues\" );
+										    a.value = \"\";
 										    }
 										  function make_cellLines_Blank() {
-										    var y = document.getElementById( \"celllines\" );
-										    y.value = \"\";
-										    }  
-										  function codename() {
-										    if(document.formname.checkboxname.checked) {
-										      document.formname.textname.disabled = false;
+										    var b = document.getElementById( \"celllines\" );
+										    b.value = \"\";
+										  }    
+										  function enableText() {
+										    if(document.addNewScreen.is_isogenic.checked) {
+										      document.addNewScreen.gene_name_if_isogenic.disabled = false;
+										      document.addNewScreen.isogenicSet.disabled = false;
+										      document.addNewScreen.name_of_set_if_isogenic.disabled = false;
+										      document.addNewScreen.isogenic_mutant_description.disabled = false;
+										      document.addNewScreen.method_of_isogenic_knockdown.disabled = false; 
 										    }
 										    else {
-										      document.formname.textname.disabled = true;
+										      document.addNewScreen.gene_name_if_isogenic.disabled = true;
+										      document.addNewScreen.isogenicSet.disabled = true;
+										      document.addNewScreen.name_of_set_if_isogenic.disabled = true;
+										      document.addNewScreen.isogenic_mutant_description.disabled = true;
+										      document.addNewScreen.method_of_isogenic_knockdown.disabled = true;
 										    }
 										  } 
+										  function make_geneName_Blank() {
+										    var c = document.getElementById( \"geneName\" );
+										    c.value = \"\";
+										  } 
+										  function make_isogenic_Set_Blank() {
+										    var d = document.getElementById( \"isogenic_Set\" );
+										    d.value = \"\";
+										  } 
+										  function make_isogenicDescription_Blank() {
+										    var e = document.getElementById( \"isogenicDescription\" );
+										    e.value = \"\";
+										  } 
+										  function make_isogenicKnockdown_Blank() {
+										    var f = document.getElementById( \"isogenicKnockdown\" );
+										    f.value = \"\";
+										  }  
+										  function make_notes_Blank() {
+										    var g = document.getElementById( \"NoteS\" );
+										    g.value = \"\";
+										  }  
 										  </script>
 				   						  </head>
 				   						  <body>
 				   						  <div id=\"Box\"></div><div id=\"MainFullWidth\">
 				   						  <a href=\"http://gft.icr.ac.uk\"><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>
 				   						  <p>
-				   						  <a href=\"/cgi-bin/rnaidb.pl?add_new_screen=1\">Add new screen</a>\&nbsp;\&nbsp;
-				    					  <a href=\"/cgi-bin/rnaidb.pl?show_all_screens=1\">Show all screens</a>\&nbsp;\&nbsp;
-				   						  <a href=\"/cgi-bin/rnaidb.pl?configure_export=1\">Configure export</a>\&nbsp;\&nbsp;
+				   						  <a href=\"/cgi-bin/$script_name?add_new_screen=1\">Add new screen</a>\&nbsp;\&nbsp;
+				    					  <a href=\"/cgi-bin/$script_name?show_all_screens=1\">Show all screens</a>\&nbsp;\&nbsp;
+				   						  <a href=\"/cgi-bin/$script_name?configure_export=1\">Configure export</a>\&nbsp;\&nbsp;
 				   						  </p>";
 				   
 my $page_footer = "</div> <!-- end Main --></div> 
@@ -1800,8 +287,7 @@ sub add_new_screen {
   print "<h1>Add new screen:</h1>";
   
   print $q -> start_multipart_form ( -method => "POST",
-  								     -name => "tissue_type",
-  								     -onSubmit => "return validateTissueType(this)" ); 
+  									 -name => "addNewScreen" ); 
   
   print "<table width = 100%>\n";
   print "<tr>\n";
@@ -1816,10 +302,9 @@ sub add_new_screen {
     print "<div id=\"Message\"><p><b>$file_upload_message</b></p></div>";
   }
   
-  
-  # =========================
-  # add main screen info here
-  # =========================
+  ##
+  ## add main screen info here ##
+  ## 
  
   print "<p><b>General screen information:</b></p>";
   print "<p>";
@@ -1828,10 +313,11 @@ sub add_new_screen {
   
   print "<p>Plate excel file:<br />";
   
-  print $q -> filefield ( -name=>'uploaded_excel_file',
-                         -default=>'starting value',
-                         -size=>35,
-                         -maxlength=>256 );
+  print $q -> filefield ( -name => 'uploaded_excel_file',
+                         -default => 'starting value',
+                         -size => 35,
+                         -maxlength => 256,
+                         -id => "xls_file" );
   print "</p>";
 
   ## get the existing plateconf filenames from the database and display them in the popup menu ##
@@ -1859,13 +345,14 @@ sub add_new_screen {
   unshift( @plateconf_path, "Please select" );
   print "<p>Plateconf file:<br />";
   
-  print $q -> popup_menu ( -name=>'plate_conf',
-  						  -value=>\@plateconf_path,
-  						  -default=>'Please select' );							    		  
+  print $q -> popup_menu ( -name => 'plate_conf',
+  						  -value => \@plateconf_path,
+  						  -default => 'Please select',
+  						  -id => "pconf_file" );							    		  
   print " - OR";
   #link to the form for adding new plateconf file 
   print "<p>";
-  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/rnaidb.pl?add_new_files=1#new_plate_conf_file\"> Add new plateconf file</a>";
+  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1#new_plate_conf_file\"> Add new plateconf file</a>";
   print "</p>";
   print "</p>";
 
@@ -1896,12 +383,13 @@ sub add_new_screen {
   
   print $q -> popup_menu ( -name => 'plate_list',
   						  -value => \@platelist_path,
-   						  -default => 'Please select' );
+   						  -default => 'Please select',
+   						  -id => "plist_file" );
   
   print " - OR";
   #link to the form for adding new platelist file 
   print "<p>";  
-  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/rnaidb.pl?add_new_files=1#new_plate_list_file\">Add new platelist file</a>";
+  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1#new_plate_list_file\">Add new platelist file</a>";
   print "</p>";  
   print "</p>";  	
   		
@@ -1933,12 +421,13 @@ sub add_new_screen {
   
   print $q -> popup_menu ( -name => 'template_library',
   						  -value => \@templib_path,
-   						  -default => 'Please select' );
+   						  -default => 'Please select',
+   						  -id => "tlib_file" );
   
   print " - OR";
   #link to the form for adding new template library file 
   print "<p>";  	
-  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/rnaidb.pl?add_new_files=1#new_plate_library_file\"> Add new template library file</a>";
+  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1#new_plate_library_file\"> Add new template library file</a>";
   print "</p>";
   print "</p>";
 
@@ -1984,16 +473,18 @@ sub add_new_screen {
   print $q -> textfield ( -name => "operator",
                           -value => $user,
                           -size => "30",
-                          -maxlength => "45");
+                          -maxlength => "45",
+                          -id => "OperatoR");
 
-  print "</p><p>Transfection reagent:<br />"; 
+  print "</p><p>Transfection reagent:<br/>"; 
     
   ## get the transfection_reagent name from the database ##
   
   my @transfection_reagent = ( "Please select", "Lipofectamine 2000", "Lipofectamine 3000", "Lipofectamine RNAi max", "Dharmafect 3", "Dharmafect 4", "Oligofectamine", "Effectene" ); 
   print $q -> popup_menu ( -name => 'transfection_reagent',
-  						  -value => \@transfection_reagent,
-  						  -default => 'Please select' );
+  						   -value => \@transfection_reagent,
+  						   -default => 'Please select',
+  						   -id => "reagent" );
   
   ## get the instrument name from the database ##
   
@@ -2001,8 +492,9 @@ sub add_new_screen {
   
   my @instrument = ( "Please select", "1S10", "1C11" ); 
   print $q -> popup_menu ( -name => 'instrument',
-  					      -values => \@instrument,
-  						  -default => 'Please select' );
+  					       -value => \@instrument,
+  						   -default => 'Please select',
+  						   -id => "InstrumenT" );
 
   print "</td>\n";
 
@@ -2014,24 +506,28 @@ sub add_new_screen {
   
   print "<p><b>Isogenic screens:</b></p>";
 
-  ## is the screen isogenic ##
+  ## checkbox for isogenic screen ##
 
   print "<p>";
   
   print $q -> checkbox( -name=>'is_isogenic',
     					-checked=>0,
+    					-onclick=>"enableText()",
    					    -value=>'ON',
     					-label=>'this is an isogenic screen' );
 
   print "</p><p>";
   
-  ## which gene was modified ##
+  ## enter modified gene name ##
   
   print "Modified gene name:<br />";
   print $q -> textfield ( -name => "gene_name_if_isogenic",
                           -value => 'Enter gene name',
                           -size => "30",
-                          -maxlength => "45" );
+                          -maxlength => "45",
+                          -onClick => "make_geneName_Blank()",
+                          -id => "geneName",
+                          -disabled );
   
   print "</p><p>";
    
@@ -2046,40 +542,50 @@ sub add_new_screen {
   print "<p>Select isogenic set:<br />";
     
   print $q -> popup_menu (-name =>'isogenicSet',
-  						 -value => $ISOGENIC_SET,
-   	                     -default =>'Please select' );
+  						  -value => $ISOGENIC_SET,
+   	                      -default =>'Please select',
+   	                      -disabled );
 
   print " - OR";
   print "<p>";
   print "</p>";  
   
-  ## what isogenic set is this part of ##
+  ## enter isogenic set name ##
   
   print "Enter isogenic set:<br />";
   print $q -> textfield ( -name => "name_of_set_if_isogenic",
-                          -value => 'Enter isogenic set name',
+                          -value => 'Enter isogenic set name',                         
                           -size => "30",
-                          -maxlength => "45" );
+                          -maxlength => "45",
+                          -onClick => "make_isogenic_Set_Blank()",
+                          -id => "isogenic_Set",
+                          -disabled );
                           
   print "</p><p>";
    
-  ## get isogenic mutant description (i.e. parental etc) ##
+  ## get isogenic mutant description ##
   
   print "Isogenic description:<br />";
   print $q -> textfield ( -name => "isogenic_mutant_description",
                           -value => 'e.g. parental',
                           -size => "30",
-                          -maxlength => "45" );
+                          -maxlength => "45",
+                          -onClick => "make_isogenicDescription_Blank()",
+                          -id => "isogenicDescription",
+                          -disabled );
   
   print "</p><p>";  
   
-  ## get method of isogenic knockout etc ##
+  ## get method of isogenic knockout ##
   
   print "Method of isogenic mutation:<br />";
   print $q -> textfield ( -name => "method_of_isogenic_knockdown",
                           -value => 'e.g. ZFN or shRNA',
                           -size => "30",
-                          -maxlength => "45" );
+                          -maxlength => "45",
+                          -onClick => "make_isogenicKnockdown_Blank()",
+                          -id => "isogenicKnockdown",
+                          -disabled );
    
   print "</p><p>";
   print "</td>\n";                        
@@ -2089,10 +595,35 @@ sub add_new_screen {
   # =========================
 
   print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n";
   
   print "<p><b>Drug screens:</b></p>";
 
-  ## is this a drug screen ##
+  ## checkbox for drug screen ##
 
   print "<p>";
   
@@ -2103,7 +634,7 @@ sub add_new_screen {
 
   print "</p><p>";
   
-  ##  Select control from dropdown menu ##
+  ##  select control from dropdown menu ##
   
   print "<p>";
   
@@ -2149,44 +680,65 @@ sub add_new_screen {
                           -maxlength => "45" ); 
     
   print "</p>";                       
-  print "</td>\n";                       
-                                              
-  # ====================================
-  # put notes text field for drug screen
-  # ====================================
+                                                            
+  ## put notes text field for drug screen ##
 
-  print "<td align=left valign=bottom>\n";
+ #print "<td align=left valign=centre>\n";
   
-  print "<p>";
+  print "<p></p>";
+  print "</p></p>";
   print "Notes about the drug screen:<br />";
   print $q -> textarea ( -name => "drug_screen_notes",
                          -default => 'write notes for drug screen',
                          -rows => "8",
-                         -columns => "40" );     
-                          
-  print "</p>";
+                         -columns => "40" );                              
   print "</td>\n";
-                                                                    
-  # ==========================================================
-  # put notes text field for new screen and submit button here
-  # ==========================================================
-
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n"; 
+  
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";
+  print "</td>\n";                  
+  
+  ## put notes text field for new screen and submit button here ##
+  
   print "<tr colspan=2>\n";
   print "<td align=left valign=top>\n";
 
-  ## Enter information to store in the Description.txt ##
+  ## Enter information to store in the Description.txt file ##
 
   print "<p>";
   print "Notes about this screen:<br />";
   print $q -> textarea ( -name => "notes",
                          -default => 'write notes for Description.txt',
                          -rows => "8",
-                         -columns => "40" );
-                         
+                         -columns => "40",
+                         -onClick => "make_notes_Blank()",
+                         -id => "NoteS" );
+  print "</p>";                       
   ## submit the form ##
                                                 
-  print "</p><p>";
-  print "<input type=\"submit\" id=\"save_new_screen\" value=\"Save new screen information and analysis results\" name=\"save_new_screen\" />";
+  print "<p>";
+  print "<input type=\"submit\" id=\"save_new_screen\" value=\"Analyse and save results\" name=\"save_new_screen\" />";
   print "</p>";
   
   ## button for viewing all screens ##
@@ -2196,7 +748,9 @@ sub add_new_screen {
   #print "</p>";
   
   print "</td>\n";
+  
   print "</tr>\n";
+  
   print $q -> end_multipart_form(); 
   
   print "$page_footer";
@@ -2502,12 +1056,16 @@ sub save_new_screen {
   my $screenDir_path = "/home/agulati/data/screen_data";
   my $file_path = "$screenDir_path/$screen_dir_name";
   
+  if (( -e $file_path ) && ( $sicon1 ne 'ON' ) && ( $sicon2 ne 'ON' ) && ( $allstar ne 'ON' )) {
+     die "Cannot make new RNAi screen directory $screen_dir_name in $screenDir_path: $!"; 
+   }
+  
   if ( ! -e $file_path ) {
-      mkdir( "$file_path" );
-      `chmod -R 777 $file_path`;
-      `chown -R agulati:agulati $file_path`;
+    mkdir( "$file_path" );
+    `chmod -R 777 $file_path`;
+    `chown -R agulati:agulati $file_path`;
       
-      print "<p><div id=\"Note\">Created new screen directory: $screen_dir_name...</div></p>";
+    print "<p><div id=\"Note\">Created new screen directory...</div></p>";
     
     ## add screen directory name as prefix to all the filenames in the selected platelist file ##
 
@@ -2528,8 +1086,10 @@ sub save_new_screen {
   
     $platelist_prefix = $screen_dir_name."_";
   
-    open IN, "< $platelist_target";
-    open OUT, "> $platelist_tmp_file";
+    open IN, "< $platelist_target"
+      or die "Cannot open $platelist_target:$!\n";
+    open OUT, "> $platelist_tmp_file"
+      or die "Cannot open $platelist_tmp_file:$!\n";
     while (<IN>) {
       if ($_ =~ /^Filename/) {
         print OUT $_;
@@ -2540,7 +1100,7 @@ sub save_new_screen {
     }
     close IN;
     close OUT; 
-    `cp $platelist_tmp_file $platelist_target`;
+    `mv $platelist_tmp_file $platelist_target`;
     
     ## match templib name, selected from the drop down menu, to the file and store it in a variable ##
 
@@ -2571,9 +1131,8 @@ sub save_new_screen {
       my $io_handle = $lightweight_fh->handle;
  
       open ( $excelFile,'>',$target )
-        or die "Cannot open '$target':$!";
-        print "<p><div id=\"Note\">Uploaded Excel file saved to the new screen directory...</div></p>";
-    
+        or die "Cannot move $excelFile to $target:$!\n";
+      
       my $bytesread = undef;
       my $buffer = undef;
     
@@ -2584,17 +1143,16 @@ sub save_new_screen {
       close $excelFile
         or die "Error writing '$target' : $!";
       }
-      else {
-        `rm -r $file_path`;
-        die "Please upload the excel file.";
-      }
+      #else {
+       # `rm -r $file_path`;
+       # die "Please upload the excel file.";
+      #}
     
       ## rename uploaded excel file ##
-    
       my $new_xls_file = rename ( $file_path."/".$excelFile, $file_path."/".$screen_dir_name.".xls" ) or die "Cannot rename $excelFile :$!";
-    
+      
       print "<p>";
-      print "<p><div id=\"Note\">Excel file renamed...</div></p>";
+      print "<p><div id=\"Note\">Renamed excel file saved in the screen directory...</div></p>";
       print "</p>"; 
     
   ###############################################[[[either copy the platelist/palteconf/library etc to the new screen folder or use symlinks to point to the templates]]]
@@ -2602,9 +1160,10 @@ sub save_new_screen {
     ## write $notes to a 'Description.txt' file ##
   
     my $descripFile = $file_path."/".$screen_dir_name."_Description.txt";
-    open NOTES, "> $descripFile" or die "Can't write notes file to ... :$!\n";
-      print NOTES $notes;
-      $screenDescription_filename = $screen_dir_name."_Description.txt";
+    open NOTES, "> $descripFile" 
+      or die "Cannot write notes to $descripFile:$!\n";
+    print NOTES $notes;
+    $screenDescription_filename = $screen_dir_name."_Description.txt";
     close NOTES;
     
     print "<p><div id=\"Note\">Created 'Description.txt' file in the new screen directory...</div></p>";  
@@ -2613,7 +1172,8 @@ sub save_new_screen {
   
     $guide_file = $screen_dir_name."_guide_file.txt";
   
-    open GUIDEFILE, '>', $file_path."/".$guide_file or die "Can't open $file_path";
+    open GUIDEFILE, '>', $file_path."/".$guide_file 
+      or die "Cannot open $file_path:$!\n";
     
     print GUIDEFILE 
       "Cell_line\t", 
@@ -2647,17 +1207,16 @@ sub save_new_screen {
       "$screen_dir_name"."_controls_qc.png\t", 
       "$screen_dir_name"."_corr.txt\n";  
   
-    print "<p><div id=\"Note\">Guide file created...</div></p>";
+    print "<p><div id=\"Note\">Created guide file...</div></p>";
     print "<p><div id=\"Note\">Analysing...</div></p>"; 
       
     close (GUIDEFILE); 
     }
     
-    
   ## Reanalysis ##
-  
-    if ((-e $file_path) && ($sicon1 eq 'ON')) {
-      @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
+    
+    if (( -e $file_path ) && ( $sicon1 eq 'ON' )) {
+      @ARGV = glob ( $file_path."/".$screen_dir_name."_".$plateconf.".txt" );
       $^I = "";
       while ( <> ) {
         s/(\s)siCON1([\n\r])/$1empty$2/g;
@@ -2665,8 +1224,8 @@ sub save_new_screen {
       }
       print "<p><div id=\"Note\">Reanalysing with updated plateconf file...</div></p>"; 
     }
-    if ((-e $file_path) && ($sicon2 eq 'ON')) {
-      @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
+    if (( -e $file_path ) && ( $sicon2 eq 'ON' )) {
+      @ARGV = glob ( $file_path."/".$screen_dir_name."_".$plateconf.".txt" );
       $^I = "";
       while ( <> ) {
         s/(\s)siCON2([\n\r])/$1empty$2/g;
@@ -2674,8 +1233,8 @@ sub save_new_screen {
       }
       print "<p><div id=\"Note\">Reanalysing with updated plateconf file...</div></p>"; 
     }
-    if ((-e $file_path) && ($allstar eq 'ON')) {
-      @ARGV = glob ($file_path."/".$screen_dir_name."_".$plateconf.".txt" );
+    if (( -e $file_path ) && ( $allstar eq 'ON' )) {
+      @ARGV = glob ( $file_path."/".$screen_dir_name."_".$plateconf.".txt" );
       $^I = "";
       while ( <> ) {
         s/(\s)allstar([\n\r])/$1empty$2/g;
@@ -2683,10 +1242,6 @@ sub save_new_screen {
       }
     print "<p><div id=\"Note\">Reanalysing with updated plateconf file...</div></p>"; 
     }
-
-   #if ((-e $file_path) && ($sicon1 ne 'ON') && ($sicon2 ne 'ON') && ($allstar ne 'ON')) {
-     #die "Cannot make new directory $screen_dir_name in $screenDir_path: $!"; 
-   #}
   
   my $guide = $guide_file;
   
@@ -2728,7 +1283,8 @@ sub save_new_screen {
   ## Capture zprime value in a variable ##
   
   my $zp_value = '';
-  open IN, "< $zPrime" or die "Can't read z-prime values from $zPrime: $!\n";
+  open IN, "< $zPrime" 
+    or die "Cannot read z-prime values from $zPrime: $!\n";
   my $rep_count = 0;
   while(<IN>) {
     if ($_ =~ /Channel/) {
@@ -2736,7 +1292,9 @@ sub save_new_screen {
     }
     my $value = $_;
     chomp $value;
+    #round off to the zprime values to two decimal places
     $value = sprintf "%.2f", $value;
+    #count number of plate replicates and write the calculated zprime for each replicate
     $rep_count ++;
     $zp_value = $zp_value . "Rep" . $rep_count . "(" . $value  . "),";
   }
@@ -2754,47 +1312,14 @@ sub save_new_screen {
   # Populate the database
   # =====================
   
-  ## declare variables locally ##
-  my $line; 
-  
-  my $is_isogenic_screen;
-  
-  my $plate_number_xls_file;
-  my $well_number_xls_file;
-  my $raw_score_xls_file;
-
-  my $compound;
-  my $plate_number_for_zscore;
-  my $well_number_for_zscore;
-  my $zscore;
-
-  my $plate_number_for_summary;
-  my $position;
-  my $zscore_summary; 
-  my $well_number_for_summary; 
-  my $well_anno;
-  my $final_well_anno;
-  my $raw_r1_ch1;
-  my $raw_r2_ch1;
-  my $raw_r3_ch1;
-  my $median_ch1;
-  my $average_ch1;
-  my $raw_plate_median_r1_ch1;
-  my $raw_plate_median_r2_ch1; 
-  my $raw_plate_median_r3_ch1;
-  my $normalized_r1_ch1;
-  my $normalized_r2_ch1;
-  my $normalized_r3_ch1;
-  my $gene_symbol_summary;
-  my $entrez_gene_id_summary;
-  
   ## 1. Store user info in the database ##
  
- # open ( FILE, "/usr/lib/cgi-bin/users.txt" );
+ # open ( FILE, "/usr/lib/cgi-bin/users.txt" )
+    # or die "Cannot open /usr/lib/cgi-bin/users.txt:$!\n";
   
-  #foreach $line ( <FILE> ) {
+  #foreach my $line ( <FILE> ) {
   #  chomp $line;
-  #  ( $username, $password ) = split( /\t/,$line );
+  #  my ( $username, $password ) = split( /\t/,$line );
     
    # $query_handle = $dbh -> do ( "INSERT INTO User_info (
 	#User_info_ID, 
@@ -2817,14 +1342,15 @@ sub save_new_screen {
   
   #first check if the screen is isogenic and then check if the user hasn't selected a set from the drop down menu
   
+  my $is_isogenic_screen;
+  
   if ($is_isogenic eq 'ON') {
     $is_isogenic_screen = "YES";
     if ( $ISOGENIC_SET eq "Please select" ) {
-      my $query = $dbh -> do ( "INSERT INTO 
-      						Name_of_set_if_isogenic ( 
-        					Name_of_set_if_isogenic) 
-        					VALUES (
-        					'$new_isogenic_set' )" );
+      my $query = $dbh -> do ( "INSERT INTO Name_of_set_if_isogenic ( 
+        					   Name_of_set_if_isogenic) 
+        					   VALUES (
+        					   '$new_isogenic_set' )" );
       my $query_handle = $dbh -> prepare ( $query );
    					      # or die "Cannot prepare: " . $dbh -> errstr();
       $query_handle -> execute();
@@ -2844,54 +1370,55 @@ sub save_new_screen {
 
   ## 3. Store new Rnai screen metadata in the database ##
   
-  my $query = $dbh -> do( "INSERT INTO Rnai_screen_info (      
-    Cell_line,    
-    Rnai_screen_name,    
-    Date_of_run,    
-    Operator,    
-    Is_isogenic,    
-    Gene_name_if_isogenic,    
-    Isogenic_mutant_description,    
-    Method_of_isogenic_knockdown,    
-    Rnai_template_library,    
-    Plate_list_file_name,    
-    Plate_conf_file_name,   
-    Rnai_screen_link_to_report,
-    Rnai_screen_link_to_qc_plots,
-    Zprime,  
-    Notes,   
-    Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID, 
-    Instrument_used_Instrument_used_ID,   
-    Tissue_type_Tissue_type_ID,    
-    Transfection_reagent_used_Transfection_reagent_used_ID,    
-    Template_library_file_path_Template_library_file_path_ID,
-    Plateconf_file_path_Plateconf_file_path_ID,
-    Platelist_file_path_Platelist_file_path_ID,
-    Template_library_Template_library_ID ) 
-    SELECT 
-    '$cell_line_name',
-    '$screen_dir_name',
-    '$date_of_run', 
-    '$operator',
-    '$is_isogenic_screen',
-    '$gene_name_if_isogenic',
-    '$isogenic_mutant_description',
-    '$method_of_isogenic_knockdown',
-    '$templib',
-    '$platelist',
-    '$plateconf',
-    '$rnai_screen_link_to_report',
-    '$rnai_screen_link_to_qc_plots',
-    '$zp_value',
-    '$notes', 
-    ( SELECT Name_of_set_if_isogenic_ID FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic = '$ISOGENIC_SET' ), 
-    ( SELECT Instrument_used_ID FROM Instrument_used WHERE Instrument_name = '$instrument' ),
-    ( SELECT Tissue_type_ID FROM Tissue_type WHERE Tissue_of_origin = '$tissue_type' ), 
-    ( SELECT Transfection_reagent_used_ID FROM Transfection_reagent_used WHERE Transfection_reagent = '$transfection_reagent' ), 
-    ( SELECT Template_library_file_path_ID FROM Template_library_file_path WHERE Template_library_file_location = '$templib_file_path' ),
-    ( SELECT Plateconf_file_path_ID FROM Plateconf_file_path WHERE Plateconf_file_location = '$plateconf_file_path' ),
-    ( SELECT Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$platelist_file_path' ),
-    ( SELECT Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )");
+  my $query = $dbh -> do( "INSERT INTO 
+                          Rnai_screen_info (      
+						  Cell_line,    
+						  Rnai_screen_name,    
+						  Date_of_run,    
+						  Operator,    
+						  Is_isogenic,    
+						  Gene_name_if_isogenic,    
+						  Isogenic_mutant_description,    
+						  Method_of_isogenic_knockdown,    
+						  Rnai_template_library,    
+						  Plate_list_file_name,    
+						  Plate_conf_file_name,   
+						  Rnai_screen_link_to_report,
+						  Rnai_screen_link_to_qc_plots,
+						  Zprime,  
+						  Notes,   
+						  Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID, 
+						  Instrument_used_Instrument_used_ID,   
+						  Tissue_type_Tissue_type_ID,    
+						  Transfection_reagent_used_Transfection_reagent_used_ID,    
+						  Template_library_file_path_Template_library_file_path_ID,
+						  Plateconf_file_path_Plateconf_file_path_ID,
+						  Platelist_file_path_Platelist_file_path_ID,
+						  Template_library_Template_library_ID ) 
+						  SELECT 
+						  '$cell_line_name',
+						  '$screen_dir_name',
+						  '$date_of_run', 
+						  '$operator',
+						  '$is_isogenic_screen',
+						  '$gene_name_if_isogenic',
+						  '$isogenic_mutant_description',
+						  '$method_of_isogenic_knockdown',
+						  '$templib',
+						  '$platelist',
+						  '$plateconf',
+						  '$rnai_screen_link_to_report',
+						  '$rnai_screen_link_to_qc_plots',
+						  '$zp_value',
+						  '$notes', 
+						  ( SELECT Name_of_set_if_isogenic_ID FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic = '$ISOGENIC_SET' ), 
+						  ( SELECT Instrument_used_ID FROM Instrument_used WHERE Instrument_name = '$instrument' ),
+						  ( SELECT Tissue_type_ID FROM Tissue_type WHERE Tissue_of_origin = '$tissue_type' ), 
+						  ( SELECT Transfection_reagent_used_ID FROM Transfection_reagent_used WHERE Transfection_reagent = '$transfection_reagent' ), 
+						  ( SELECT Template_library_file_path_ID FROM Template_library_file_path WHERE Template_library_file_location = '$templib_file_path' ),
+						  ( SELECT Plateconf_file_path_ID FROM Plateconf_file_path WHERE Plateconf_file_location = '$plateconf_file_path' ),
+						  ( SELECT Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$platelist_file_path' ),
+						  ( SELECT Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )");
   
   my $query_handle = $dbh->prepare( $query );
    					    #or die "Cannot prepare: " . $dbh -> errstr();
@@ -2903,7 +1430,6 @@ sub save_new_screen {
   #else {
    # print "error";
   #}
-  
   #capture the last row ID for the rnai screen info table in the database
   my $last_rnai_screen_info_id = $dbh -> { mysql_insertid };
   #$query_handle -> finish();
@@ -2912,13 +1438,16 @@ sub save_new_screen {
   
   ######### COMMENTED OUT TEMPORARILY #########
   
-  #open ( FILE, $file_path."/".$screen_dir_name.".txt" );
+  #open ( FILE, $file_path."/".$screen_dir_name.".txt" )
+    #or die "Cannot open the xls2txt file:$!\n";
   
-  #foreach $line( <FILE> ){
+  #foreach my $line( <FILE> ){
    # chomp $line;
-    #( $plate_number_xls_file, $well_number_xls_file, $raw_score_xls_file ) = split ( /\t/,$line );
+    #my ( $plate_number_xls_file, 
+    #$well_number_xls_file, 
+    #$raw_score_xls_file ) = split ( /\t/,$line );
     
-    #$query_handle = $dbh -> do ( "INSERT INTO Plate_excel_file_as_text (
+    #my $query = $dbh -> do ( "INSERT INTO Plate_excel_file_as_text (
     #Plate_excel_file_as_text_ID, 
     #Plate_number_xls_file, 
     #Well_number_xls_file, 
@@ -2946,30 +1475,30 @@ sub save_new_screen {
   my $zscores_file_wo_header = $file_path."/".$screen_dir_name."_zscores_wo_header.txt";
   `cat $zscores_file_complete | grep -v ^Compound > $zscores_file_wo_header`;
   
-  open ( FILE, $zscores_file_wo_header );
-  foreach $line ( <FILE> ) {
+  open (FILE, $zscores_file_wo_header);
+  foreach my $line(<FILE>) {
     chomp $line;
-    ( $compound, $plate_number_for_zscore, $well_number_for_zscore, $zscore ) = split( /\t/,$line );
+    my ($compound, 
+    $plate_number_for_zscore, 
+    $well_number_for_zscore, 
+    $zscore) = split(/\t/,$line);
     
-    my $query = $dbh -> do( "INSERT INTO Zscores_result (
-      Compound, 
-      Plate_number_for_zscore, 
-      Well_number_for_zscore,
-      Zscore,
-      Rnai_screen_info_Rnai_screen_info_ID,
-      Template_library_Template_library_ID ) 
-      SELECT 
-      '$compound', 
-      '$plate_number_for_zscore',
-      '$well_number_for_zscore', 
-      '$zscore',
-      '$last_rnai_screen_info_id',
-      ( SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )" );
-    my $query_handle = $dbh -> prepare ( $query );
-   					    # or die "Cannot prepare: " . $dbh -> errstr();
+    my $query = $dbh -> do ("INSERT INTO Zscores_result (
+							  Compound, 
+							  Plate_number_for_zscore, 
+							  Well_number_for_zscore,
+							  Zscore,
+							  Rnai_screen_info_Rnai_screen_info_ID,
+							  Template_library_Template_library_ID) 
+							  SELECT 
+							  '$compound', 
+							  '$plate_number_for_zscore',
+							  '$well_number_for_zscore', 
+							  '$zscore',
+							  '$last_rnai_screen_info_id',
+							  (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')");
+    my $query_handle = $dbh->prepare($query);
     $query_handle -> execute();
-      #or die "SQL Error: ".$query_handle->errstr();
-    #$query_handle->finish();
   }
   close FILE;
   
@@ -2980,10 +1509,10 @@ sub save_new_screen {
   my $summary_file_wo_header = $file_path."/".$screen_dir_name."_summary_wo_header.txt";
   `cat $summary_file_complete | grep -v ^plate > $summary_file_wo_header`;
   
-  open ( FILE, $summary_file_wo_header );
-  foreach $line( <FILE> ) {
+  open (FILE, $summary_file_wo_header);
+  foreach my $line(<FILE>) {
     chomp $line;
-    ($plate_number_for_summary, 
+    my ($plate_number_for_summary, 
     $position, 
     $zscore_summary, 
     $well_number_for_summary, 
@@ -3000,90 +1529,82 @@ sub save_new_screen {
     $normalized_r1_ch1, 
     $normalized_r2_ch1, 
     $normalized_r3_ch1, 
-    $gene_symbol_summary, 
-    $entrez_gene_id_summary ) = split( /\t/,$line );
-    
-    my $query = $dbh -> do ( "INSERT INTO Summary_of_result (
-							 Plate_number_for_summary,
-							 Position,
-							 Zscore_summary, 
-							 Well_number_for_summary,
-							 Well_anno,
-							 Final_well_anno,
-						     Raw_r1_ch1,
-						     Raw_r2_ch1,
-						     Raw_r3_ch1,
-						     Median_ch1,
-						     Average_ch1,
-						     Raw_plate_median_r1_ch1,
-						     Raw_plate_median_r2_ch1,
-						     Raw_plate_median_r3_ch1,
-						     Normalized_r1_ch1,
-							 Normalized_r2_ch1,
-							 Normalized_r3_ch1,
-							 Gene_symbol_summary,
-							 Entrez_gene_id_summary,
-							 Rnai_screen_info_Rnai_screen_info_ID, 
-							 Template_library_Template_library_ID ) 
-							 SELECT 
-							 '$plate_number_for_summary',
-							 '$position',
-							 '$zscore_summary', 
-							 '$well_number_for_summary', 
-							 '$well_anno',
-							 '$final_well_anno',
-							 '$raw_r1_ch1',
-							 '$raw_r2_ch1',
-							 '$raw_r3_ch1',
-							 '$median_ch1',
-							 '$average_ch1',
-							 '$raw_plate_median_r1_ch1',
-							 '$raw_plate_median_r2_ch1', 
-						     '$raw_plate_median_r3_ch1',
-						     '$normalized_r1_ch1',
-							 '$normalized_r2_ch1',
-							 '$normalized_r3_ch1',
-							 '$gene_symbol_summary',
-							 '$entrez_gene_id_summary',
-							 '$last_rnai_screen_info_id',
-							 ( SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )" );
-    
-    my $query_handle = $dbh -> prepare( $query );
-   					    # or die "Cannot prepare: " . $dbh -> errstr();
-    $query_handle->execute();
-     # or die "SQL Error: " . $query_handle -> errstr();
-    #$query_handle -> finish();
+    $gene_symbol_summary,
+    $entrez_gene_id_summary) = split(/\t/, $line);
+  
+    my $query = $dbh -> do("INSERT INTO Summary_of_result(
+    Plate_number_for_summary, 
+    Position, 
+    Zscore_summary, 
+    Well_number_for_summary, 
+    Well_anno, 
+    Final_well_anno, 
+    Raw_r1_ch1, 
+    Raw_r2_ch1, 
+    Raw_r3_ch1, 
+    Median_ch1, 
+    Average_ch1, 
+    Raw_plate_median_r1_ch1, 
+    Raw_plate_median_r2_ch1, 
+    Raw_plate_median_r3_ch1, 
+    Normalized_r1_ch1, 
+    Normalized_r2_ch1, 
+    Normalized_r3_ch1, 
+    Gene_symbol_summary, 
+    Entrez_gene_id_summary, 
+    Rnai_screen_info_Rnai_screen_info_ID,  
+    Template_library_Template_library_ID) 
+    SELECT 
+    '$plate_number_for_summary', 
+    '$position', 
+    '$zscore_summary',  
+    '$well_number_for_summary',  
+    '$well_anno', 
+    '$final_well_anno', 
+    '$raw_r1_ch1', 
+    '$raw_r2_ch1', 
+    '$raw_r3_ch1', 
+    '$median_ch1', 
+    '$average_ch1', 
+    '$raw_plate_median_r1_ch1', 
+    '$raw_plate_median_r2_ch1', 
+    '$raw_plate_median_r3_ch1', 
+    '$normalized_r1_ch1', 
+    '$normalized_r2_ch1', 
+    '$normalized_r3_ch1', 
+    '$gene_symbol_summary', 
+    '$entrez_gene_id_summary', 
+    '$last_rnai_screen_info_id', 
+    (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')");
+	
+    my $query_handle = $dbh -> prepare($query);
+    $query_handle -> execute();
   }
   
   close FILE;
   
   print "<p>";
-  print "<p><div id=\"Note\">Result files for the screen, $screen_dir_name, stored in the database...</div></p>";
+  print "<p><div id=\"Note\">Stored screen results in the database...</div></p>";
   print "</p>";
  
-  print "<p>";
-  print "<p>ANALYSIS COMPLETE</p>";
-  print "</p>";
+  print "<p></p>";
+ 
+  print "<p><b>ANALYSIS DONE</b></p>";
+  
+  print "<b>RNAi screen name: $screen_dir_name</b>";
+  
+  print "<p></p>";
   
   print "<p>";
+  print "<a href = \"$rnai_screen_link_to_report\">View cellHTS2 analysis report </a>";
   print "<p>";
+  
   print "<p>";
-  
-  print "View analysis report for the screen: ";
-  print "<a href = \"$rnai_screen_link_to_report\">'$screen_dir_name'</a>";
-  print "</p>";
-  
-  print "View QC plots for the screen: ";
-  print "<a href=\"$rnai_screen_link_to_qc_plots\">'$screen_dir_name'</a>";
-  print "</p>";
-  
-  print "</p>";
-  print "</p>";
-  print "</p>";
+  print "<a href=\"$rnai_screen_link_to_qc_plots\">View QC plot </a>";
+  print "</p>"; 
   
   print "$page_footer";
   print $q -> end_html;
-
 }
 
   ############### TO DO:
@@ -3145,7 +1666,8 @@ sub save_new_uploaded_plateconf_file {
       my $io_handle = $lightweight_fh->handle;
     
       #save the uploaded file on the server
-      open ( $new_plateconf_file_renamed,'>', $target );
+      open ( $new_plateconf_file_renamed,'>', $target )
+        or die "Cannot move $new_plateconf_file_renamed to $target:$!\n";
       if ( $new_plateconf_file_renamed ) {
         $set_plateconf_error = undef;
       }
@@ -3176,8 +1698,10 @@ sub save_new_uploaded_plateconf_file {
     `chmod 777 $target`;
     `tr '\r' '\n' < $target > $tmpfile_path`;
     `cp $tmpfile_path $target`;
-    open IN, "<$tmpfile_path";
-    open OUT, ">$target";
+    open IN, "< $tmpfile_path"
+      or die "Cannot open $tmpfile_path:$!\n";
+    open OUT, ">$target"
+      or die "Cannot open $target:$!\n";
     while ( <IN> ){
       if( /\S/ ){
         print OUT $_;
@@ -3203,7 +1727,7 @@ sub save_new_uploaded_plateconf_file {
       $processing_status = 1;
     }
    # $query_handle -> finish();
-    #print $q->redirect (-uri=>"http://www.gft.icr.ac.uk/cgi-bin/rnaidb.pl?add_new_screen=1");
+    #print $q->redirect (-uri=>"http://www.gft.icr.ac.uk/cgi-bin/$script_name?add_new_screen=1");
   
   } #end of else statement loop
   
@@ -3349,7 +1873,8 @@ sub save_new_uploaded_platelist_file {
       my $io_handle = $lightweight_fh -> handle;
 
       #save the uploaded file on the server
-      open ( $new_platelist_file_renamed,'>',$target );
+      open ( $new_platelist_file_renamed,'>',$target )
+        or die "Cannot move $new_platelist_file_renamed to $target:$!\n";
       if ( $new_platelist_file_renamed ) {
         $set_platelist_error = undef;
       }
@@ -3379,8 +1904,10 @@ sub save_new_uploaded_platelist_file {
     #reformat the uploaded file
     `chmod 777 $target`;
     `tr '\r' '\n'  < $target > $tmpfile_path`;
-    open IN, "<$tmpfile_path";
-    open OUT, ">$target";
+    open IN, "<$tmpfile_path"
+      or die "Cannot open $tmpfile_path:$!\n";
+    open OUT, "> $target"
+      or die "Cannot open $target:$!\n";
     while ( <IN> ) {
       if( /\S/ ) {
         print OUT $_;
@@ -3391,7 +1918,8 @@ sub save_new_uploaded_platelist_file {
     
    # `cp $tmpfile_path $target`;
   
-    my $query = $dbh -> do ( "INSERT INTO Platelist_file_path (
+    my $query = $dbh -> do ( "INSERT INTO 
+                             Platelist_file_path (
       					     Platelist_file_location )
       					     VALUES (
       					     '$target' )");
@@ -3550,7 +2078,8 @@ sub save_new_uploaded_templib_file {
       my $io_handle = $lightweight_fh->handle;
       
       #save the uploaded file on the server
-      open ( $new_templib_file_renamed,'>',$target );
+      open ( $new_templib_file_renamed,'>',$target )
+        or die "Cannot move $new_templib_file_renamed to $target:$!\n";
       if ( $new_templib_file_renamed ) {
         $set_templib_error = undef;
      }
@@ -3580,8 +2109,10 @@ sub save_new_uploaded_templib_file {
     #reformat the uploaded file
     `chmod 777 $target`;
     `tr '\r' '\n'  < $target > $tmpfile_path`;
-    open IN, "< $tmpfile_path";
-    open OUT, "> $target";
+    open IN, "< $tmpfile_path"
+      or die "Cannot open $tmpfile_path:$!\n";
+    open OUT, "> $target"
+      or die "Cannot open $target:$!\n";
     while ( <IN> ) {
       if( /\S/ ) {
         print OUT $_;
@@ -3590,7 +2121,8 @@ sub save_new_uploaded_templib_file {
     close IN;
     close OUT;
   
-    my $query = $dbh -> do ( "INSERT INTO Template_library_file_path (
+    my $query = $dbh -> do ( "INSERT INTO 
+                             Template_library_file_path (
       					     Template_library_file_location)
       					     VALUES (
       					     '$target' )" );
@@ -3706,139 +2238,253 @@ sub show_all_screens {
   print $q -> header ( "text/html" );
   print "$page_header";
   print "<h1>Available screens:</h1>";
-
+    
+  print "<table>";
+ 
   my $query = "SELECT
-    r.Rnai_screen_name,
-    t.Tissue_of_origin,
-    r.Cell_line, 
-    r.Date_of_run,
-    r.Operator,
-    i.Instrument_name,
-    u.Transfection_reagent,
-    r.Rnai_template_library,
-    r.Plate_list_file_name,
-    r.Plate_conf_file_name,
-    r.Is_isogenic,
-    r.Gene_name_if_isogenic,
-    (SELECT n.Name_of_set_if_isogenic FROM Name_of_set_if_isogenic n WHERE n.Name_of_set_if_isogenic = 'NA'),
-    r.Isogenic_mutant_description,
-    r.Method_of_isogenic_knockdown,
-    r.Rnai_screen_link_to_report,
-    r.Zprime FROM
-    Rnai_screen_info r,
-    Transfection_reagent_used u,
-    Instrument_used i,
-    Tissue_type t,
-    Name_of_set_if_isogenic n WHERE
-    r.Transfection_reagent_used_Transfection_reagent_used_ID = u.Transfection_reagent_used_ID AND
-    r.Instrument_used_Instrument_used_ID = i.Instrument_used_ID AND
-    r.Tissue_type_Tissue_type_ID = t.Tissue_type_ID AND
-    r.Is_isogenic = 'NO' AND
-    r.Gene_name_if_isogenic = 'NA' AND
-    r.Isogenic_mutant_description = 'NA' AND
-    r.Method_of_isogenic_knockdown = 'NA' AND
-    r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = '4' GROUP BY
-    r.Rnai_screen_info_ID UNION ALL 
-    SELECT
-    r.Rnai_screen_name,
-    t.Tissue_of_origin,
-    r.Cell_line,
-    r.Date_of_run,
-    r.Operator,
-    i.Instrument_name,
-    u.Transfection_reagent,
-    r.Rnai_template_library,
-    r.Plate_list_file_name,
-    r.Plate_conf_file_name,
-    r.Is_isogenic,
-    r.Gene_name_if_isogenic,
-    n.Name_of_set_if_isogenic,
-    r.Isogenic_mutant_description,
-    r.Method_of_isogenic_knockdown,
-    r.Rnai_screen_link_to_report, 
-    r.Zprime FROM
-    Rnai_screen_info r,
-    Transfection_reagent_used u,
-    Instrument_used i,
-    Tissue_type t,
-    Name_of_set_if_isogenic n WHERE
-    r.Transfection_reagent_used_Transfection_reagent_used_ID = u.Transfection_reagent_used_ID AND
-    r.Instrument_used_Instrument_used_ID = i.Instrument_used_ID AND
-    r.Tissue_type_Tissue_type_ID = t.Tissue_type_ID AND
-    r.Is_isogenic = 'YES' AND
-    r.Gene_name_if_isogenic != 'NA' AND
-    r.Isogenic_mutant_description != 'NA' AND
-    r.Method_of_isogenic_knockdown != 'NA' AND
-    n.Name_of_set_if_isogenic_ID != '4' AND
-    r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = n.Name_of_set_if_isogenic_ID GROUP BY 
-    r.Rnai_screen_info_ID";
+			  r.Rnai_screen_name,
+			  t.Tissue_of_origin,
+		      r.Cell_line, 
+			  r.Date_of_run,
+			  r.Operator,
+			  i.Instrument_name,
+			  u.Transfection_reagent,
+			  r.Rnai_template_library,
+			  r.Plate_list_file_name,
+			  r.Plate_conf_file_name,
+			  r.Is_isogenic,
+			  r.Gene_name_if_isogenic,
+			  (SELECT n.Name_of_set_if_isogenic FROM Name_of_set_if_isogenic n WHERE n.Name_of_set_if_isogenic = 'NA'),
+		      r.Isogenic_mutant_description,
+			  r.Method_of_isogenic_knockdown,
+			  r.Rnai_screen_link_to_report,
+			  r.Zprime FROM
+			  Rnai_screen_info r,
+			  Transfection_reagent_used u,
+			  Instrument_used i,
+			  Tissue_type t,
+			  Name_of_set_if_isogenic n WHERE
+			  r.Transfection_reagent_used_Transfection_reagent_used_ID = u.Transfection_reagent_used_ID AND
+			  r.Instrument_used_Instrument_used_ID = i.Instrument_used_ID AND
+			  r.Tissue_type_Tissue_type_ID = t.Tissue_type_ID AND
+			  r.Is_isogenic = 'NO' AND
+			  r.Gene_name_if_isogenic = 'NA' AND
+			  r.Isogenic_mutant_description = 'NA' AND
+			  r.Method_of_isogenic_knockdown = 'NA' AND
+			  r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = '4' GROUP BY
+			  r.Rnai_screen_info_ID UNION ALL 
+			  SELECT
+			  r.Rnai_screen_name,
+			  t.Tissue_of_origin,
+			  r.Cell_line,
+			  r.Date_of_run,
+			  r.Operator,
+			  i.Instrument_name,
+			  u.Transfection_reagent,
+			  r.Rnai_template_library,
+			  r.Plate_list_file_name,
+			  r.Plate_conf_file_name,
+			  r.Is_isogenic,
+			  r.Gene_name_if_isogenic,
+			  n.Name_of_set_if_isogenic,
+			  r.Isogenic_mutant_description,
+			  r.Method_of_isogenic_knockdown,
+			  r.Rnai_screen_link_to_report, 
+			  r.Zprime FROM
+			  Rnai_screen_info r,
+			  Transfection_reagent_used u,
+			  Instrument_used i,
+			  Tissue_type t,
+			  Name_of_set_if_isogenic n WHERE
+			  r.Transfection_reagent_used_Transfection_reagent_used_ID = u.Transfection_reagent_used_ID AND
+			  r.Instrument_used_Instrument_used_ID = i.Instrument_used_ID AND
+			  r.Tissue_type_Tissue_type_ID = t.Tissue_type_ID AND
+			  r.Is_isogenic = 'YES' AND
+			  r.Gene_name_if_isogenic != 'NA' AND
+			  r.Isogenic_mutant_description != 'NA' AND
+			  r.Method_of_isogenic_knockdown != 'NA' AND
+			  n.Name_of_set_if_isogenic_ID != '4' AND
+			  r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = n.Name_of_set_if_isogenic_ID GROUP BY 
+			  r.Rnai_screen_info_ID";
     
   my $query_handle = $dbh -> prepare ( $query );
    					   #or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle -> execute();
    # or die "SQL Error: ".$query_handle -> errstr();
-    
-  print "<table>";
+  
+  print "<td align=left valign=top>\n";
   
   print "<th>";
   print "RNAi screen name";
   print "</th>";
   
   print "<th>";
+  print "    ";
+  print "</th>"; 
+  
+  print "<th>";
   print "Tissue of origin";
   print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
   
   print "<th>";
   print "Cell line";
   print "</th>";
   
   print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
+  
+  print "<th>";
   print "Date of run";
   print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
   
   print "<th>";
   print "Operator";
   print "</th>";
   
   print "<th>";
+  print "    ";
+  print "</th>"; 
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
+  
+  print "<th>";
   print "Instrument name";
   print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
   
   print "<th>";
   print "Transfection reagent";
   print "</th>";
   
   print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
+  
+  print "<th>";
   print "Rnai library name";
   print "</th>";
   
   print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
+  
+  print "<th>";
   print "Platelist file name";
   print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
 
   print "<th>";
   print "Plateconf file name";
   print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
 
   print "<th>";
   print "Is isogenic or not";
   print "</th>";
   
   print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
+  
+  print "<th>";
   print "Gene name if isogenic";
   print "</th>";
   
   print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
+  
+  print "<th>";
   print "Name of set if isogenic";
   print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
    
   print "<th>";
   print "Isogenic mutant description";
   print "</th>";
   
   print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
+  
+  print "<th>";
   print "Method of isogenic knockdown";
   print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
   
   print "<th>";
   print "Link to cellHTS2 analysis report";
@@ -3848,25 +2494,56 @@ sub show_all_screens {
   print "Link to QC plots";
   print "</th>";
   
- print "<th>";
+  print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";  
+  
+  print "<th>";
   print "Zprime";
   print "</th>"; 
+  
+  print "</td>";
  
   while ( my @row = $query_handle -> fetchrow_array ) {
   
     print "<tr>";
-   # print join("\t", @row), "\n";
+    
+    print "<td align=left valign=top>\n";
     
     print "<td>";
     print "$row[0]";
     print "</td>"; 
     
     print "<td>";
+    print "    ";
+    print "</td>";  
+    
+    print "<td>";
     print "$row[1]";
     print "</td>"; 
     
     print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>";  
+    
+    print "<td>";
     print "$row[2]";
+    print "</td>"; 
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
     print "</td>"; 
     
     print "<td>";
@@ -3874,7 +2551,23 @@ sub show_all_screens {
     print "</td>"; 
     
     print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>"; 
+    
+    print "<td>";
     print "$row[4]";
+    print "</td>"; 
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
     print "</td>"; 
     
     print "<td>";
@@ -3882,7 +2575,23 @@ sub show_all_screens {
     print "</td>"; 
     
     print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>"; 
+    
+    print "<td>";
     print "$row[6]";
+    print "</td>"; 
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
     print "</td>"; 
      
     print "<td>";
@@ -3890,11 +2599,31 @@ sub show_all_screens {
     print "</td>"; 
     
     print "<td>";
-    print "$row[8]";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
     print "</td>"; 
     
     print "<td>";
+    print "$row[8]";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+   
+    print "<td>";
     print "$row[9]";
+    print "</td>"; 
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
     print "</td>"; 
     
     print "<td>";
@@ -3902,7 +2631,23 @@ sub show_all_screens {
     print "</td>"; 
     
     print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>";  
+    
+    print "<td>";
     print "$row[11]";
+    print "</td>"; 
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
     print "</td>"; 
     
     print "<td>";
@@ -3910,24 +2655,66 @@ sub show_all_screens {
     print "</td>"; 
     
     print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>"; 
+    
+    print "<td>";
     print "$row[13]";
     print "</td>";
     
     print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>"; 
+    
+    print "<td>";
     print "$row[14]";
     print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>"; 
    
     print "<td>";
     print "<a href=\"$row[15]\" >Analysis report</a>";
     print "</td>"; 
     
     print "<td>";
-    print "<a href=\"http://gft.icr.ac.uk/cgi-bin/rnaidb.pl?show_qc=1\&screen_dir_name=$row[0]\&plate_conf=$row[9]\">QC</a>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>"; 
+    
+    print "<td>";
+    print "<a href=\"http://gft.icr.ac.uk/cgi-bin/$script_name?show_qc=1\&screen_dir_name=$row[0]\&plate_conf=$row[9]\">QC</a>";
+    print "</td>"; 
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
     print "</td>"; 
     
     print "<td>";
     print "$row[16]";
     print "</td>"; 
+    
+    print "</td>";
     
     print "</tr>";
 
@@ -3955,24 +2742,24 @@ sub configure_export {
   ## retrieve library_gene names from the database and save them in a hash ##
   
   my $query = ( "SELECT 
-    CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) FROM 
-    Template_library_file l WHERE 
-    l.Gene_symbol_templib IS NOT NULL AND        
-    l.Gene_symbol_templib != 'unknown' AND            
-    l.Gene_symbol_templib != 'sicon1' AND            
-    l.Gene_symbol_templib != 'plk1' AND           
-    l.Gene_symbol_templib != 'Plk1' AND
-    l.Gene_symbol_templib != 'siPLK1' AND            
-    l.Gene_symbol_templib != 'MOCK' AND            
-    l.Gene_symbol_templib != 'sicon2' AND            
-    l.Gene_symbol_templib != 'siCON2' AND           
-    l.Gene_symbol_templib != 'allSTAR' AND            
-    l.Gene_symbol_templib != 'siCON1' AND            
-    l.Gene_symbol_templib != 'allstar' AND            
-    l.Gene_symbol_templib != 'empty' AND            
-    l.Gene_symbol_templib != 'NULL' AND
-    l.Sub_lib IS NOT NULL GROUP BY  
-    CONCAT( Sub_lib, '_', Gene_symbol_templib )" );
+				CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) FROM 
+				Template_library_file l WHERE 
+				l.Gene_symbol_templib IS NOT NULL AND        
+				l.Gene_symbol_templib != 'unknown' AND            
+				l.Gene_symbol_templib != 'sicon1' AND            
+				l.Gene_symbol_templib != 'plk1' AND           
+				l.Gene_symbol_templib != 'Plk1' AND
+				l.Gene_symbol_templib != 'siPLK1' AND            
+				l.Gene_symbol_templib != 'MOCK' AND            
+				l.Gene_symbol_templib != 'sicon2' AND            
+				l.Gene_symbol_templib != 'siCON2' AND           
+				l.Gene_symbol_templib != 'allSTAR' AND            
+				l.Gene_symbol_templib != 'siCON1' AND            
+				l.Gene_symbol_templib != 'allstar' AND            
+				l.Gene_symbol_templib != 'empty' AND            
+				l.Gene_symbol_templib != 'NULL' AND
+				l.Sub_lib IS NOT NULL GROUP BY  
+				CONCAT( Sub_lib, '_', Gene_symbol_templib )" );
   
   my $query_handle = $dbh -> prepare ( $query );
    					 #  or die "Cannot prepare: " . $dbh -> errstr();
@@ -4028,7 +2815,7 @@ sub configure_export {
 				Template_library_file l WHERE 
 				r.Rnai_screen_info_ID = s.Rnai_screen_info_Rnai_screen_info_ID AND
 				r.Template_library_Template_library_ID = s.Template_library_Template_library_ID AND 
-				CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) = CONCAT(l.Sub_lib, '_', s.Gene_id_summary) AND
+				CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib) = CONCAT(l.Sub_lib, '_', s.Gene_symbol_summary) AND
 				s.Zscore_summary != 'NA' AND
 				l.Gene_symbol_templib IS NOT NULL AND        
 				l.Gene_symbol_templib != 'unknown' AND           
@@ -4057,7 +2844,8 @@ sub configure_export {
   @lib_genes = keys %lib_gene_h;
   @cell_lines = keys %cell_line_h; 
   
-  open OUT, "> /home/agulati/data/screen_data/Rnai_screen_analysis_configure_export.txt";
+  open OUT, "> /home/agulati/data/screen_data/Rnai_screen_analysis_configure_export.txt"
+    or die "Cannot open /home/agulati/data/screen_data/Rnai_screen_analysis_configure_export.txt:$!\n";
   my @header = sort @lib_genes;
   print OUT "CELL LINE/TARGET\t"."@header\t";
   print OUT "\n";
@@ -4118,6 +2906,10 @@ sub show_qc {
   my $screen_dir_name = $q -> param ( "screen_dir_name" );
   my $plateconf = $q -> param ( "plate_conf" );
   
+  #print "<p>";
+  print "<b>Screen name: $screen_dir_name</b>";
+  #print "</p>";
+  
   my $show_qc_page = "http://gft.icr.ac.uk/RNAi_screen_analysis_qc_plots/".$screen_dir_name."_controls_qc.png";
   
   print "<p>";
@@ -4125,32 +2917,66 @@ sub show_qc {
   print "</p>";
 
   my $coco_file = "/home/agulati/data/screen_data/".$screen_dir_name."/".$screen_dir_name."_corr.txt";
-  my $coco_file_wo_header = "/home/agulati/data/screen_data/". $screen_dir_name."/coco_wo_header.txt";
   
-  `cat $coco_file | grep -v ^Minimum_correlation > $coco_file_wo_header`;
-  
-  my @coco;
-  my $coco;
-  
-  open ( IN, "< $coco_file_wo_header" );
+  open ( IN, "< $coco_file" )
+    or die "Cannot open $coco_file:$!\n";
   while ( <IN> ) {
-    @coco = $_;
-    foreach $coco(@coco) {
-      print "<br>";
-      print "<b>";
-      print "Minimum_correlation\t";
-      print "Maximum_correlation";
-      print "</b>";
-      print "</br>";
-
-      print "<p>";
-      print "$coco[0]\t";
-      print "</p>";
-      
-      print "<p>";
-      print "$coco[1]";
-      print "</p>"; 
+    if ($_ =~ /Min/) {
+      next;
     }
+    my $line = $_;
+    #print $line;
+    my( $coco_min, $coco_max ) = split(/\t/, $line);
+    $coco_min = sprintf "%.4f", $coco_min;
+    $coco_max = sprintf "%.4f", $coco_max;
+
+    print "<p></p>";
+    print "<p></p>";
+    
+    print "<b>Pearson's correlation:</b>";
+    
+    print "<p></p>";
+    
+    print "<table>";
+    
+    print "<th>";
+    print "Min correlation";
+    print "</th>";
+    
+    print "<th>";
+    print "     ";
+    print "</th>";
+    
+    print "<th>";
+    print "    ";
+    print "</th>"; 
+    
+    print "<th>";
+    print "Max correlation";
+    print "</th>";
+    
+    print "<tr>";
+    
+    print "<td>";
+    print "$coco_min";
+    print "</td>";
+    
+    print "<td>";
+    print "     ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "$coco_max";
+    print "</td>";
+    
+    print "</tr>";
+    
+    print "</table>";
+
   }
   close IN;
   
@@ -4159,30 +2985,29 @@ sub show_qc {
   print "<td align=left valign=top>\n";
   
   print "<p>";
-  print "<h2>Update plateconf file for reanalysis:</h2>";
+  print "<h1>Reanalysis:</h1>";
+  print "<b>Modify plateconf file for reanalysis:</b>";
   print "</p>";
   
   ## replace 'siCON1' with 'empty' ##
 
-  print "<p>";
-  print "<p>";
+  print "<p><p>";
   
-  print $q -> checkbox( -name=>'sicon1_empty',
-    					-checked=>0,
-   					    -value=>'ON',
-    					-label=>'replace siCON1 with empty' );
+  print $q -> checkbox( -name => 'sicon1_empty',
+    					-checked => 0,
+   					    -value => 'ON',
+    					-label => 'remove siCON1' );
 
-  print "</p>";
-  print "</p>";
+  print "</p></p>";
   
   ## replace 'siCON2' with 'empty' ##
   
   print "<p>";
   
-  print $q -> checkbox( -name=>'sicon2_empty',
-    					-checked=>0,
-   					    -value=>'ON',
-    					-label=>'replace siCON2 with empty' );
+  print $q -> checkbox( -name => 'sicon2_empty',
+    					-checked => 0,
+   					    -value => 'ON',
+    					-label => 'remove siCON2' );
 
   print "</p>";
   
@@ -4190,10 +3015,10 @@ sub show_qc {
   
   print "<p>";
   
-  print $q -> checkbox( -name=>'allstar_empty',
-    					-checked=>0,
-   					    -value=>'ON',
-    					-label=>'replace allstar with empty' );
+  print $q -> checkbox( -name => 'allstar_empty',
+    					-checked => 0,
+   					    -value => 'ON',
+    					-label => 'remove allstar' );
 
   print "</p>";
   
@@ -4210,9 +3035,9 @@ sub show_qc {
   print "</p>"; 
   
   print "</td>";
-  
-  print "</table>";
   print "</tr>\n";
+  print "</table>";
+  
   
   print $q -> end_multipart_form(); 
   
@@ -4401,7 +3226,7 @@ sub set_cookie{
                              );
 
   print $q -> redirect(
-    -url => "/cgi-bin/rnaidb.pl?add_new_screen=1",
+    -url => "/cgi-bin/$script_name?add_new_screen=1",
     -cookie => $cookie
     );
   exit(0);
@@ -4415,7 +3240,7 @@ sub logout{
                              );
 
   print $q -> redirect(
-    -url => "/cgi-bin/rnaidb.pl",
+    -url => "/cgi-bin/$script_name",
     -cookie => $cookie
     );
 

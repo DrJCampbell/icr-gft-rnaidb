@@ -68,7 +68,7 @@ zScreen<-function(name,
 
 	# top table
 	
-  summary_info<-getTopTable(list("raw"=x, "normalized"=xn, "scored"=xsc), file=paste(datapath,summaryName, sep=""))
+  getTopTable(list("raw"=x, "normalized"=xn, "scored"=xsc), file=paste(datapath,summaryName, sep=""))
 
   ###########################################################	
   # write a QC report for zscores
@@ -80,7 +80,6 @@ zScreen<-function(name,
   ###########################################################
   # write z scores for this screen in the same folder
   scorefile<-paste(datapath, zscoreName, sep="")
-
   plates<-plate(xsc)
   wells<-well(xsc)
   scores<-Data(xsc)
@@ -91,6 +90,7 @@ zScreen<-function(name,
 
   ###########################################################
   # write zprime for this screen in the same folder	
+  # calculates zprime for each replicate separately 
   zp <- getZfactor(xn,
            posControls=poscontrols,
            negControls=negcontrols)     

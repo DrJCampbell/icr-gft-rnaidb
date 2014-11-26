@@ -104,6 +104,8 @@ CREATE TABLE IF NOT EXISTS `RNAi_analysis_database`.`Template_library_file` (
   `Template_library_Template_library_ID` INT NULL,
   PRIMARY KEY (`Template_library_file_ID`),
   INDEX `fk_Template_library_file_Template_library1_idx` (`Template_library_Template_library_ID` ASC),
+  INDEX `col_Sub_lib1_idx` (`Sub_lib` ASC),
+  INDEX `col_Gene_symbol_templib1_idx` (`Gene_symbol_templib` ASC),
   CONSTRAINT `fk_Template_library_file_Template_library1`
     FOREIGN KEY (`Template_library_Template_library_ID`)
     REFERENCES `RNAi_analysis_database`.`Template_library` (`Template_library_ID`)
@@ -149,6 +151,7 @@ CREATE TABLE IF NOT EXISTS `RNAi_analysis_database`.`Rnai_screen_info` (
   INDEX `fk_Rnai_screen_info_Plateconf_file_path1_idx` (`Plateconf_file_path_Plateconf_file_path_ID` ASC),
   INDEX `fk_Rnai_screen_info_Platelist_file_path1_idx` (`Platelist_file_path_Platelist_file_path_ID` ASC),
   INDEX `fk_Rnai_screen_info_Template_library1_idx` (`Template_library_Template_library_ID` ASC),
+  INDEX `col_Cell_line1_idx` (`Cell_line` ASC),
   CONSTRAINT `fk_Rnai_screen_info_Name_of_set_if_isogenic1`
     FOREIGN KEY (`Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID`)
     REFERENCES `RNAi_analysis_database`.`Name_of_set_if_isogenic` (`Name_of_set_if_isogenic_ID`)
@@ -192,9 +195,9 @@ CREATE TABLE IF NOT EXISTS `RNAi_analysis_database`.`Rnai_screen_info` (
 ENGINE = InnoDB;
 
 
--- -----------------------------------------------------
+-- ---------------------------------------------------------
 -- Table `RNAi_analysis_database`.`Plate_excel_file_as_text`
--- -----------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `RNAi_analysis_database`.`Plate_excel_file_as_text` (
   `Plate_excel_file_as_text_ID` INT NOT NULL AUTO_INCREMENT,
   `Plate_number_xls_file` VARCHAR(3) NULL,
@@ -267,6 +270,7 @@ CREATE TABLE IF NOT EXISTS `RNAi_analysis_database`.`Summary_of_result` (
   PRIMARY KEY (`Summary_of_result_ID`),
   INDEX `fk_Summary_of_result_Rnai_screen_info1_idx` (`Rnai_screen_info_Rnai_screen_info_ID` ASC),
   INDEX `fk_Summary_of_result_Template_library1_idx` (`Template_library_Template_library_ID` ASC),
+  INDEX `col_Zscore_summary1_idx` (`Zscore_summary` ASC),
   CONSTRAINT `fk_Summary_of_result_Rnai_screen_info1`
     FOREIGN KEY (`Rnai_screen_info_Rnai_screen_info_ID`)
     REFERENCES `RNAi_analysis_database`.`Rnai_screen_info` (`Rnai_screen_info_ID`)
