@@ -1,6 +1,47 @@
 Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
-1	A01	empty		
-1	A02	all star		
+1	K20	CAMK2N1	55450	KIN
+3	F03	KRAS_ol1		
+3	F05	KRAS_ol2		
+3	F07	KRAS_ol3		
+3	F09	KRAS_ol4		
+3	F11	KRAS_pool		
+3	F13	STK22_ol1		
+3	F15	STK22_ol2		
+3	F17	STK22_ol3		
+3	F19	STK22_ol4		
+3	F21	STK22_pool		
+3	H03	TBK1_ol1		
+3	H05	TBK1_ol2		
+3	H07	TBK1_ol3		
+3	H09	TBK1_ol4		
+3	H11	TBK1_pool		
+3	H13	PINK1_ol1		
+3	H15	PINK1_ol2		
+3	H17	PINK1_ol3		
+3	H19	PINK1_ol4		
+3	H21	PINK1_pool		
+3	J03	IKBKE_ol1		
+3	J05	IKBKE_ol2		
+3	J07	IKBKE_ol3		
+3	J09	IKBKE_ol4		
+3	J11	IKBKE_pool		
+3	J13	IKBKAP_ol1		
+3	J15	IKBKAP_ol2		
+3	J17	IKBKAP_ol3		
+3	J19	IKBKAP_ol4		
+3	J21	IKBKAP_pool		
+3	L03	IBTK_ol1		
+3	L05	IBTK_ol2		
+3	L07	IBTK_ol3		
+3	L09	IBTK_ol4		
+3	L11	IBTK_pool		
+3	L13	PSKH2_ol1		
+3	L15	PSKH2_ol2		
+3	L17	PSKH2_ol3		
+3	L19	PSKH2_ol4		
+3	L21	PSKH2_pool		
+1	A01			
+1	A02			
 1	A03	TTK	7272	KIN
 1	A04	PIK3CA	5290	KIN
 1	A05	SYK	6850	KIN
@@ -21,10 +62,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	A20	RPS6KA4	8986	KIN
 1	A21	CAMK2B	816	KIN
 1	A22	CALM1	801	KIN
-1	A23	all star		
-1	A24	empty		
-1	B01	empty		
-1	B02	all star		
+1	A23			
+1	A24			
+1	B01			
+1	B02			
 1	B03	MAP3K2	10746	KIN
 1	B04	STK31	56164	KIN
 1	B05	LATS2	26524	KIN
@@ -45,10 +86,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	B20	JAK2	3717	KIN
 1	B21	BLK	640	KIN
 1	B22	BRD2	6046	KIN
-1	B23	all star		
-1	B24	empty		
-1	C01	empty		
-1	C02	all star		
+1	B23			
+1	B24			
+1	C01			
+1	C02			
 1	C03	ACVRL1	94	KIN
 1	C04	FLJ32685	152110	KIN
 1	C05	LYN	4067	KIN
@@ -69,10 +110,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	C20	TRPM6	140803	KIN
 1	C21	THNSL1	79896	KIN
 1	C22	CLK1	1195	KIN
-1	C23	all star		
-1	C24	empty		
-1	D01	empty		
-1	D02	all star		
+1	C23			
+1	C24			
+1	D01			
+1	D02			
 1	D03	DGKK	139189	KIN
 1	D04	CDKN2C	1031	KIN
 1	D05	MPP2	4355	KIN
@@ -93,10 +134,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	D20	ACVR1B	91	KIN
 1	D21	GSK3A	2931	KIN
 1	D22	CPNE3	8895	KIN
-1	D23	all star		
-1	D24	empty		
-1	E01	empty		
-1	E02	sicon 1		
+1	D23			
+1	D24			
+1	E01			
+1	E02			
 1	E03	ALS2CR2	55437	KIN
 1	E04	PAPSS2	9060	KIN
 1	E05	CARKL	23729	KIN
@@ -117,10 +158,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	E20	AKT1	207	KIN
 1	E21	CKB	1152	KIN
 1	E22	SNRK	54861	KIN
-1	E23	sicon 1		
-1	E24	empty		
-1	F01	empty		
-1	F02	sicon 1		
+1	E23			
+1	E24			
+1	F01			
+1	F02			
 1	F03	CSNK1E	1454	KIN
 1	F04	CAMK1	8536	KIN
 1	F05	RELA	5970	KIN
@@ -141,10 +182,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	F20	CDC2L1	984	KIN
 1	F21	CDC42BPB	9578	KIN
 1	F22	MAP2K7	5609	KIN
-1	F23	sicon 1		
-1	F24	empty		
-1	G01	empty		
-1	G02	sicon 1		
+1	F23			
+1	F24			
+1	G01			
+1	G02			
 1	G03	CDC2	983	KIN
 1	G04	KIAA1811	84446	KIN
 1	G05	PIM2	11040	KIN
@@ -165,10 +206,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	G20	PFKP	5214	KIN
 1	G21	NME3	4832	KIN
 1	G22	PRKG1	5592	KIN
-1	G23	sicon 1		
-1	G24	empty		
-1	H01	empty		
-1	H02	sicon 1		
+1	G23			
+1	G24			
+1	H01			
+1	H02			
 1	H03	JAK3	3718	KIN
 1	H04	EPHB6	2051	KIN
 1	H05	STK22D	83942	KIN
@@ -189,10 +230,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	H20	PAK4	10298	KIN
 1	H21	FLJ23356	84197	KIN
 1	H22	MAPK1	5594	KIN
-1	H23	sicon 1		
-1	H24	empty		
-1	I01	empty		
-1	I02	sicon 2		
+1	H23			
+1	H24			
+1	I01			
+1	I02			
 1	I03	PRKAG3	53632	KIN
 1	I04	RIOK2	55781	KIN
 1	I05	GRK5	2869	KIN
@@ -213,10 +254,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	I20	STK24	8428	KIN
 1	I21	ROCK1	6093	KIN
 1	I22	DGKB	1607	KIN
-1	I23	sicon 2		
-1	I24	empty		
-1	J01	empty		
-1	J02	sicon 2		
+1	I23			
+1	I24			
+1	J01			
+1	J02			
 1	J03	FLT3	2322	KIN
 1	J04	MAST4	375449	KIN
 1	J05	PIP5K2A	5305	KIN
@@ -237,10 +278,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	J20	STK36	27148	KIN
 1	J21	PRKCL2	5586	KIN
 1	J22	MAPK8	5599	KIN
-1	J23	sicon 2		
-1	J24	empty		
-1	K01	empty		
-1	K02	sicon 2		
+1	J23			
+1	J24			
+1	K01			
+1	K02			
 1	K03	TEK	7010	KIN
 1	K04	STK25	10494	KIN
 1	K05	PANK1	53354	KIN
@@ -258,13 +299,12 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	K17	CAMK2D	817	KIN
 1	K18	KIAA1639	57729	KIN
 1	K19	MAP4K5	11183	KIN
-1	K20	CAMK2N1	55450	KIN
 1	K21	PKN3	29941	KIN
 1	K22	KIT	3815	KIN
-1	K23	sicon 2		
-1	K24	empty		
-1	L01	empty		
-1	L02	sicon 2		
+1	K23			
+1	K24			
+1	L01			
+1	L02			
 1	L03	RPS6KA3	6197	KIN
 1	L04	TGFBR1	7046	KIN
 1	L05	EFNA4	1945	KIN
@@ -285,10 +325,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	L20	C9ORF12	64768	KIN
 1	L21	DGKQ	1609	KIN
 1	L22	PTK6	5753	KIN
-1	L23	sicon 2		
-1	L24	empty		
-1	M01	empty		
-1	M02	plk 		
+1	L23			
+1	L24			
+1	M01			
+1	M02			
 1	M03	ATM	472	KIN
 1	M04	PRKCL1	5585	KIN
 1	M05	PHKA2	5256	KIN
@@ -309,10 +349,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	M20	BMP2K	55589	KIN
 1	M21	GRK1	6011	KIN
 1	M22	PHKB	5257	KIN
-1	M23	plk 		
-1	M24	empty		
-1	N01	empty		
-1	N02	plk 		
+1	M23			
+1	M24			
+1	N01			
+1	N02			
 1	N03	MAP3K12	7786	KIN
 1	N04	PAK1	5058	KIN
 1	N05	STK22C	81629	KIN
@@ -333,10 +373,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	N20	ROR2	4920	KIN
 1	N21	PAK6	56924	KIN
 1	N22	PIP5K2C	79837	KIN
-1	N23	plk 		
-1	N24	empty		
-1	O01	empty		
-1	O02	plk 		
+1	N23			
+1	N24			
+1	O01			
+1	O02			
 1	O03	RFP	5987	KIN
 1	O04	TRIO	7204	KIN
 1	O05	PIP5KL1	138429	KIN
@@ -357,10 +397,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	O20	SGK2	10110	KIN
 1	O21	CDKL5	6792	KIN
 1	O22	DYRK4	8798	KIN
-1	O23	plk 		
-1	O24	empty		
-1	P01	empty		
-1	P02	plk 		
+1	O23			
+1	O24			
+1	P01			
+1	P02			
 1	P03	FN3KRP	79672	KIN
 1	P04	ACVR1	90	KIN
 1	P05	AKT2	208	KIN
@@ -381,10 +421,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 1	P20	GSG2	83903	KIN
 1	P21	CDADC1	81602	KIN
 1	P22	HIPK1	204851	KIN
-1	P23	plk 		
-1	P24	empty		
-2	A01	empty		
-2	A02	all star		
+1	P23			
+1	P24			
+2	A01			
+2	A02			
 2	A03	MAP3K11	4296	KIN
 2	A04	MAP2K4	6416	KIN
 2	A05	AURKB	9212	KIN
@@ -405,10 +445,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	A20	MAP2K5	5607	KIN
 2	A21	PKIB	5570	KIN
 2	A22	LAK	80216	KIN
-2	A23	all star		
-2	A24	empty		
-2	B01	empty		
-2	B02	all star		
+2	A23			
+2	A24			
+2	B01			
+2	B02			
 2	B03	RET	5979	KIN
 2	B04	MELK	9833	KIN
 2	B05	MAP2K6	5608	KIN
@@ -429,10 +469,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	B20	PRPS1L1	221823	KIN
 2	B21	COL4A3BP	10087	KIN
 2	B22	IGF2R	3482	KIN
-2	B23	all star		
-2	B24	empty		
-2	C01	empty		
-2	C02	all star		
+2	B23			
+2	B24			
+2	C01			
+2	C02			
 2	C03	CDK5	1020	KIN
 2	C04	CDK7	1022	KIN
 2	C05	ADCK4	79934	KIN
@@ -453,10 +493,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	C20	CSNK1A1L	122011	KIN
 2	C21	DAPK2	23604	KIN
 2	C22	PIP5K1A	8394	KIN
-2	C23	all star		
-2	C24	empty		
-2	D01	empty		
-2	D02	all star		
+2	C23			
+2	C24			
+2	D01			
+2	D02			
 2	D03	CDC2L5	8621	KIN
 2	D04	TGFBR3	7049	KIN
 2	D05	ALK	238	KIN
@@ -477,10 +517,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	D20	PAK2	5062	KIN
 2	D21	PIK3CB	5291	KIN
 2	D22	LOC390226	390226	KIN
-2	D23	all star		
-2	D24	empty		
-2	E01	empty		
-2	E02	sicon 1		
+2	D23			
+2	D24			
+2	E01			
+2	E02			
 2	E03	ITPK1	3705	KIN
 2	E04	STK17A	9263	KIN
 2	E05	ILK-2	55522	KIN
@@ -501,10 +541,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	E20	MAP3K4	4216	KIN
 2	E21	ARAF1	369	KIN
 2	E22	STK38L	23012	KIN
-2	E23	sicon 1		
-2	E24	empty		
-2	F01	empty		
-2	F02	sicon 1		
+2	E23			
+2	E24			
+2	F01			
+2	F02			
 2	F03	KCNH2	3757	KIN
 2	F04	CSNK1A1	1452	KIN
 2	F05	CDKL1	8814	KIN
@@ -525,10 +565,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	F20	DYRK1A	1859	KIN
 2	F21	PRKCSH	5589	KIN
 2	F22	CAMK4	814	KIN
-2	F23	sicon 1		
-2	F24	empty		
-2	G01	empty		
-2	G02	sicon 1		
+2	F23			
+2	F24			
+2	G01			
+2	G02			
 2	G03	BCR	613	KIN
 2	G04	MGC4796	83931	KIN
 2	G05	DCK	1633	KIN
@@ -549,10 +589,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	G20	DGUOK	1716	KIN
 2	G21	ICK	22858	KIN
 2	G22	PANK3	79646	KIN
-2	G23	sicon 1		
-2	G24	empty		
-2	H01	empty		
-2	H02	sicon 1		
+2	G23			
+2	G24			
+2	H01			
+2	H02			
 2	H03	PRKCD	5580	KIN
 2	H04	JIK	51347	KIN
 2	H05	ATR	545	KIN
@@ -573,10 +613,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	H20	PDGFRA	5156	KIN
 2	H21	MGC4796	83931	KIN
 2	H22	DDR1	780	KIN
-2	H23	sicon 1		
-2	H24	empty		
-2	I01	empty		
-2	I02	sicon 2		
+2	H23			
+2	H24			
+2	I01			
+2	I02			
 2	I03	ADCK2	90956	KIN
 2	I04	SRPK2	6733	KIN
 2	I05	PI4K2B	55300	KIN
@@ -597,10 +637,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	I20	ADRBK1	156	KIN
 2	I21	MYO3A	53904	KIN
 2	I22	CDK10	8558	KIN
-2	I23	sicon 2		
-2	I24	empty		
-2	J01	empty		
-2	J02	sicon 2		
+2	I23			
+2	I24			
+2	J01			
+2	J02			
 2	J03	STK32B	55351	KIN
 2	J04	PTK9L	11344	KIN
 2	J05	MAP3K7IP1	10454	KIN
@@ -621,10 +661,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	J20	TPK1	27010	KIN
 2	J21	PFKFB4	5210	KIN
 2	J22	C14ORF20	283629	KIN
-2	J23	sicon 2		
-2	J24	empty		
-2	K01	empty		
-2	K02	sicon 2		
+2	J23			
+2	J24			
+2	K01			
+2	K02			
 2	K03	SPHK1	8877	KIN
 2	K04	CDKN1A	1026	KIN
 2	K05	ASK	10926	KIN
@@ -645,10 +685,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	K20	PRPS2	5634	KIN
 2	K21	PIK3R1	5295	KIN
 2	K22	AK5	26289	KIN
-2	K23	sicon 2		
-2	K24	empty		
-2	L01	empty		
-2	L02	sicon 2		
+2	K23			
+2	K24			
+2	L01			
+2	L02			
 2	L03	PKMYT1	9088	KIN
 2	L04	PIM3	415116	KIN
 2	L05	PACE-1	57147	KIN
@@ -669,10 +709,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	L20	SGK	6446	KIN
 2	L21	BAIAP1	9223	KIN
 2	L22	CLK3	1198	KIN
-2	L23	sicon 2		
-2	L24	empty		
-2	M01	empty		
-2	M02	plk		
+2	L23			
+2	L24			
+2	M01			
+2	M02			
 2	M03	PRKY	5616	KIN
 2	M04	MAST2	23139	KIN
 2	M05	MAP3K1	4214	KIN
@@ -693,10 +733,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	M20	FGFRL1	53834	KIN
 2	M21	PTK2B	2185	KIN
 2	M22	NME1	4830	KIN
-2	M23	plk		
-2	M24	empty		
-2	N01	empty		
-2	N02	plk		
+2	M23			
+2	M24			
+2	N01			
+2	N02			
 2	N03	SLK	9748	KIN
 2	N04	PXK	54899	KIN
 2	N05	CDKN1C	1028	KIN
@@ -717,10 +757,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	N20	FYN	2534	KIN
 2	N21	STK32C	282974	KIN
 2	N22	DKFZP434C131	25989	KIN
-2	N23	plk		
-2	N24	empty		
-2	O01	empty		
-2	O02	plk		
+2	N23			
+2	N24			
+2	O01			
+2	O02			
 2	O03	MERTK	10461	KIN
 2	O04	TNK1	8711	KIN
 2	O05	CERK	64781	KIN
@@ -741,10 +781,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	O20	SGKL	23678	KIN
 2	O21	NRBP2	340371	KIN
 2	O22	DLG3	1741	KIN
-2	O23	plk		
-2	O24	empty		
-2	P01	empty		
-2	P02	plk		
+2	O23			
+2	O24			
+2	P01			
+2	P02			
 2	P03	PRKD2	25865	KIN
 2	P04	SAST	22983	KIN
 2	P05	CAMKK1	84254	KIN
@@ -765,10 +805,10 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 2	P20	SSTK	83983	KIN
 2	P21	PDK1	5163	KIN
 2	P22	IKBKG	8517	KIN
-2	P23	plk		
-2	P24	empty		
-3	A01	empty		
-3	A02	all star		
+2	P23			
+2	P24			
+3	A01			
+3	A02			
 3	A03	N4BP2	55728	KIN
 3	A04	WAS	7454	TSG
 3	A05	NEK1	4750	KIN
@@ -789,34 +829,34 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 3	A20	BRCA1	672	TSG
 3	A21	ULK1	8408	KIN
 3	A22	BRCA2	675	TSG
-3	A23	all star		
-3	A24	empty		
-3	B01	empty		
-3	B02	all star		
-3	B03	empty		
-3	B04	empty		
-3	B05	empty		
-3	B06	empty		
-3	B07	empty		
-3	B08	empty		
-3	B09	empty		
-3	B10	empty		
-3	B11	empty		
-3	B12	empty		
-3	B13	empty		
-3	B14	empty		
-3	B15	empty		
-3	B16	empty		
-3	B17	empty		
-3	B18	empty		
-3	B19	empty		
-3	B20	empty		
-3	B21	empty		
-3	B22	empty		
-3	B23	all star		
-3	B24	empty		
-3	C01	empty		
-3	C02	all star		
+3	A23			
+3	A24			
+3	B01			
+3	B02			
+3	B03			
+3	B04			
+3	B05			
+3	B06			
+3	B07			
+3	B08			
+3	B09			
+3	B10			
+3	B11			
+3	B12			
+3	B13			
+3	B14			
+3	B15			
+3	B16			
+3	B17			
+3	B18			
+3	B19			
+3	B20			
+3	B21			
+3	B22			
+3	B23			
+3	B24			
+3	C01			
+3	C02			
 3	C03	PRKCA	5578	KIN
 3	C04	BRIP1	83990	TSG
 3	C05	CDKL2	8999	KIN
@@ -837,34 +877,34 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 3	C20	DDB2	1643	TSG
 3	C21	KHK	3795	KIN
 3	C22	EP300	2033	TSG
-3	C23	all star		
-3	C24	empty		
-3	D01	empty		
-3	D02	all star		
-3	D03	empty		
-3	D04	empty		
-3	D05	empty		
-3	D06	empty		
-3	D07	empty		
-3	D08	empty		
-3	D09	empty		
-3	D10	empty		
-3	D11	empty		
-3	D12	empty		
-3	D13	empty		
-3	D14	empty		
-3	D15	empty		
-3	D16	empty		
-3	D17	empty		
-3	D18	empty		
-3	D19	empty		
-3	D20	empty		
-3	D21	empty		
-3	D22	empty		
-3	D23	all star		
-3	D24	empty		
-3	E01	empty		
-3	E02	sicon 1		
+3	C23			
+3	C24			
+3	D01			
+3	D02			
+3	D03			
+3	D04			
+3	D05			
+3	D06			
+3	D07			
+3	D08			
+3	D09			
+3	D10			
+3	D11			
+3	D12			
+3	D13			
+3	D14			
+3	D15			
+3	D16			
+3	D17			
+3	D18			
+3	D19			
+3	D20			
+3	D21			
+3	D22			
+3	D23			
+3	D24			
+3	E01			
+3	E02			
 3	E03	GUK1	2987	KIN
 3	E04	ERCC2	2068	TSG
 3	E05	CKM	1158	KIN
@@ -885,34 +925,24 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 3	E20	FANCD2	2177	TSG
 3	E21	AK3L1	50808	KIN
 3	E22	FANCE	2178	TSG
-3	E23	sicon 1		
-3	E24	empty		
-3	F01	empty		
-3	F02	sicon 1		
-3	F03	empty		
-3	F04	empty		
-3	F05	empty		
-3	F06	empty		
-3	F07	empty		
-3	F08	empty		
-3	F09	empty		
-3	F10	empty		
-3	F11	empty		
-3	F12	empty		
-3	F13	empty		
-3	F14	empty		
-3	F15	empty		
-3	F16	empty		
-3	F17	empty		
-3	F18	empty		
-3	F19	empty		
-3	F20	empty		
-3	F21	empty		
-3	F22	empty		
-3	F23	sicon 1		
-3	F24	empty		
-3	G01	empty		
-3	G02	sicon 1		
+3	E23			
+3	E24			
+3	F01			
+3	F02			
+3	F04			
+3	F06			
+3	F08			
+3	F10			
+3	F12			
+3	F14			
+3	F16			
+3	F18			
+3	F20			
+3	F22			
+3	F23			
+3	F24			
+3	G01			
+3	G02			
 3	G03	PLK3	1263	KIN
 3	G04	FANCF	2188	TSG
 3	G05	EFNB3	1949	KIN
@@ -933,34 +963,24 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 3	G20	MLH1	4292	TSG
 3	G21	PCK2	5106	KIN
 3	G22	MSH2	4436	TSG
-3	G23	sicon 1		
-3	G24	empty		
-3	H01	empty		
-3	H02	sicon 1		
-3	H03	empty		
-3	H04	empty		
-3	H05	empty		
-3	H06	empty		
-3	H07	empty		
-3	H08	empty		
-3	H09	empty		
-3	H10	empty		
-3	H11	empty		
-3	H12	empty		
-3	H13	empty		
-3	H14	empty		
-3	H15	empty		
-3	H16	empty		
-3	H17	empty		
-3	H18	empty		
-3	H19	empty		
-3	H20	empty		
-3	H21	empty		
-3	H22	empty		
-3	H23	sicon 1		
-3	H24	empty		
-3	I01	empty		
-3	I02	sicon 2		
+3	G23			
+3	G24			
+3	H01			
+3	H02			
+3	H04			
+3	H06			
+3	H08			
+3	H10			
+3	H12			
+3	H14			
+3	H16			
+3	H18			
+3	H20			
+3	H22			
+3	H23			
+3	H24			
+3	I01			
+3	I02			
 3	I03	AMHR2	269	KIN
 3	I04	MSH6	2956	TSG
 3	I05	DUSP21	63904	KIN
@@ -981,34 +1001,24 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 3	I20	PMS1	5378	TSG
 3	I21	BRAF	673	KIN
 3	I22	PMS2	5395	TSG
-3	I23	sicon 2		
-3	I24	empty		
-3	J01	empty		
-3	J02	sicon 2		
-3	J03	empty		
-3	J04	empty		
-3	J05	empty		
-3	J06	empty		
-3	J07	empty		
-3	J08	empty		
-3	J09	empty		
-3	J10	empty		
-3	J11	empty		
-3	J12	empty		
-3	J13	empty		
-3	J14	empty		
-3	J15	empty		
-3	J16	empty		
-3	J17	empty		
-3	J18	empty		
-3	J19	empty		
-3	J20	empty		
-3	J21	empty		
-3	J22	empty		
-3	J23	sicon 2		
-3	J24	empty		
-3	K01	empty		
-3	K02	sicon 2		
+3	I23			
+3	I24			
+3	J01			
+3	J02			
+3	J04			
+3	J06			
+3	J08			
+3	J10			
+3	J12			
+3	J14			
+3	J16			
+3	J18			
+3	J20			
+3	J22			
+3	J23			
+3	J24			
+3	K01			
+3	K02			
 3	K03	PASK	23178	KIN
 3	K04	PTCH	5727	TSG
 3	K05	HUS1	3364	KIN
@@ -1029,34 +1039,24 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 3	K20	SMARCB1	6598	TSG
 3	K21	C10ORF89	118672	KIN
 3	K22	SOCS1	8651	TSG
-3	K23	sicon 2		
-3	K24	empty		
-3	L01	empty		
-3	L02	sicon 2		
-3	L03	empty		
-3	L04	empty		
-3	L05	empty		
-3	L06	empty		
-3	L07	empty		
-3	L08	empty		
-3	L09	empty		
-3	L10	empty		
-3	L11	empty		
-3	L12	empty		
-3	L13	empty		
-3	L14	empty		
-3	L15	empty		
-3	L16	empty		
-3	L17	empty		
-3	L18	empty		
-3	L19	empty		
-3	L20	empty		
-3	L21	empty		
-3	L22	empty		
-3	L23	sicon 2		
-3	L24	empty		
-3	M01	empty		
-3	M02	plk		
+3	K23			
+3	K24			
+3	L01			
+3	L02			
+3	L04			
+3	L06			
+3	L08			
+3	L10			
+3	L12			
+3	L14			
+3	L16			
+3	L18			
+3	L20			
+3	L22			
+3	L23			
+3	L24			
+3	M01			
+3	M02			
 3	M03	EPHA4	2043	KIN
 3	M04	STK11	6794	TSG
 3	M05	DCAMKL1	9201	KIN
@@ -1077,34 +1077,34 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 3	M20	WRN	7486	TSG
 3	M21	AK2	204	KIN
 3	M22	WT1	7490	TSG
-3	M23	plk		
-3	M24	empty		
-3	N01	empty		
-3	N02	plk		
-3	N03	empty		
-3	N04	empty		
-3	N05	empty		
-3	N06	empty		
-3	N07	empty		
-3	N08	empty		
-3	N09	empty		
-3	N10	empty		
-3	N11	empty		
-3	N12	empty		
-3	N13	empty		
-3	N14	empty		
-3	N15	empty		
-3	N16	empty		
-3	N17	empty		
-3	N18	empty		
-3	N19	empty		
-3	N20	empty		
-3	N21	empty		
-3	N22	empty		
-3	N23	plk		
-3	N24	empty		
-3	O01	empty		
-3	O02	plk		
+3	M23			
+3	M24			
+3	N01			
+3	N02			
+3	N03			
+3	N04			
+3	N05			
+3	N06			
+3	N07			
+3	N08			
+3	N09			
+3	N10			
+3	N11			
+3	N12			
+3	N13			
+3	N14			
+3	N15			
+3	N16			
+3	N17			
+3	N18			
+3	N19			
+3	N20			
+3	N21			
+3	N22			
+3	N23			
+3	N24			
+3	O01			
+3	O02			
 3	O03	NEK7	140609	KIN
 3	O04	FLJ39827	139285	TSG
 3	O05	PRKWNK1	65125	KIN
@@ -1114,40 +1114,40 @@ Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
 3	O09	STK19	8859	KIN
 3	O10	PRKAR1A	5573	TSG
 3	O11	MAPK12	6300	KIN
-3	O12	empty		
+3	O12			
 3	O13	GALK1	2584	KIN
-3	O14	empty		
+3	O14			
 3	O15	IPMK	253430	KIN
-3	O16	empty		
+3	O16			
 3	O17	PANK4	55229	KIN
-3	O18	empty		
+3	O18			
 3	O19	PRKACG	5568	KIN
-3	O20	empty		
+3	O20			
 3	O21	FLT1	2321	KIN
-3	O22	empty		
-3	O23	plk		
-3	O24	empty		
-3	P01	empty		
-3	P02	plk		
-3	P03	empty		
-3	P04	empty		
-3	P05	empty		
-3	P06	empty		
-3	P07	empty		
-3	P08	empty		
-3	P09	empty		
-3	P10	empty		
-3	P11	empty		
-3	P12	empty		
-3	P13	empty		
-3	P14	empty		
-3	P15	empty		
-3	P16	empty		
-3	P17	empty		
-3	P18	empty		
-3	P19	empty		
-3	P20	empty		
-3	P21	empty		
-3	P22	empty		
-3	P23	plk		
-3	P24	empty		
+3	O22			
+3	O23			
+3	O24			
+3	P01			
+3	P02			
+3	P03			
+3	P04			
+3	P05			
+3	P06			
+3	P07			
+3	P08			
+3	P09			
+3	P10			
+3	P11			
+3	P12			
+3	P13			
+3	P14			
+3	P15			
+3	P16			
+3	P17			
+3	P18			
+3	P19			
+3	P20			
+3	P21			
+3	P22			
+3	P23			
+3	P24			

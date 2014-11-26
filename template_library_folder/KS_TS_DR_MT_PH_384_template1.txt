@@ -258,7 +258,7 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 1	K17	CAMK2D	817	KIN
 1	K18	KIAA1639	57729	KIN
 1	K19	MAP4K5	11183	KIN
-1	K20	CAMKIINALPHA	55450	KIN
+1	K20	CAMK2N1	55450	KIN
 1	K21	PKN3	29941	KIN
 1	K22	KIT	3815	KIN
 1	K23	sicon2		
@@ -1240,11 +1240,11 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 4	D15	SYNJ1	8867	PHO
 4	D16	TPTE	7179	PHO
 4	D17	PPP1CB	5500	PHO
-4	D18	unknown		
+4	D18	empty		
 4	D19	DUSP8	1850	PHO
-4	D20	unknown		
+4	D20	empty		
 4	D21	IMPA1	3612	PHO
-4	D22	unknown		
+4	D22	empty		
 4	D23	allstar		
 4	D24	allstar		
 4	E01	sicon1		
@@ -1274,25 +1274,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 4	F01	sicon1		
 4	F02	sicon1		
 4	F03	PPM1D	8493	PHO
-4	F04	unknown		
+4	F04	empty		
 4	F05	PTPRC	5788	PHO
-4	F06	unknown		
+4	F06	empty		
 4	F07	PPAPDC2	403313	PHO
-4	F08	unknown		
+4	F08	empty		
 4	F09	DUSP9	1852	PHO
-4	F10	unknown		
+4	F10	empty		
 4	F11	PPAP2A	8611	PHO
-4	F12	unknown		
+4	F12	empty		
 4	F13	PDP2	57546	PHO
-4	F14	unknown		
+4	F14	empty		
 4	F15	INPP4B	8821	PHO
-4	F16	unknown		
+4	F16	empty		
 4	F17	MTMR3	8897	PHO
-4	F18	unknown		
+4	F18	empty		
 4	F19	ACP1	52	PHO
-4	F20	unknown		
+4	F20	empty		
 4	F21	TIMM50	92609	PHO
-4	F22	unknown		
+4	F22	empty		
 4	F23	sicon1		
 4	F24	sicon1		
 4	G01	sicon1		
@@ -1322,25 +1322,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 4	H01	sicon1		
 4	H02	sicon1		
 4	H03	EYA1	2138	PHO
-4	H04	unknown		
+4	H04	empty		
 4	H05	NT5C2	22978	PHO
-4	H06	unknown		
+4	H06	empty		
 4	H07	MTMR1	8776	PHO
-4	H08	unknown		
+4	H08	empty		
 4	H09	PPP2CZ	333926	PHO
-4	H10	unknown		
+4	H10	empty		
 4	H11	PPP2R5E	5529	PHO
-4	H12	unknown		
+4	H12	empty		
 4	H13	PPP2CB	5516	PHO
-4	H14	unknown		
+4	H14	empty		
 4	H15	OCRL	4952	PHO
-4	H16	unknown		
+4	H16	empty		
 4	H17	MTMR2	8898	PHO
-4	H18	unknown		
+4	H18	empty		
 4	H19	PPEF1	5475	PHO
-4	H20	unknown		
+4	H20	empty		
 4	H21	DUSP1	1843	PHO
-4	H22	unknown		
+4	H22	empty		
 4	H23	sicon1		
 4	H24	sicon1		
 4	I01	sicon2		
@@ -1370,25 +1370,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 4	J01	sicon2		
 4	J02	sicon2		
 4	J03	ACPT	93650	PHO
-4	J04	unknown		
+4	J04	empty		
 4	J05	PTPRZ1	5803	PHO
-4	J06	unknown		
+4	J06	empty		
 4	J07	PTPLA	9200	PHO
-4	J08	unknown		
+4	J08	empty		
 4	J09	PPP2R5A	5525	PHO
-4	J10	unknown		
+4	J10	empty		
 4	J11	PTPMT1	114971	PHO
-4	J12	unknown		
+4	J12	empty		
 4	J13	DUSP12	11266	PHO
-4	J14	unknown		
+4	J14	empty		
 4	J15	PPP3CC	5533	PHO
-4	J16	unknown		
+4	J16	empty		
 4	J17	INPPL1	3636	PHO
-4	J18	unknown		
+4	J18	empty		
 4	J19	PPP2CA	5515	PHO
-4	J20	unknown		
+4	J20	empty		
 4	J21	TA-PP2C	160760	PHO
-4	J22	unknown		
+4	J22	empty		
 4	J23	sicon2		
 4	J24	sicon2		
 4	K01	sicon2		
@@ -1418,25 +1418,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 4	L01	sicon2		
 4	L02	sicon2		
 4	L03	PTPRB	5787	PHO
-4	L04	unknown		
+4	L04	empty		
 4	L05	PPP1R15B	84919	PHO
-4	L06	unknown		
+4	L06	empty		
 4	L07	INPP5B	3633	PHO
-4	L08	unknown		
+4	L08	empty		
 4	L09	PTP4A1	7803	PHO
-4	L10	unknown		
+4	L10	empty		
 4	L11	PALD	27143	PHO
-4	L12	unknown		
+4	L12	empty		
 4	L13	PGAM1	5223	PHO
-4	L14	unknown		
+4	L14	empty		
 4	L15	NUDT9	53343	PHO
-4	L16	unknown		
+4	L16	empty		
 4	L17	SYNJ2	8871	PHO
-4	L18	unknown		
+4	L18	empty		
 4	L19	PTPRM	5797	PHO
-4	L20	unknown		
+4	L20	empty		
 4	L21	PPP3CB	5532	PHO
-4	L22	unknown		
+4	L22	empty		
 4	L23	sicon2		
 4	L24	sicon2		
 4	M01	plk1		
@@ -1466,25 +1466,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 4	N01	plk1		
 4	N02	plk1		
 4	N03	MTMR8	55613	PHO
-4	N04	unknown		
+4	N04	empty		
 4	N05	PTPRN	5798	PHO
-4	N06	unknown		
+4	N06	empty		
 4	N07	PTPRE	5791	PHO
-4	N08	unknown		
+4	N08	empty		
 4	N09	DUSP16	80824	PHO
-4	N10	unknown		
+4	N10	empty		
 4	N11	PTPRS	5802	PHO
-4	N12	unknown		
+4	N12	empty		
 4	N13	PSPHL	8781	PHO
-4	N14	unknown		
+4	N14	empty		
 4	N15	DUSP6	1848	PHO
-4	N16	unknown		
+4	N16	empty		
 4	N17	SACM1L	22908	PHO
-4	N18	unknown		
+4	N18	empty		
 4	N19	INPP5D	3635	PHO
-4	N20	unknown		
+4	N20	empty		
 4	N21	PTEN	5728	PHO
-4	N22	unknown		
+4	N22	empty		
 4	N23	plk1		
 4	N24	plk1		
 4	O01	plk1		
@@ -1508,31 +1508,31 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 4	O19	DUSP19	142679	PHO
 4	O20	ALPP	250	PHO
 4	O21	CILP	8483	PHO
-4	O22	unknown		
+4	O22	empty		
 4	O23	plk1		
 4	O24	plk1		
 4	P01	plk1		
 4	P02	plk1		
 4	P03	PTPRK	5796	PHO
-4	P04	unknown		
+4	P04	empty		
 4	P05	PPAPDC1	196051	PHO
-4	P06	unknown		
+4	P06	empty		
 4	P07	NUDT2	318	PHO
-4	P08	unknown		
+4	P08	empty		
 4	P09	SKIP	51763	PHO
-4	P10	unknown		
+4	P10	empty		
 4	P11	PPP2R5B	5526	PHO
-4	P12	unknown		
+4	P12	empty		
 4	P13	RNGTT	8732	PHO
-4	P14	unknown		
+4	P14	empty		
 4	P15	PPP1CA	5499	PHO
-4	P16	unknown		
+4	P16	empty		
 4	P17	BPGM	669	PHO
-4	P18	unknown		
+4	P18	empty		
 4	P19	PPFIA2	8499	PHO
-4	P20	unknown		
+4	P20	empty		
 4	P21	PPP4R1	9989	PHO
-4	P22	unknown		
+4	P22	empty		
 4	P23	plk1		
 4	P24	plk1		
 5	A01	allstar		
@@ -2310,21 +2310,21 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 7	A05	G6PC2	57818	MET
 7	A06	MCART6	401612	MET
 7	A07	SLC25A19	60386	MET
-7	A08	unknown		
+7	A08	empty		
 7	A09	MCCC2	64087	MET
-7	A10	unknown		
+7	A10	empty		
 7	A11	FN3K	64122	MET
-7	A12	unknown		
+7	A12	empty		
 7	A13	GBL	64223	MET
-7	A14	unknown		
+7	A14	empty		
 7	A15	CREB3L2	64764	MET
-7	A16	unknown		
+7	A16	empty		
 7	A17	C9ORF12	64768	MET
-7	A18	unknown		
+7	A18	empty		
 7	A19	GNPNAT1	64841	MET
-7	A20	unknown		
+7	A20	empty		
 7	A21	AGXT2L1	64850	MET
-7	A22	unknown		
+7	A22	empty		
 7	A23	allstar		
 7	A24	allstar		
 7	B01	allstar		
@@ -2366,13 +2366,13 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 7	C13	SLC25A22	79751	MET
 7	C14	PTEN	5728	DDR
 7	C15	FLJ21934	79799	MET
-7	C16	unknown		
+7	C16	empty		
 7	C17	EHMT1	79813	MET
-7	C18	unknown		
+7	C18	empty		
 7	C19	AGMAT	79814	MET
-7	C20	unknown		
+7	C20	empty		
 7	C21	PGAP1	80055	MET
-7	C22	unknown		
+7	C22	empty		
 7	C23	allstar		
 7	C24	allstar		
 7	D01	allstar		
@@ -2402,25 +2402,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 7	E01	sicon1		
 7	E02	sicon1		
 7	E03	ASRGL1	80150	MET
-7	E04	unknown		
+7	E04	empty		
 7	E05	SMP3	80235	MET
-7	E06	unknown		
+7	E06	empty		
 7	E07	ADPN	80339	MET
-7	E08	unknown		
+7	E08	empty		
 7	E09	MGC5601	80724	MET
-7	E10	unknown		
+7	E10	empty		
 7	E11	NPL	80896	MET
-7	E12	unknown		
+7	E12	empty		
 7	E13	SLC2A10	81031	MET
-7	E14	unknown		
+7	E14	empty		
 7	E15	MFTC	81034	MET
-7	E16	unknown		
+7	E16	empty		
 7	E17	SFXN3	81855	MET
-7	E18	unknown		
+7	E18	empty		
 7	E19	SLC25A28	81894	MET
-7	E20	unknown		
+7	E20	empty		
 7	E21	ELOVL3	83401	MET
-7	E22	unknown		
+7	E22	empty		
 7	E23	sicon1		
 7	E24	sicon1		
 7	F01	sicon1		
@@ -2450,25 +2450,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 7	G01	sicon1		
 7	G02	sicon1		
 7	G03	SLC25A18	83733	MET
-7	G04	unknown		
+7	G04	empty		
 7	G05	SLC25A2	83884	MET
-7	G06	unknown		
+7	G06	empty		
 7	G07	DGAT2	84649	MET
-7	G08	unknown		
+7	G08	empty		
 7	G09	MCEE	84693	MET
-7	G10	unknown		
+7	G10	empty		
 7	G11	CREB3L3	84699	MET
-7	G12	unknown		
+7	G12	empty		
 7	G13	GPT2	84706	MET
-7	G14	unknown		
+7	G14	empty		
 7	G15	PIGO	84720	MET
-7	G16	unknown		
+7	G16	empty		
 7	G17	KIAA1959	84959	MET
-7	G18	unknown		
+7	G18	empty		
 7	G19	MGC14156	84992	MET
-7	G20	unknown		
+7	G20	empty		
 7	G21	SLC22A16	85413	MET
-7	G22	unknown		
+7	G22	empty		
 7	G23	sicon1		
 7	G24	sicon1		
 7	H01	sicon1		
@@ -2498,25 +2498,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 7	I01	sicon2		
 7	I02	sicon2		
 7	I03	SLC25A21	89874	MET
-7	I04	unknown		
+7	I04	empty		
 7	I05	CREB3L1	90993	MET
-7	I06	unknown		
+7	I06	empty		
 7	I07	ACY-3	91703	MET
-7	I08	unknown		
+7	I08	empty		
 7	I09	MCART1	92014	MET
-7	I10	unknown		
+7	I10	empty		
 7	I11	LDHAL6B	92483	MET
-7	I12	unknown		
+7	I12	empty		
 7	I13	PIGM	93183	MET
-7	I14	unknown		
+7	I14	empty		
 7	I15	PIGS	94005	MET
-7	I16	unknown		
+7	I16	empty		
 7	I17	SFXN1	94081	MET
-7	I18	unknown		
+7	I18	empty		
 7	I19	SFXN5	94097	MET
-7	I20	unknown		
+7	I20	empty		
 7	I21	SAT2	112483	MET
-7	I22	unknown		
+7	I22	empty		
 7	I23	sicon2		
 7	I24	sicon2		
 7	J01	sicon2		
@@ -2546,25 +2546,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 7	K01	sicon2		
 7	K02	sicon2		
 7	K03	WBSCR22	114049	MET
-7	K04	unknown		
+7	K04	empty		
 7	K05	SLC2A13	114134	MET
-7	K06	unknown		
+7	K06	empty		
 7	K07	SLC25A25	114789	MET
-7	K08	unknown		
+7	K08	empty		
 7	K09	SLC25A26	115286	MET
-7	K10	unknown		
+7	K10	empty		
 7	K11	IHPK3	117283	MET
-7	K12	unknown		
+7	K12	empty		
 7	K13	SFXN2	118980	MET
-7	K14	unknown		
+7	K14	empty		
 7	K15	SFXN4	119559	MET
-7	K16	unknown		
+7	K16	empty		
 7	K17	TPH2	121278	MET
-7	K18	unknown		
+7	K18	empty		
 7	K19	AK7	122481	MET
-7	K20	unknown		
+7	K20	empty		
 7	K21	SOCS4	122809	MET
-7	K22	unknown		
+7	K22	empty		
 7	K23	sicon2		
 7	K24	sicon2		
 7	L01	sicon2		
@@ -2594,25 +2594,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 7	M01	plk1		
 7	M02	plk1		
 7	M03	SLC25A29	123096	MET
-7	M04	unknown		
+7	M04	empty		
 7	M05	NTAN1	123803	MET
-7	M06	unknown		
+7	M06	empty		
 7	M07	CPT1C	126129	MET
-7	M08	unknown		
+7	M08	empty		
 7	M09	GNPDA2	132789	MET
-7	M10	unknown		
+7	M10	empty		
 7	M11	FLJ34658	133688	MET
-7	M12	unknown		
+7	M12	empty		
 7	M13	B3GAT2	135152	MET
-7	M14	unknown		
+7	M14	empty		
 7	M15	DKFZP586M1819	137964	MET
-7	M16	unknown		
+7	M16	empty		
 7	M17	CREB3L4	148327	MET
-7	M18	unknown		
+7	M18	empty		
 7	M19	SLC2A12	154091	MET
-7	M20	unknown		
+7	M20	empty		
 7	M21	LDHAL6A	160287	MET
-7	M22	unknown		
+7	M22	empty		
 7	M23	plk1		
 7	M24	plk1		
 7	N01	plk1		
@@ -2642,25 +2642,25 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 7	O01	plk1		
 7	O02	plk1		
 7	O03	CAGLP	163688	MET
-7	O04	unknown		
+7	O04	empty		
 7	O05	CLYBL	171425	MET
-7	O06	unknown		
+7	O06	empty		
 7	O07	ADCY4	196883	MET
-7	O08	unknown		
+7	O08	empty		
 7	O09	PRPS1L1	221823	MET
-7	O10	unknown		
+7	O10	empty		
 7	O11	RICTOR	253260	MET
-7	O12	unknown		
+7	O12	empty		
 7	O13	SLC25A30	253512	MET
-7	O14	unknown		
+7	O14	empty		
 7	O15	PGM2L1	283209	MET
-7	O16	unknown		
+7	O16	empty		
 7	O17	PIGW	284098	MET
-7	O18	unknown		
+7	O18	empty		
 7	O19	PHGDHL1	337867	MET
-7	O20	unknown		
+7	O20	empty		
 7	O21	SLC25A35	399512	MET
-7	O22	unknown		
+7	O22	empty		
 7	O23	plk1		
 7	O24	plk1		
 7	P01	plk1		
