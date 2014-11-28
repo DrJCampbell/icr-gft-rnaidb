@@ -160,7 +160,7 @@ COMMIT;
 
 BEGIN;
 LOAD DATA LOCAL INFILE '/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_384_template_SaraCav.txt' INTO TABLE Template_library_file FIELDS TERMINATED BY "\t" LINES TERMINATED BY "\n" IGNORE 1 LINES (@vPlate_templib, @vWell_templib, @vGene_symbol_templib, @vEntrez_gene_id_templib, @vSub_lib) SET Plate_templib = nullif(@vPlate_templib, ''), Well_templib = nullif(@vWell_templib,''), Gene_symbol_templib = nullif(@vGene_symbol_templib,''), Entrez_gene_id_templib = nullif(@vEntrez_gene_id_templib,''), Sub_lib = nullif(@vSub_lib,'');
-UPDATE Template_library_file SET Template_library_Template_library_ID = (select Template_library_ID from Template_library where Template_library_name='KS_TS_384_template') WHERE Template_library_Template_library_ID IS NULL;
+UPDATE Template_library_file SET Template_library_Template_library_ID = (select Template_library_ID from Template_library where Template_library_name='KS_TS_384_template_SaraCav') WHERE Template_library_Template_library_ID IS NULL;
 select * from Template_library_file where Well_templib='A03';
 COMMIT;
 
