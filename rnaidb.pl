@@ -80,19 +80,32 @@ my $page_header = "<html>
 
 my $tissue_file = "/home/agulati/data/screen_data/tissue_type.txt";
 my $tissue_list;
-open (IN, "< $tissue_file")
+my $t_l;
+open IN, "< $tissue_file"
   or die "Cannot open $tissue_file:$!\n";
+
 while (<IN>) {
-    $tissue_list = $_;
-} 
+  if ($_ =~ /^ADRENAL/) {
+    $t_l = $tissue_list;
+  }
+}
+$tissue_list = $_;
+chomp $tissue_list;
+close IN;
 
 my $cell_line_file = "/home/agulati/data/screen_data/cell_lines.txt";
 my $cell_line_list;
-open (IN, "< $cell_line_file")
+my $c_l;
+open IN, "< $cell_line_file"
   or die "Cannot open $cell_line_file:$!\n";
 while (<IN>) {
-  $cell_line_list = $_;
-} 
+  if ($_ =~ /^1321N1/) {
+    $c_l = $cell_line_list;
+  }
+}
+$cell_line_list = $_;
+chomp $cell_line_list;
+close IN;
 
 my $page_header_for_add_new_screen_sub = "<html>
 				   						  <head>
@@ -301,6 +314,9 @@ sub add_new_screen {
   if ( defined ( $file_upload_message ) ) {
     print "<div id=\"Message\"><p><b>$file_upload_message</b></p></div>";
   }
+  
+  print $cell_line_list;
+  print $tissue_list;
   
   ##
   ## add main screen info here ##

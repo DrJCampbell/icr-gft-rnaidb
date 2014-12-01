@@ -29,17 +29,15 @@ summary_file <- read.table(
 			    header=TRUE,
  				)
  				
-sicon1.z <- (names.arg=summary_file$score)[which(summary_file$wellAnno == "sicon1")] 
+sicon1.z <- (summary_file$score)[which(summary_file$wellAnno == "sicon1")] 
 
-sicon2.z <- (names.arg=summary_file$score)[which(summary_file$wellAnno == "sicon2")] 
+sicon2.z <- (summary_file$score)[which(summary_file$wellAnno == "sicon2")] 
 
-allstar.z <- (names.arg=summary_file$score)[which(summary_file$wellAnno == "allstar")] 
+allstar.z <- (summary_file$score)[which(summary_file$wellAnno == "allstar")] 
 
-plk1.z <- (names.arg=summary_file$score)[which(summary_file$wellAnno == "siplk1")] 
+plk1.z <- (summary_file$score)[which(summary_file$wellAnno == "siplk1")] 
 
 qc_file <- paste(datapath, controls_qc, sep="")
-
-if (!file.exists(qc_file)){
 
   png(file=qc_file, width=800, height=500)
 
@@ -86,11 +84,10 @@ if (!file.exists(qc_file)){
 	)
 
 dev.off()
-}
 
-rep1 <- (names.arg=summary_file$normalized_r1_ch1)[which(summary_file$wellAnno == "sample")]
-rep2 <- (names.arg-summary_file$normalized_r2_ch1)[which(summary_file$wellAnno == "sample")]
-rep3 <- (names.arg=summary_file$normalized_r3_ch1)[which(summary_file$wellAnno == "sample")]
+rep1 <- (summary_file$normalized_r1_ch1)[which(summary_file$wellAnno == "sample")]
+rep2 <- (summary_file$normalized_r2_ch1)[which(summary_file$wellAnno == "sample")]
+rep3 <- (summary_file$normalized_r3_ch1)[which(summary_file$wellAnno == "sample")]
 
 r12.cor <- cor(rep1,rep2,method="pearson",use="pairwise.complete.obs")
 r13.cor <- cor(rep1,rep3,method="pearson",use="pairwise.complete.obs")
