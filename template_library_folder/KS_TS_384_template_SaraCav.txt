@@ -1,4 +1,4 @@
-Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
+Plate	Well	GeneID	Entrez_gene_ID	sublib
 1	K20	CAMK2N1	55450	KIN
 3	F03	KRAS_ol1		
 3	F05	KRAS_ol2		

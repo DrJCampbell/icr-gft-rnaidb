@@ -1,4 +1,4 @@
-Plate	Well	GeneID	EntrezGene_ID	sub_lib
+Plate	Well	GeneID	EntrezGene_ID	sublib
 1	A01			
 1	A02			
 1	A03	BCL2L11	10018	MET

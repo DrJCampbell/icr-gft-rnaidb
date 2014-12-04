@@ -1,4 +1,4 @@
-Plate	Well	GeneID	Entrez_gene_ID	Sub_lib
+Plate	Well	GeneID	Entrez_gene_ID	sublib
 1	A01			
 1	A02			
 1	A03	TTK	7272	KIN

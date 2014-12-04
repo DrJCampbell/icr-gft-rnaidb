@@ -1,4 +1,4 @@
-Plate	Well	GeneID	Entrez_gene_ID	sub_lib
+Plate	Well	GeneID	Entrez_gene_ID	sublib
 1	A01	siCON1	neg	
 1	A02	siCON1	neg	
 1	A03	KAT2A	2648	EPI
