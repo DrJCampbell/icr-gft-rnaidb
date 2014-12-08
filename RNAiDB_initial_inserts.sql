@@ -100,8 +100,6 @@ insert into Template_library (Template_library_name) values ('KS_TS_CGC_384_temp
 insert into Template_library (Template_library_name) values ('KS_TS_CGC_WNT_384_template');
 insert into Template_library (Template_library_name) values ('KS_TS_DR_384_template');
 insert into Template_library (Template_library_name) values ('KS_TS_DR_MT_PH_384_template');
-insert into Template_library (Template_library_name) values ('KS_TS_DR_MT_PH_384_template1');
-insert into Template_library (Template_library_name) values ('KS_TS_DR_MT_PH_384_template3');
 insert into Template_library (Template_library_name) values ('MET_PH_SPV384');
 select * from Template_library;
 
@@ -116,8 +114,6 @@ insert into Template_library_file_path (Template_library_file_location) values (
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_CGC_WNT_384_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_384_template.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template.txt');
-insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template1.txt');
-insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template3.txt');
 insert into Template_library_file_path (Template_library_file_location) values ('/Users/wwei/icr-gft-rnaidb/template_library_folder/MET_PH_SPV384.txt');
 select * from Template_library_file_path;
 
@@ -187,19 +183,6 @@ COMMIT;
 BEGIN;
 LOAD DATA LOCAL INFILE '/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template.txt' INTO TABLE Template_library_file FIELDS TERMINATED BY "\t" LINES TERMINATED BY "\n" IGNORE 1 LINES (@vPlate_templib, @vWell_templib, @vGene_symbol_templib, @vEntrez_gene_id_templib, @vSub_lib) SET Plate_templib = nullif(@vPlate_templib, ''), Well_templib = nullif(@vWell_templib,''), Gene_symbol_templib = nullif(@vGene_symbol_templib,''), Entrez_gene_id_templib = nullif(@vEntrez_gene_id_templib,''), Sub_lib = nullif(@vSub_lib,'');
 UPDATE Template_library_file SET Template_library_Template_library_ID = (select Template_library_ID from Template_library where Template_library_name='KS_TS_DR_MT_PH_384_template') WHERE Template_library_Template_library_ID IS NULL;
-select * from Template_library_file where Well_templib='A03';
-COMMIT;
-
-BEGIN;
-LOAD DATA LOCAL INFILE '/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template1.txt' INTO TABLE Template_library_file FIELDS TERMINATED BY "\t" LINES TERMINATED BY "\n" IGNORE 1 LINES (@vPlate_templib, @vWell_templib, @vGene_symbol_templib, @vEntrez_gene_id_templib, @vSub_lib) SET Plate_templib = nullif(@vPlate_templib, ''), Well_templib = nullif(@vWell_templib,''), Gene_symbol_templib = nullif(@vGene_symbol_templib,''), Entrez_gene_id_templib = nullif(@vEntrez_gene_id_templib,''), Sub_lib = nullif(@vSub_lib,'');
-UPDATE Template_library_file SET Template_library_Template_library_ID = (select Template_library_ID from Template_library where Template_library_name='KS_TS_DR_MT_PH_384_template1') WHERE Template_library_Template_library_ID IS NULL;
-select * from Template_library_file where Well_templib='A03';
-COMMIT;
-
-
-BEGIN;
-LOAD DATA LOCAL INFILE '/Users/wwei/icr-gft-rnaidb/template_library_folder/KS_TS_DR_MT_PH_384_template3.txt' INTO TABLE Template_library_file FIELDS TERMINATED BY "\t" LINES TERMINATED BY "\n" IGNORE 1 LINES (@vPlate_templib, @vWell_templib, @vGene_symbol_templib, @vEntrez_gene_id_templib, @vSub_lib) SET Plate_templib = nullif(@vPlate_templib, ''), Well_templib = nullif(@vWell_templib,''), Gene_symbol_templib = nullif(@vGene_symbol_templib,''), Entrez_gene_id_templib = nullif(@vEntrez_gene_id_templib,''), Sub_lib = nullif(@vSub_lib,'');
-UPDATE Template_library_file SET Template_library_Template_library_ID = (select Template_library_ID from Template_library where Template_library_name='KS_TS_DR_MT_PH_384_template3') WHERE Template_library_Template_library_ID IS NULL;
 select * from Template_library_file where Well_templib='A03';
 COMMIT;
 
