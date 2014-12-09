@@ -85,11 +85,13 @@ insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/ic
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_KS_TS_CGC.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p3r3.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p3r3c1.txt');
+insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p4r3.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p7r3.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p7r3_TKCC07.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p7r3c1.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p9_v2.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p9.txt');
+insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/ScreenSpecific');
 select * from Platelist_file_path;
 
 insert into Template_library (Template_library_name) values ('Epigenetics_template');
