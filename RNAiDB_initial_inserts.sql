@@ -4,8 +4,13 @@ insert into Instrument_used (Instrument_name) values ('NA');
 select * from Instrument_used;
 
 insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('ARID1A-set');
+insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('CDH1-set');
 insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('KRAS-set');
+insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('MLH1-set');
+insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('MSH-set');
 insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('PTEN-set');
+insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('RB1-set');
+insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('TP53-set');
 insert into Name_of_set_if_isogenic (Name_of_set_if_isogenic) values ('NA');
 select * from Name_of_set_if_isogenic;
 
