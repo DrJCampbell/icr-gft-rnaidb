@@ -2287,7 +2287,7 @@ sub show_all_screens {
 			  r.Gene_name_if_isogenic = 'NA' AND
 			  r.Isogenic_mutant_description = 'NA' AND
 			  r.Method_of_isogenic_knockdown = 'NA' AND
-			  r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = '4' GROUP BY
+			  r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = '9' GROUP BY
 			  r.Rnai_screen_info_ID UNION ALL 
 			  SELECT
 			  r.Rnai_screen_name,
@@ -2319,7 +2319,7 @@ sub show_all_screens {
 			  r.Gene_name_if_isogenic != 'NA' AND
 			  r.Isogenic_mutant_description != 'NA' AND
 			  r.Method_of_isogenic_knockdown != 'NA' AND
-			  n.Name_of_set_if_isogenic_ID != '4' AND
+			  n.Name_of_set_if_isogenic_ID != '9' AND
 			  r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = n.Name_of_set_if_isogenic_ID GROUP BY 
 			  r.Rnai_screen_info_ID";
     
