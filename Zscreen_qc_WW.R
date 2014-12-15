@@ -38,11 +38,10 @@ Zscreen_qc<- function(datapath, summaryName, ReportdirName, controls_qc, corr_co
 
 	dev.off()
 	
-	nData<-subset(summary_file, subset=(wellAnno=="sample"))
-	nData<-nData[, c("normalized_r1_ch1", "normalized_r2_ch1", "normalized_r3_ch1")]
-	rep1<-nData$normalized_r1_ch1
-	rep2<-nData$normalized_r2_ch1
-	rep3<-nData$normalized_r3_ch1
+	sample_summary_data<-subset(summary_file, subset=(wellAnno=="sample"))
+	rep1<-sample_summary_data$normalized_r1_ch1
+	rep2<-sample_summary_data$normalized_r2_ch1
+	rep3<-sample_summary_data$normalized_r3_ch1
 
 	r12.cor <- cor(rep1,rep2,method="pearson",use="pairwise.complete.obs")
 	r13.cor <- cor(rep1,rep3,method="pearson",use="pairwise.complete.obs")
