@@ -2888,6 +2888,12 @@ sub save_new_screen {
   my $rnai_screen_qc_new_path = "/usr/local/www/html/RNAi_screen_analysis_qc_plots";
   `cp -r $rnai_screen_qc_original_path $rnai_screen_qc_new_path`;
   
+  ## copy the file with corr coef to the /usr/local/www/html/RNAi_screen_analysis_correlation_folder ##
+  
+  my $rnai_screen_corr_original_path = $file_path."/".$screen_dir_name."_corr.txt"; 		
+  my $rnai_screen_corr_new_path = "/usr/local/www/html/RNAi_screen_analysis_correlation_folder"; 		
+  `cp -r $rnai_screen_corr_original_path $rnai_screen_corr_new_path`;
+  
   ## Display the link to screen analysis qc plots on the save new screen page ##
   
   my $rnai_screen_link_to_qc_plots = "http://gft.icr.ac.uk/RNAi_screen_analysis_qc_plots/".$screen_dir_name."_controls_qc.png";
@@ -4532,7 +4538,8 @@ sub show_qc {
   print "<img src=\"$show_qc_page\" alt=\"QC plots:\">";
   print "</p>";
 
-  my $coco_file = "/home/agulati/data/screen_data/".$screen_dir_name."/".$screen_dir_name."_corr.txt";
+  #my $coco_file = "/home/agulati/data/screen_data/".$screen_dir_name."/".$screen_dir_name."_corr.txt";
+  my $coco_file = "/usr/local/www/html/RNAi_screen_analysis_correlation_folder/".$screen_dir_name."_corr.txt";
   
   open ( IN, "< $coco_file" )
     or die "Cannot open $coco_file:$!\n";
