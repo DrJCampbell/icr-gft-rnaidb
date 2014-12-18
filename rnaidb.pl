@@ -3058,7 +3058,7 @@ sub save_new_screen {
     #or die "Cannot open the xls2txt file:$!\n";
   
   #foreach my $line( <FILE> ){
-   # chomp $line;
+    #chomp $line;
     #my ( $plate_number_xls_file, 
     #$well_number_xls_file, 
     #$raw_score_xls_file ) = split ( /\t/,$line );
@@ -3070,16 +3070,16 @@ sub save_new_screen {
     #Raw_score_xls_file,
     #Rnai_screen_info_Rnai_screen_info_ID ) 
     #VALUES (
-    #DEFAULT, 
+	#DEFAULT, 
     #'$plate_number_xls_file', 
     #'$well_number_xls_file', 
     #'$raw_score_xls_file',
     #'$last_rnai_screen_info_id' ) ");
     
     #$query_handle = $dbh -> prepare ( $query );
-       				    #or die "Cannot prepare: " . $dbh->errstr();
-  #$query_handle -> execute()
-    #or die "SQL Error: ".$query_handle -> errstr();
+       	###########or die "Cannot prepare: " . $dbh->errstr();
+  #$query_handle -> execute();
+        ###########or die "SQL Error: ".$query_handle -> errstr();
     #$query_handle -> finish();
   #}
   #close FILE;
