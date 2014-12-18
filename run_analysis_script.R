@@ -6,7 +6,8 @@
 #getwd()
 
 source( "/home/agulati/scripts/xls2platetxtfiles.R" )
-source( "/home/agulati/scripts/zScreen.R" )
+#source( "/home/agulati/scripts/zScreen.R" )
+source( "/Rnaidb_git/icr-gft-rnaidb/zScreenSublib.R" )
 source( "/home/agulati/scripts/xls2txt_file.R" )
 source( "/home/agulati/scripts/Zscreen_qc.R")
 
@@ -53,7 +54,7 @@ res_1 <- xls2platelist(
 ## function for cellHTS2 analysis
 #
 
-res_2 <- zScreen(
+res_2 <- zScreenSublib(
 		 name=Cell_line,
 		 datapath=Datapath,
 		 poscontrols=Poscontrols,
