@@ -75,9 +75,9 @@ res_2 <- zScreenSublib(
 ## function using gdata for converting xls to txt file for storing in the database
 #
 
-res_3 <- xls2txt_file(
-		 datapath=Datapath,
-		 xls=Xls)
+#res_3 <- xls2txt_file(
+#		 datapath=Datapath,
+#		 xls=Xls)
 
 #
 ## function for qc - creating boxplots and calculating correlation coefficient
