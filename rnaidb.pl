@@ -2754,40 +2754,38 @@ sub save_new_screen {
     	my $target = $file_path."/".$excelFile;
     	# undef may be returned if it's not a valid file handle
   
-    	if ( defined $lightweight_fh ) {
-    	# Upgrade the handle to one compatible with IO::Handle:
-      	my $io_handle = $lightweight_fh->handle;
+    	if ( defined $lightweight_fh ) 
+    	{
+    		# Upgrade the handle to one compatible with IO::Handle:
+      		my $io_handle = $lightweight_fh->handle;
  
-      	open ( $excelFile,'>',$target )
-        	or die "Cannot move $excelFile to $target:$!\n";
+      		open ( $excelFile,'>',$target )
+        		or die "Cannot move $excelFile to $target:$!\n";
       
-      	my $bytesread = undef;
-      	my $buffer = undef;
+      		my $bytesread = undef;
+      		my $buffer = undef;
     
-      	while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) {
-        	print $excelFile $buffer
-          	or die "Error writing '$target' : $!";
-      	}
-      	close $excelFile
-        	or die "Error writing '$target' : $!";
-      	}
-      	#else {
-       	# `rm -r $file_path`;
-       	# die "Please upload the excel file.";
-      	#}
-    
-      	## rename uploaded excel file ##
-      	my $new_excel_filename_wo_spaces = $excelFile;
-    	$new_excel_filename_wo_spaces =~ s/\s+/_/g;
-      	my $new_xls_file = rename ( $file_path."/".$excelFile, $file_path."/".$new_excel_filename_wo_spaces ) or die "Cannot rename $excelFile :$!";
-      	if (!defined($xls_files))
-      	{
-      		$xls_files = $new_excel_filename_wo_spaces;
-      	}
-      	else
-      	{
-      		$xls_files = $xls_files . " " . $new_excel_filename_wo_spaces;
-      	}
+      		while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) 
+      		{
+        		print $excelFile $buffer
+          		or die "Error writing '$target' : $!";
+      		}
+      		close $excelFile
+        		or die "Error writing '$target' : $!";
+        		 
+      		## rename uploaded excel file ##
+      		my $new_excel_filename_wo_spaces = $excelFile;
+    		$new_excel_filename_wo_spaces =~ s/\s+/_/g;
+      		my $new_xls_file = rename ( $file_path."/".$excelFile, $file_path."/".$new_excel_filename_wo_spaces ) or die "Cannot rename $excelFile :$!";
+      		if (!defined($xls_files))
+      		{
+      			$xls_files = $new_excel_filename_wo_spaces;
+      		}
+      		else
+      		{
+      			$xls_files = $xls_files . " " . $new_excel_filename_wo_spaces;
+      		}
+    	}
     }
     
     print "<p>";
