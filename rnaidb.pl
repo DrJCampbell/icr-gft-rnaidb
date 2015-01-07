@@ -1977,8 +1977,9 @@ sub add_new_screen {
   						  -id => "pconf_file" );							    		  
   print " - OR";
   #link to the form for adding new plateconf file 
+  ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plateconf_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
   print "<p>";
-  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1#new_plate_conf_file\"> Add new plateconf file</a>";
+  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\"> Add new plateconf file</a>";
   print "</p>";
   print "</p>";
 
@@ -2014,8 +2015,9 @@ sub add_new_screen {
   
   print " - OR";
   #link to the form for adding new platelist file 
+  ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_platelist_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
   print "<p>";  
-  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1#new_plate_list_file\">Add new platelist file</a>";
+  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\">Add new platelist file</a>";
   print "</p>";  
   print "</p>";  	
   		
@@ -2051,9 +2053,10 @@ sub add_new_screen {
    						  -id => "tlib_file" );
   
   print " - OR";
-  #link to the form for adding new template library file 
+  #link to the form for adding new template library file
+  ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plate_library_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages 
   print "<p>";  	
-  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1#new_plate_library_file\"> Add new template library file</a>";
+  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\"> Add new template library file</a>";
   print "</p>";
   print "</p>";
 
