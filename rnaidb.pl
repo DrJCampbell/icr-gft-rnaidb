@@ -1934,6 +1934,16 @@ sub add_new_screen {
                          -size => 35,
                          -maxlength => 256,
                          -id => "xls_file" );
+  print $q -> filefield ( -name => 'uploaded_excel_file2',
+                         -default => 'starting value',
+                         -size => 35,
+                         -maxlength => 256,
+                         -id => "xls_file2" );
+  print $q -> filefield ( -name => 'uploaded_excel_file3',
+                         -default => 'starting value',
+                         -size => 35,
+                         -maxlength => 256,
+                         -id => "xls_file3" );
   print "</p>";
 
   ## get the existing plateconf filenames from the database and display them in the popup menu ##
@@ -2634,7 +2644,7 @@ sub save_new_screen {
   my $sicon1 = $q -> param( "sicon1_empty" );
   my $sicon2 = $q -> param( "sicon2_empty" );
   my $allstar = $q -> param( "allstar_empty" );
-  my $excelFile = $q->param( "uploaded_excel_file" ); 
+  my $xls_files;
   
   ################################################[[[get params to check the previous page is working as expected]]]
   
@@ -2729,47 +2739,60 @@ sub save_new_screen {
   ############################################[[[probably need to copy $temp_file_path somewhere safe and give it to an R script to convert]]]
   
     ## Upload excel file and save it to new screen directory ##
-  
-    my $lightweight_fh  = $q -> upload ( 'uploaded_excel_file' );
-    #unless ( $excelFile =~ /(xls)$/ ) {
-    #  `rm -r $file_path`;
-    #  print "<div id=\"Message\"><p>ERROR: Please upload a valid excel file for analysis.</p></div>";
-    #  print "<p>Deleted new screen directory: $screen_dir_name.</p>";
-     # die "Please upload a valid excel file for analysis.";
+    foreach my $excel_filefield ('uploaded_excel_file', 'uploaded_excel_file2', 'uploaded_excel_file3')
+    { 
+    	my $lightweight_fh  = $q -> upload ( $excel_filefield );
+    	my $excelFile = $q->param( $excel_filefield );
+    	#unless ( $excelFile =~ /(xls)$/ ) {
+    	#  `rm -r $file_path`;
+    	#  print "<div id=\"Message\"><p>ERROR: Please upload a valid excel file for analysis.</p></div>";
+    	#  print "<p>Deleted new screen directory: $screen_dir_name.</p>";
+     	# die "Please upload a valid excel file for analysis.";
       
-    #}
+    	#}
 
-    my $target = $file_path."/".$excelFile;
-    # undef may be returned if it's not a valid file handle
+    	my $target = $file_path."/".$excelFile;
+    	# undef may be returned if it's not a valid file handle
   
-    if ( defined $lightweight_fh ) {
-    # Upgrade the handle to one compatible with IO::Handle:
-      my $io_handle = $lightweight_fh->handle;
+    	if ( defined $lightweight_fh ) {
+    	# Upgrade the handle to one compatible with IO::Handle:
+      	my $io_handle = $lightweight_fh->handle;
  
-      open ( $excelFile,'>',$target )
-        or die "Cannot move $excelFile to $target:$!\n";
+      	open ( $excelFile,'>',$target )
+        	or die "Cannot move $excelFile to $target:$!\n";
       
-      my $bytesread = undef;
-      my $buffer = undef;
+      	my $bytesread = undef;
+      	my $buffer = undef;
     
-      while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) {
-        print $excelFile $buffer
-          or die "Error writing '$target' : $!";
-      }
-      close $excelFile
-        or die "Error writing '$target' : $!";
-      }
-      #else {
-       # `rm -r $file_path`;
-       # die "Please upload the excel file.";
-      #}
+      	while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) {
+        	print $excelFile $buffer
+          	or die "Error writing '$target' : $!";
+      	}
+      	close $excelFile
+        	or die "Error writing '$target' : $!";
+      	}
+      	#else {
+       	# `rm -r $file_path`;
+       	# die "Please upload the excel file.";
+      	#}
     
-      ## rename uploaded excel file ##
-      my $new_xls_file = rename ( $file_path."/".$excelFile, $file_path."/".$screen_dir_name.".xls" ) or die "Cannot rename $excelFile :$!";
-      
-      print "<p>";
-      print "<p><div id=\"Note\">Renamed excel file saved in the screen directory...</div></p>";
-      print "</p>"; 
+      	## rename uploaded excel file ##
+      	my $new_excel_filename_wo_spaces = $excelFile;
+    	$new_excel_filename_wo_spaces =~ s/\s+/_/g;
+      	my $new_xls_file = rename ( $file_path."/".$excelFile, $file_path."/".$new_excel_filename_wo_spaces ) or die "Cannot rename $excelFile :$!";
+      	if (!defined($xls_files))
+      	{
+      		$xls_files = $new_excel_filename_wo_spaces;
+      	}
+      	else
+      	{
+      		$xls_files = $xls_files . " " . $new_excel_filename_wo_spaces;
+      	}
+    }
+    
+    print "<p>";
+    print "<p><div id=\"Note\">Renamed excel file(s) saved in the screen directory...</div></p>";
+    print "</p>"; 
     
   ###############################################[[[either copy the platelist/palteconf/library etc to the new screen folder or use symlinks to point to the templates]]]
   
@@ -2819,7 +2842,7 @@ sub save_new_screen {
       "$screen_dir_name"."_summary.txt\t", 
       "$screen_dir_name"."_zprime.txt\t", 
       "$screen_dir_name"."_reportdir\t", 
-      "$screen_dir_name".".xls\t", 
+      "$xls_files\t", 
       "$screen_dir_name"."_controls_qc.png\t", 
       "$screen_dir_name"."_corr.txt\n";  
   
@@ -4402,7 +4425,7 @@ sub configure_export {
 
   ## retrieve cell lines from the database and save them in a hash ##
   
-  my $query = ( "SELECT 
+  $query = ( "SELECT 
    				r.Cell_line FROM 
    				Rnai_screen_info r, 
    				Summary_of_result s, 
@@ -4411,7 +4434,7 @@ sub configure_export {
    				r.Template_library_Template_library_ID = t.Template_library_ID GROUP BY 
    				r. Rnai_screen_info_ID" );
    
-  my $query_handle = $dbh -> prepare ( $query );
+  $query_handle = $dbh -> prepare ( $query );
    					   #or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle -> execute();
     #or die "SQL Error: " . $query_handle -> errstr();
@@ -4428,7 +4451,7 @@ sub configure_export {
   
   ## retrieve zscores for each cell line from the database and save them in a hash ##
   
-  my $query = ( "SELECT
+  $query = ( "SELECT
     			CONCAT(l.Sub_lib, '_', l.Gene_symbol_templib),
     			r.Cell_line, 
     			s.Zscore_summary FROM 
@@ -4456,7 +4479,7 @@ sub configure_export {
 				l.Sub_lib IS NOT NULL GROUP BY 
 				s.Summary_of_result_ID" );
   
-  my $query_handle = $dbh -> prepare ( $query );
+  $query_handle = $dbh -> prepare ( $query );
    					   #or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle -> execute();
    # or die "SQL Error: " . $query_handle -> errstr();
