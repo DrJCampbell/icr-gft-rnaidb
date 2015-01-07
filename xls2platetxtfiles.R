@@ -1,7 +1,7 @@
 xls2platelist<-function(xls, datapath){
 	require(gdata)
 	setwd(datapath)
-	xls<-unlist(strsplit(xls, sep=" "))
+	xls<-unlist(strsplit(xls, split=" "))
 	screen_plate_number <- 0
 	screen_name<-basename(datapath)
 	for (iFile in 1:length(xls))
