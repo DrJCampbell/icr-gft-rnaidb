@@ -69,6 +69,8 @@ insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/ic
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_384_plateconf6.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_384_plateconf7.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_384_plateconf_SaraCav.txt');
+insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_CGC_384_plateconf.txt');
+insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_CGC_WNT_384_plateconf.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_DR_384_plateconf1.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_DR_384_plateconf2.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_DR_384_plateconf3.txt');
@@ -80,7 +82,7 @@ insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/ic
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_DR_MT_PH_384_plateconf8.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/KS_TS_DR_MT_PH_384_plateconf9.txt');
 insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/MET_PH_SPV384_plateconf.txt');
-insert into Plateconf_file_path(Plateconf_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_conf_folder/plateconf_KS_TS_CGC.txt');
+
 select * from Plateconf_file_path;
 
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/Kinome_96_validation_platelist.txt');
