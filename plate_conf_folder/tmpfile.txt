@@ -1,6 +1,6 @@
 Wells: 384
 
-Plates:	3
+Plates:5
 
 Plate	Well	Content
 
@@ -10,19 +10,19 @@ Plate	Well	Content
 
 *	[A-P]24	empty
 
-*	[A-D]02	allstar
+*	[A-D]02	sicon1
 
-*	[E-H]02	sicon1
+*	[E-H]02	sicon2
 
-*	[I-L]02	sicon2
+*	[I-L]02	allstar
 
 *	[M-P]02	plk1
 
-*	[A-D]23	allstar
+*	[A-D]23	sicon1 drug
 
-*	[E-H]23	sicon1
+*	[E-H]23	sicon2 drug
 
-*	[I-L]23	sicon2
+*	[I-L]23	allstar drug
 
-*	[M-P]23	plk1
+*	[M-P]23	plk1 drug
 
