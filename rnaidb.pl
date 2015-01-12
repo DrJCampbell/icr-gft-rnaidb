@@ -17,22 +17,47 @@ use Data::Dumper;
 $0 =~ /([^\/]+)$/;
 
 my $script_name = $1;
+my $conf_file = $script_name;
+$conf_file =~ s/pl$/conf/;
 
+my $run_analysis_script = $script_name;
+$run_analysis_script =~ s/pl$/run_analysis_script.R/;
 
 ## stuff to configure when moving... ##
 
 my $users_file = './users.txt';
 my $temp_file_path = '/tmp/tmp.csv';
-my $sqldb_name = 'RNAi_analysis_database';
-my $sqldb_host = 'localhost';
-my $sqldb_port = '3306';
-my $sqldb_user = 'internal';
-my $sqldb_pass = '1nt3rnal';
+
+# These are the basic set of options
+my %configures = &get_configures_hash($conf_file);
+
+sub get_configures_hash{
+        my $configures = shift;
+        my %configures;
+        open RES, "< $configures" or die "Can't read list of configures from file:\n$configures\n$!\n";
+        while(<RES>){
+                next if /^(#|[\n\r])/;
+                my ($key, $value);
+                if(/^([^\t]+)\t+([^\t]+)/){
+                        $key = $1;
+                        $value = $2;
+                }
+                chomp($value);
+                if(exists($configures{$key})){die "configure: $key is duplicated in the configures file $configures\n\nYou need to fix that to continue\n";}
+                $configures{$key} = $value;
+        }
+        return %configures;
+}
+my $sqldb_name = $configures{'sqldb_name'};
+my $sqldb_host = $configures{'sqldb_host'};
+my $sqldb_port = $configures{'sqldb_port'};
+my $sqldb_user = $configures{'sqldb_user'};
+my $sqldb_pass = $configures{'sqldb_pass'};
 
 ## Declare variables globally ##
 
 my $ISOGENIC_SET;
-my $ADD_NEW_FILES_LINK = "http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1";
+my $ADD_NEW_FILES_LINK = $configures{'hostname'} . "cgi-bin/$script_name?add_new_files=1";
 
 #my $username;
 #my $password;
@@ -69,7 +94,7 @@ my $page_header = "<html>
 				   </head>
 				   <body>
 				   <div id=\"Box\"></div><div id=\"MainFullWidth\">
-				   <a href=\"http://gft.icr.ac.uk\"><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>
+				   <a href=$configures{'hostname'}><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>
 				   <p>
 				   <a href=\"/cgi-bin/$script_name?add_new_screen=1\">Add new screen</a>\&nbsp;\&nbsp;
 				   <a href=\"/cgi-bin/$script_name?show_all_screens=1\">Show all screens</a>\&nbsp;\&nbsp;
@@ -78,7 +103,7 @@ my $page_header = "<html>
 
 # HTML strings used in add new screen:
 
-#my $tissue_file = "/home/agulati/data/screen_data/tissue_type.txt";
+#my $tissue_file = $configures{'screenDir_path'} . "tissue_type.txt";
 #my $tissue_list;
 #my $t_l;
 #open IN, "< $tissue_file"
@@ -93,7 +118,7 @@ my $page_header = "<html>
 #chomp $tissue_list;
 #close IN;
 
-#my $cell_line_file = "/home/agulati/data/screen_data/cell_lines.txt";
+#my $cell_line_file = $configures{'screenDir_path'}. "cell_lines.txt";
 #my $cell_line_list;
 #my $c_l;
 #open IN, "< $cell_line_file"
@@ -1764,7 +1789,7 @@ my $page_header_for_add_new_screen_sub = "<html>
 				   						  </head>
 				   						  <body>
 				   						  <div id=\"Box\"></div><div id=\"MainFullWidth\">
-				   						  <a href=\"http://gft.icr.ac.uk\"><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>
+				   						  <a href=$configures{'hostname'}><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>
 				   						  <p>
 				   						  <a href=\"/cgi-bin/$script_name?add_new_screen=1\">Add new screen</a>\&nbsp;\&nbsp;
 				    					  <a href=\"/cgi-bin/$script_name?show_all_screens=1\">Show all screens</a>\&nbsp;\&nbsp;
@@ -1883,8 +1908,22 @@ sub home {
   }
   
   print "<p>";
-  print "<p>Connected to the RNAi_analysis_database</p>";
+  print "<p>Scriptname is $script_name</p>";
   print "</p>";
+  
+  print "<p>";
+  print "<p>Configname is $conf_file</p>";
+  print "</p>";
+  
+  print "<p>";
+  print "<p>Connected to the database $sqldb_name</p>";
+  print "</p>";
+  
+  my $var_name;
+  foreach $var_name ( sort keys %configures ) {
+  print "<P><B>$var_name</B><BR>";
+  print $configures{$var_name};
+}
  
   print "$page_footer";
   print $q -> end_html;
@@ -1976,10 +2015,18 @@ sub add_new_screen {
   						  -default => 'Please select',
   						  -id => "pconf_file" );							    		  
   print " - OR";
+  
+  ## View old Plateconf file ## 
+  my $plate_conf_download_link = $configures{'hostname'} . $configures{'plateconf_folder'}; 
+  print "    ";
+  print "<a href=\"$plate_conf_download_link\">View existing plate conf files</a>";
+  
+  print " - OR";
+  
   #link to the form for adding new plateconf file 
   ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plateconf_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
   print "<p>";
-  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\"> Add new plateconf file</a>";
+  print "<a href =" . $configures{'hostname'} . "cgi-bin/$script_name?add_new_files=1\"> Add new plateconf file</a>";
   print "</p>";
   print "</p>";
 
@@ -2014,10 +2061,18 @@ sub add_new_screen {
    						  -id => "plist_file" );
   
   print " - OR";
+  
+   ## View old Platelist file ## 
+  my $plate_list_download_link = $configures{'hostname'} . $configures{'platelist_folder'}; 
+  print "    ";
+  print "<a href=\"$plate_list_download_link\">View existing plate list files</a>";
+  
+  print " - OR";
+  
   #link to the form for adding new platelist file 
   ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_platelist_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
   print "<p>";  
-  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\">Add new platelist file</a>";
+  print "<a href =" . $configures{'hostname'} .  "cgi-bin/$script_name?add_new_files=1\">Add new platelist file</a>";
   print "</p>";  
   print "</p>";  	
   		
@@ -2053,10 +2108,18 @@ sub add_new_screen {
    						  -id => "tlib_file" );
   
   print " - OR";
+  
+  ## View old template library ## 
+  my $template_library_download_link = $configures{'hostname'} . $configures{'templib_folder'}; 
+  print "    ";
+  print "<a href=\"$template_library_download_link\">View existing template library files</a>";
+  
+  print " - OR";
+  
   #link to the form for adding new template library file
   ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plate_library_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages 
   print "<p>";  	
-  print "<a href = \"http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\"> Add new template library file</a>";
+  print "<a href =" . $configures{'hostname'} .  "cgi-bin/$script_name?add_new_files=1\"> Add new template library file</a>";
   print "</p>";
   print "</p>";
 
@@ -2410,24 +2473,17 @@ sub add_new_files {
  
   ## download old Plateconf file ##
  
-  my $plate_conf_384_download_link = "http://gft.icr.ac.uk/plate_conf_folder/plateconf_384.txt";
-  my $plate_conf_96_download_link = "http://gft.icr.ac.uk/plate_conf_folder/plateconf_96.txt";
-
-  print "<div id=\"Note\"><p>NOTE: For downloading the plateconf file, right click on the relevant link below and select the 'Save Link As...' option for saving the file on your computer.</p></div>";
+  my $plate_conf_download_link = $configures{'hostname'} . $configures{'plateconf_folder'};
+  
+  #print "<div id=\"Note\"><p>NOTE: For downloading existing plateconf files, click on the link below.</p></div>";
   
   print "<p>";
-  print "<a href=\"$plate_conf_384_download_link\">Download the 384-well plate conf file for editing</a>";
-  print "     -  OR";
+  print "<a href=\"$plate_conf_download_link\">Download existing plate conf files</a>";
   print "</p>";
-  
-  print "<p>";
-  print "<a href=\"$plate_conf_96_download_link\">Download the 96-well plate conf file for editing</a>";
-  print "</p>";
-  print "<p></p>";
   
   ## get new Plateconf file ##
   
-  print "<p>Upload edited plateconf file:<br />";
+  print "<p>Upload new plateconf file:<br />";
   print "<p></p>";
   
   print $q -> filefield ( -name=>'new_uploaded_plateconf_file',
@@ -2479,20 +2535,13 @@ sub add_new_files {
  
   ## download old Platelist file ##
  
-  my $plate_list_384_download_link = "http://gft.icr.ac.uk/plate_list_folder/platelist_384.txt";
-  my $plate_list_96_download_link = "http://gft.icr.ac.uk/plate_list_folder/platelist_96.txt";
+  my $plate_list_download_link = $configures{'hostname'} . $configures{'platelist_folder'};
 
-  print "<p><div id=\"Note\">NOTE: For downloading the platelist file, right click on the relevant link and select the 'Save Link As...' option for saving the file on your computer.</div></p>";
+  #print "<p><div id=\"Note\">NOTE: For downloading existing platelist files, click on the link below.</div></p>";
   
   print "<p>";
-  print "<a href=\"$plate_list_384_download_link\">Download the 384-well plate list file for editing</a>";
-  print "     -  OR";
+  print "<a href=\"$plate_list_download_link\">Download existing plate list files</a>";
   print "</p>";
-  
-  print "<p>";
-  print "<a href=\"$plate_list_96_download_link\">Download the 96-well plate list file for editing</a>";
-  print "</p>";
-  print "<p></p>";
   
   ## get new platelist file ##
   
@@ -2547,33 +2596,14 @@ sub add_new_files {
  
   ## download old template library file ##
  
-  my $kinome_library_download_link = "http://gft.icr.ac.uk/template_library_folder/Kinome_template.txt";
-  my $KS_TS_384_library_download_link = "http://gft.icr.ac.uk/template_library_folder/KS_TS_384_template.txt";
-  my $KS_TS_DR_384_library_download_link = "http://gft.icr.ac.uk/template_library_folder/KS_TS_DR_384_template.txt";
-  my $KS_TS_MT_PH_for_panc_template_library_download_link = "http://gft.icr.ac.uk/template_library_folder/KS_TS_DR_MT_PH_for_panc_template.txt";
-
-  print "<p><div id=\"Note\">NOTE: For downloading the library file for editing, right click on the relevant link below and select the 'Save Link As...' option for saving the file on your computer.</div></p>";
+  my $library_download_link = $configures{'hostname'} . $configures{'templib_folder'};
+  
+  #print "<p><div id=\"Note\">NOTE: For downloading the library file for editing, right click on the relevant link below and select the 'Save Link As...' option for saving the file on your computer.</div></p>";
   
   print "<p>";
-  print "<a href=\"$kinome_library_download_link\">Download the Kinome library file for editing</a>";
-  print "     -  OR";
+  print "<a href=\"$library_download_link\">Download existing library files</a>";
   print "</p>";
   
-  print "<p>";
-  print "<a href=\"$KS_TS_384_library_download_link\">Download the KS_TS_384 library file for editing</a>";
-  print "     -  OR";
-  print "</p>";
-  
-  print "<p>";
-  print "<a href=\"$KS_TS_DR_384_library_download_link\">Download the KS_TS_DR_384 library file for editing</a>";
-  print "     -  OR";
-  print "</p>";
-  
-  print "<p>";
-  print "<a href=\"$KS_TS_MT_PH_for_panc_template_library_download_link\">Download the KS_TS_DR_MT_PH_384 library file for editing</a>";
-  print "</p>";
-  print "<p></p>";
-
   ## get new template library file ##
   
   print "<p>Upload edited template library file:<br />";
@@ -2682,7 +2712,7 @@ sub save_new_screen {
   if ( not defined ( $screen_dir_name ) ) {
     $screen_dir_name = $tissue_type."_".$cell_line_name."_".$templib."_".$date_of_run;
   }
-  my $screenDir_path = "/home/agulati/data/screen_data";
+  my $screenDir_path = $configures{'screenDir_path'};
   my $file_path = "$screenDir_path/$screen_dir_name";
   
   if (( -e $file_path ) && ( $sicon1 ne 'ON' ) && ( $sicon2 ne 'ON' ) && ( $allstar ne 'ON' )) {
@@ -2698,7 +2728,7 @@ sub save_new_screen {
     
     ## add screen directory name as prefix to all the filenames in the selected platelist file ##
 
-    $plateconf_file_path = "/home/agulati/data/plate_conf_folder/".$plateconf.".txt";
+    $plateconf_file_path = $configures{'WebDocumentRoot'} . $configures{'plateconf_folder'}.$plateconf.".txt";
     $plateconf_target = $file_path."/".$screen_dir_name."_".$plateconf.".txt";
     `cp $plateconf_file_path $plateconf_target`;
     
@@ -2706,7 +2736,7 @@ sub save_new_screen {
   
     ## match platelist name, selected from the drop down menu, to the file and store it in a variable ##   
       
-    $platelist_file_path = "/home/agulati/data/plate_list_folder/".$platelist.".txt";
+    $platelist_file_path = $configures{'WebDocumentRoot'} . $configures{'platelist_folder'}.$platelist.".txt";
     $platelist_target = $file_path."/".$screen_dir_name."_".$platelist.".txt";
     `cp $platelist_file_path $platelist_target`;
     $platelist_tmp_file = $file_path."/tmp_platelist_file.txt";
@@ -2733,7 +2763,7 @@ sub save_new_screen {
     
     ## match templib name, selected from the drop down menu, to the file and store it in a variable ##
 
-    $templib_file_path = "/home/agulati/data/template_library_folder/".$templib.".txt";
+    $templib_file_path = $configures{'WebDocumentRoot'} . $configures{'templib_folder'}.$templib.".txt";
     $templib_target = $file_path."/".$screen_dir_name."_".$templib.".txt"; 
     `cp $templib_file_path $templib_target`; 
     
@@ -2887,7 +2917,7 @@ sub save_new_screen {
   
   ##  run RNAi screen analysis scripts by calling R ##  
   
-  my $run_analysis_scripts = `cd $file_path && R --vanilla < /home/agulati/scripts/run_analysis_script.R`;
+  my $run_analysis_scripts = `cd $file_path && R --vanilla < $configures{'run_analysis_script'}`;
    
   ####[[[Alternatively :- my $run_analysis_scripts = system("R --vanilla < /home/agulati/scripts/run_analysis_script.R"); ####]]]
 
@@ -2899,28 +2929,26 @@ sub save_new_screen {
   my $rnai_screen_report_renamed_file = $rnai_screen_report_original_path."/".$screen_dir_name."_index.html";
   `cp $rnai_screen_report_original_file $rnai_screen_report_renamed_file`;
   
-  my $rnai_screen_report_new_path = "/usr/local/www/html/RNAi_screen_analysis_report_folders";
+  my $rnai_screen_report_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_report_new_path'};
   `cp -r $rnai_screen_report_original_path $rnai_screen_report_new_path`;
   
   ## Display the link to screen analysis report on the save new screen page ##
   
-  my $rnai_screen_link_to_report = "http://gft.icr.ac.uk/RNAi_screen_analysis_report_folders/".$screen_dir_name."_reportdir/";
+  my $rnai_screen_link_to_report = $configures{'hostname'} . $configures{'rnai_screen_report_new_path'} . $screen_dir_name."_reportdir/";
  
   ## copy the file with qc plots to the /usr/local/www/html/RNAi_screen_analysis_qc_plots ##
   
   my $rnai_screen_qc_original_path = $file_path."/".$screen_dir_name."_controls_qc.png"; 
-  my $rnai_screen_qc_new_path = "/usr/local/www/html/RNAi_screen_analysis_qc_plots";
+  my $rnai_screen_qc_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_qc_new_path'};
   `cp -r $rnai_screen_qc_original_path $rnai_screen_qc_new_path`;
   
-  ## copy the file with corr coef to the /usr/local/www/html/RNAi_screen_analysis_correlation_folder ##
-  
   my $rnai_screen_corr_original_path = $file_path."/".$screen_dir_name."_corr.txt"; 		
-  my $rnai_screen_corr_new_path = "/usr/local/www/html/RNAi_screen_analysis_correlation_folder"; 		
+  my $rnai_screen_corr_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_corr_new_path'}; 		
   `cp -r $rnai_screen_corr_original_path $rnai_screen_corr_new_path`;
   
   ## Display the link to screen analysis qc plots on the save new screen page ##
   
-  my $rnai_screen_link_to_qc_plots = "http://gft.icr.ac.uk/RNAi_screen_analysis_qc_plots/".$screen_dir_name."_controls_qc.png";
+  my $rnai_screen_link_to_qc_plots = $configures{'hostname'} . $configures{'rnai_screen_qc_new_path'} . $screen_dir_name . "_controls_qc.png";
   
   #return $rnai_screen_link_to_qc_plots;
   
@@ -3268,7 +3296,7 @@ sub save_new_uploaded_plateconf_file {
   
   my $lightweight_fh = $q -> upload ( 'new_uploaded_plateconf_file' );
   my $new_uploaded_plateconf_file = $q -> param( "new_uploaded_plateconf_file" );
-  my $plateconf_folder = "/home/agulati/data/plate_conf_folder";
+  my $plateconf_folder = $configures{'WebDocumentRoot'} . $configures{'plateconf_folder'};
   my $target= "";
   my $new_plateconf_file_renamed;
   
@@ -3476,7 +3504,7 @@ sub save_new_uploaded_platelist_file {
 
   my $lightweight_fh  = $q -> upload ( 'new_uploaded_platelist_file' );
   my $new_uploaded_platelist_file = $q -> param( "new_uploaded_platelist_file" );
-  my $platelist_folder = "/home/agulati/data/plate_list_folder";
+  my $platelist_folder = $configures{'WebDocumentRoot'} . $configures{'platelist_folder'};
   my $target = "";
   my $new_platelist_file_renamed;
   
@@ -3681,7 +3709,7 @@ sub save_new_uploaded_templib_file {
 
   my $lightweight_fh  = $q -> upload( 'new_uploaded_templib_file' );
   my $new_uploaded_templib_file = $q -> param( "new_uploaded_templib_file" );
-  my $templib_folder = "/home/agulati/data/template_library_folder";
+  my $templib_folder = $configures{'WebDocumentRoot'} . $configures{'templib_folder'};
   my $target = "";
   my $new_templib_file_renamed;
   
@@ -4345,7 +4373,7 @@ sub show_all_screens {
     print "</td>"; 
     
     print "<td>";
-    print "<a href=\"http://gft.icr.ac.uk/cgi-bin/$script_name?show_qc=1\&screen_dir_name=$row[0]\&plate_conf=$row[9]\">QC</a>";
+    print "<a href=" . $configures{'hostname'} . "cgi-bin/$script_name?show_qc=1\&screen_dir_name=$row[0]\&plate_conf=$row[9]\">QC</a>";
     print "</td>"; 
     
     print "<td>";
@@ -4490,8 +4518,8 @@ sub configure_export {
   @lib_genes = keys %lib_gene_h;
   @cell_lines = keys %cell_line_h; 
   
-  open OUT, "> /home/agulati/data/screen_data/Rnai_screen_analysis_configure_export.txt"
-    or die "Cannot open /home/agulati/data/screen_data/Rnai_screen_analysis_configure_export.txt:$!\n";
+  open OUT, "> ". $configures{'screenDir_path'} . "Rnai_screen_analysis_configure_export.txt"
+    or die "Cannot open" .  $configures{'screenDir_path'} . "Rnai_screen_analysis_configure_export.txt:$!\n";
   my @header = sort @lib_genes;
   print OUT "CELL LINE/TARGET\t"."@header\t";
   print OUT "\n";
@@ -4516,12 +4544,12 @@ sub configure_export {
 
   close OUT;
   
-  my $configure_export_file_path = "/home/agulati/data/screen_data/Rnai_screen_analysis_configure_export.txt";
+  my $configure_export_file_path = $configures{'screenDir_path'} . "Rnai_screen_analysis_configure_export.txt";
   
-  my $configure_export_new_file_path = "/usr/local/www/html/RNAi_screen_analysis_configure_export";
+  my $configure_export_new_file_path = $configures{'WebDocumentRoot'} . $configures{'configure_export_new_file_path'};
   `cp $configure_export_file_path $configure_export_new_file_path`;
   
-  my $link_to_configure_export_file = "http://gft.icr.ac.uk/RNAi_screen_analysis_configure_export/";
+  my $link_to_configure_export_file = $configures{'hostname'} . "RNAi_screen_analysis_configure_export/";
   
   print "<p>";
   print "<a href = \"$link_to_configure_export_file\">Click here to download the file with analysis results for all the RNAi screens analysed.</a>";
@@ -4556,14 +4584,13 @@ sub show_qc {
   print "<b>Screen name: $screen_dir_name</b>";
   #print "</p>";
   
-  my $show_qc_page = "http://gft.icr.ac.uk/RNAi_screen_analysis_qc_plots/".$screen_dir_name."_controls_qc.png";
+  my $show_qc_page = $configures{'hostname'} . $configures{'rnai_screen_qc_new_path'} . $screen_dir_name . "_controls_qc.png";
   
   print "<p>";
   print "<img src=\"$show_qc_page\" alt=\"QC plots:\">";
   print "</p>";
 
-  #my $coco_file = "/home/agulati/data/screen_data/".$screen_dir_name."/".$screen_dir_name."_corr.txt";
-  my $coco_file = "/usr/local/www/html/RNAi_screen_analysis_correlation_folder/".$screen_dir_name."_corr.txt";
+  my $coco_file = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_corr_new_path'} . $screen_dir_name . "_corr.txt";
   
   open ( IN, "< $coco_file" )
     or die "Cannot open $coco_file:$!\n";
