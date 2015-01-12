@@ -20,9 +20,6 @@ my $script_name = $1;
 my $conf_file = $script_name;
 $conf_file =~ s/pl$/conf/;
 
-my $run_analysis_script = $script_name;
-$run_analysis_script =~ s/pl$/run_analysis_script.R/;
-
 ## stuff to configure when moving... ##
 
 my $users_file = './users.txt';
@@ -1919,12 +1916,6 @@ sub home {
   print "<p>Connected to the database $sqldb_name</p>";
   print "</p>";
   
-  my $var_name;
-  foreach $var_name ( sort keys %configures ) {
-  print "<P><B>$var_name</B><BR>";
-  print $configures{$var_name};
-}
- 
   print "$page_footer";
   print $q -> end_html;
 }
