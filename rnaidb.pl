@@ -1897,24 +1897,31 @@ sub home {
   # summary info about all screens
 
   print "<h1>Hello:</h1>";
-  if ( defined ( $login_key ) ) {
-    print "got cookie $login_key<br />";
+  #if ( defined ( $login_key ) ) {
+  #  print "got cookie $login_key<br />";
+  #}
+  #else {
+  #  print "Where's my cookie?"
+  #}
+  
+  if ($script_name =~ "devel")
+  {
+  	print "<p>This is the test version.</p>";
+  	print "<p>Data will be deleted.</p>";
   }
-  else {
-    print "Where's my cookie?"
+  else
+  {
+  	print "<p>This is the working version.</p>";
+  	print "<p>If you are not sure how to use it, please try the test version.</p>"; 	
   }
   
-  print "<p>";
-  print "<p>Scriptname is $script_name</p>";
-  print "</p>";
+  #print "<p>";
+  #print "<p>Configname is $conf_file</p>";
+  #print "</p>";
   
-  print "<p>";
-  print "<p>Configname is $conf_file</p>";
-  print "</p>";
-  
-  print "<p>";
-  print "<p>Connected to the database $sqldb_name</p>";
-  print "</p>";
+  #print "<p>";
+  #print "<p>Connected to the database $sqldb_name</p>";
+  #print "</p>";
   
   print "$page_footer";
   print $q -> end_html;
