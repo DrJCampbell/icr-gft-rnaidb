@@ -1983,55 +1983,10 @@ sub add_new_screen {
                          -id => "xls_file3" );
   print "</p>";
 
-  ## get the existing plateconf filenames from the database and display them in the popup menu ##
-  
-  my $query = "SELECT Plateconf_file_location FROM Plateconf_file_path";
-  my $query_handle = $dbh -> prepare( $query );
-    				   #or die "Cannot prepare: " . $dbh -> errstr();
-  $query_handle -> execute();
-    #or die "SQL Error: ".$query_handle->errstr();
-  
-  my $plateconf_path;
-  my $plateconf_file_dest;
-  my $plateconf_name;
-  my @plateconf_path;
-  
-  while ( $plateconf_path = $query_handle -> fetchrow_array ){
-    $plateconf_file_dest = $plateconf_path;
-    $plateconf_file_dest =~ s/.*\///;
-    $plateconf_name = $plateconf_file_dest;
-    $plateconf_name =~ s{\.[^.]+$}{};
-    
-    push ( @plateconf_path, $plateconf_name );
-  }
-  #$query_handle -> finish();
-  unshift( @plateconf_path, "Please select" );
-  print "<p>Plateconf file:<br />";
-  
-  print $q -> popup_menu ( -name => 'plate_conf',
-  						  -value => \@plateconf_path,
-  						  -default => 'Please select',
-  						  -id => "pconf_file" );							    		  
-  print " - OR";
-  
-  ## View old Plateconf file ## 
-  my $plate_conf_download_link = $configures{'hostname'} . $configures{'plateconf_folder'}; 
-  print "    ";
-  print "<a href=\"$plate_conf_download_link\">View existing plate conf files</a>";
-  
-  print " - OR";
-  
-  #link to the form for adding new plateconf file 
-  ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plateconf_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
-  print "<p>";
-  print "<a href =" . $configures{'hostname'} . "cgi-bin/$script_name?add_new_files=1\"> Add new plateconf file</a>";
-  print "</p>";
-  print "</p>";
-
   ## get the existing platelist filenames from the database and display them in the popup menu ##
   
-  $query = "SELECT Platelist_file_location FROM Platelist_file_path";
-  $query_handle = $dbh -> prepare ( $query );
+  my $query = "SELECT Platelist_file_location FROM Platelist_file_path";
+  my $query_handle = $dbh -> prepare ( $query );
      				#or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle->execute();
     #or die "SQL Error: " . $query_handle -> errstr();
@@ -2118,6 +2073,51 @@ sub add_new_screen {
   ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plate_library_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages 
   print "<p>";  	
   print "<a href =" . $configures{'hostname'} .  "cgi-bin/$script_name?add_new_files=1\"> Add new template library file</a>";
+  print "</p>";
+  print "</p>";
+  
+  ## get the existing plateconf filenames from the database and display them in the popup menu ##
+  
+  $query = "SELECT Plateconf_file_location FROM Plateconf_file_path";
+  my $query_handle = $dbh -> prepare( $query );
+    				   #or die "Cannot prepare: " . $dbh -> errstr();
+  $query_handle -> execute();
+    #or die "SQL Error: ".$query_handle->errstr();
+  
+  my $plateconf_path;
+  my $plateconf_file_dest;
+  my $plateconf_name;
+  my @plateconf_path;
+  
+  while ( $plateconf_path = $query_handle -> fetchrow_array ){
+    $plateconf_file_dest = $plateconf_path;
+    $plateconf_file_dest =~ s/.*\///;
+    $plateconf_name = $plateconf_file_dest;
+    $plateconf_name =~ s{\.[^.]+$}{};
+    
+    push ( @plateconf_path, $plateconf_name );
+  }
+  #$query_handle -> finish();
+  unshift( @plateconf_path, "Please select" );
+  print "<p>Plateconf file:<br />";
+  
+  print $q -> popup_menu ( -name => 'plate_conf',
+  						  -value => \@plateconf_path,
+  						  -default => 'Please select',
+  						  -id => "pconf_file" );							    		  
+  print " - OR";
+  
+  ## View old Plateconf file ## 
+  my $plate_conf_download_link = $configures{'hostname'} . $configures{'plateconf_folder'}; 
+  print "    ";
+  print "<a href=\"$plate_conf_download_link\">View existing plate conf files</a>";
+  
+  print " - OR";
+  
+  #link to the form for adding new plateconf file 
+  ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plateconf_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
+  print "<p>";
+  print "<a href =" . $configures{'hostname'} . "cgi-bin/$script_name?add_new_files=1\"> Add new plateconf file</a>";
   print "</p>";
   print "</p>";
 
