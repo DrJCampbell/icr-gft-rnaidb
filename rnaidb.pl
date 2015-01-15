@@ -2079,7 +2079,7 @@ sub add_new_screen {
   ## get the existing plateconf filenames from the database and display them in the popup menu ##
   
   $query = "SELECT Plateconf_file_location FROM Plateconf_file_path";
-  my $query_handle = $dbh -> prepare( $query );
+  $query_handle = $dbh -> prepare( $query );
     				   #or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle -> execute();
     #or die "SQL Error: ".$query_handle->errstr();

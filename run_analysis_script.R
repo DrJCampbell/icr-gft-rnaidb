@@ -5,11 +5,11 @@
 #setwd( "/home/agulati/data/New_screens_from_July_2014_onwards/Breast_BT549_KS_TS_384_template_2014-07-01" )
 #getwd()
 
-source( "/home/agulati/scripts/xls2platetxtfiles.R" )
-#source( "/home/agulati/scripts/zScreen.R" )
+source( "/Rnaidb_git/icr-gft-rnaidb/xls2platetxtfiles.R" )
+#source( "/Rnaidb_git/icr-gft-rnaidb/zScreen.R" )
 source( "/Rnaidb_git/icr-gft-rnaidb/zScreenSublib.R" )
-source( "/home/agulati/scripts/xls2txt_file.R" )
-source( "/home/agulati/scripts/Zscreen_qc.R")
+source( "/Rnaidb_git/icr-gft-rnaidb/xls2txt_file.R" )
+source( "/Rnaidb_git/icr-gft-rnaidb/Zscreen_qc.R")
 
 #
 ## Get the guide file with information on new screen 
