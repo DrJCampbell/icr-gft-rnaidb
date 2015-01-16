@@ -4654,59 +4654,59 @@ sub show_qc {
   
   print "</td>";
   
-  print "<td align=left valign=top>\n";
+  #print "<td align=left valign=top>\n";
   
-  print "<p>";
-  print "<h1>Reanalysis:</h1>";
-  print "<b>Modify plateconf file for reanalysis:</b>";
-  print "</p>";
+  #print "<p>";
+  #print "<h1>Reanalysis:</h1>";
+  #print "<b>Modify plateconf file for reanalysis:</b>";
+  #print "</p>";
   
   ## replace 'siCON1' with 'empty' ##
 
-  print "<p><p>";
+  #print "<p><p>";
   
-  print $q -> checkbox( -name => 'sicon1_empty',
-    					-checked => 0,
-   					    -value => 'ON',
-    					-label => 'remove siCON1' );
+  #print $q -> checkbox( -name => 'sicon1_empty',
+  #  					-checked => 0,
+  # 					    -value => 'ON',
+  #  					-label => 'remove siCON1' );
 
-  print "</p></p>";
+  #print "</p></p>";
   
   ## replace 'siCON2' with 'empty' ##
   
-  print "<p>";
+  #print "<p>";
   
-  print $q -> checkbox( -name => 'sicon2_empty',
-    					-checked => 0,
-   					    -value => 'ON',
-    					-label => 'remove siCON2' );
+  #print $q -> checkbox( -name => 'sicon2_empty',
+  #  					-checked => 0,
+  # 					    -value => 'ON',
+  #  					-label => 'remove siCON2' );
 
-  print "</p>";
+  #print "</p>";
   
   ## replace 'allstar' with 'empty' ##
   
-  print "<p>";
+  #print "<p>";
   
-  print $q -> checkbox( -name => 'allstar_empty',
-    					-checked => 0,
-   					    -value => 'ON',
-    					-label => 'remove allstar' );
+  #print $q -> checkbox( -name => 'allstar_empty',
+  #  					-checked => 0,
+  # 					    -value => 'ON',
+  #  					-label => 'remove allstar' );
 
-  print "</p>";
+  #print "</p>";
   
-  print $q -> hidden ( -name => 'screen_dir_name',
-  					   -value => $screen_dir_name );
+  #print $q -> hidden ( -name => 'screen_dir_name',
+  #					   -value => $screen_dir_name );
   					  
-  print $q -> hidden ( -name => 'plate_conf',
-  					   -value => $plateconf );				  
+  #print $q -> hidden ( -name => 'plate_conf',
+  #					   -value => $plateconf );				  
   
  ## submit the updated plateconf file for re-analysis ##
                                                 
-  print "<p>";
-  print "<input type=\"submit\" id=\"save_new_screen\" value=\"Reanalyse\" name=\"save_new_screen\"/>";
-  print "</p>"; 
+  #print "<p>";
+  #print "<input type=\"submit\" id=\"save_new_screen\" value=\"Reanalyse\" name=\"save_new_screen\"/>";
+  #print "</p>"; 
   
-  print "</td>";
+  #print "</td>";
   print "</tr>\n";
   print "</table>";
   
