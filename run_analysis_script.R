@@ -10,6 +10,7 @@ source( "/Rnaidb_git/icr-gft-rnaidb/xls2platetxtfiles.R" )
 source( "/Rnaidb_git/icr-gft-rnaidb/zScreenSublib.R" )
 source( "/Rnaidb_git/icr-gft-rnaidb/xls2txt_file.R" )
 source( "/Rnaidb_git/icr-gft-rnaidb/Zscreen_qc.R")
+source( "/Rnaidb_git/icr-gft-rnaidb/separateZprime.R")
 
 #
 ## Get the guide file with information on new screen 
@@ -40,6 +41,7 @@ ZprimeName=guide$zprime_file
 ReportdirName=guide$reportdir_file
 Controls_qc=guide$qc_file
 Corr_coeff=guide$corr_file
+separateZprimeFile=guide$separate_zprime_file
 
 #
 ## function using gdata for xls2platelistfiles conversion
@@ -89,4 +91,15 @@ res_4 <- Zscreen_qc(
 		 ReportdirName = ReportdirName,
  		 controls_qc=Controls_qc,
  		 corr_coeff=Corr_coeff
+		 )
+		 
+separateZprime(
+		 name= Cell_line,
+		 datapath= Datapath,
+		 poscontrols= Poscontrols,
+		 negcontrols= Negcontrols,
+		 descripFile= DescripFile,
+		 plateconf= Plateconf,
+		 platelist= Platelist,
+		 separateZprimeFile = separateZprimeFile
 		 )
