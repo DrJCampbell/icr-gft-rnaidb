@@ -2730,7 +2730,7 @@ sub save_new_screen {
     $plateconf_target = $file_path."/".$screen_dir_name."_".$plateconf.".txt";
     `cp $plateconf_file_path $plateconf_target`;
     
-    print "<p><div id=\"Note\">Selected plateconf file saved in the new screen directory...</div></p>";  
+    #print "<p><div id=\"Note\">Selected plateconf file saved in the new screen directory...</div></p>";  
   
     ## match platelist name, selected from the drop down menu, to the file and store it in a variable ##   
       
@@ -2739,7 +2739,7 @@ sub save_new_screen {
     `cp $platelist_file_path $platelist_target`;
     $platelist_tmp_file = $file_path."/tmp_platelist_file.txt";
     
-    print "<p><div id=\"Note\">Selected platelist file saved in the new screen directory...</div></p>";  
+    #print "<p><div id=\"Note\">Selected platelist file saved in the new screen directory...</div></p>";  
   
     $platelist_prefix = $screen_dir_name."_";
   
@@ -2765,7 +2765,7 @@ sub save_new_screen {
     $templib_target = $file_path."/".$screen_dir_name."_".$templib.".txt"; 
     `cp $templib_file_path $templib_target`; 
     
-    print "<p><div id=\"Note\">Selected template library file saved in the new screen directory...</div></p>";  
+    #print "<p><div id=\"Note\">Selected template library file saved in the new screen directory...</div></p>";  
   
   ############################################[[[probably need to copy $temp_file_path somewhere safe and give it to an R script to convert]]]
   
@@ -2819,9 +2819,9 @@ sub save_new_screen {
     	}
     }
     
-    print "<p>";
-    print "<p><div id=\"Note\">Renamed excel file(s) saved in the screen directory...</div></p>";
-    print "</p>"; 
+    #print "<p>";
+    #print "<p><div id=\"Note\">Renamed excel file(s) saved in the screen directory...</div></p>";
+    #print "</p>"; 
     
   ###############################################[[[either copy the platelist/palteconf/library etc to the new screen folder or use symlinks to point to the templates]]]
   
@@ -2834,7 +2834,7 @@ sub save_new_screen {
     $screenDescription_filename = $screen_dir_name."_Description.txt";
     close NOTES;
     
-    print "<p><div id=\"Note\">Created 'Description.txt' file in the new screen directory...</div></p>";  
+    #print "<p><div id=\"Note\">Created 'Description.txt' file in the new screen directory...</div></p>";  
   
     ## Add new screen info to Guide file ##
   
@@ -2877,7 +2877,7 @@ sub save_new_screen {
       "$screen_dir_name"."_corr.txt\t",
       "$screen_dir_name"."_separate_zprime.txt";  
   
-    print "<p><div id=\"Note\">Created guide file...</div></p>";
+    #print "<p><div id=\"Note\">Created guide file...</div></p>";
     print "<p><div id=\"Note\">Analysing...</div></p>"; 
       
     close (GUIDEFILE); 
@@ -2974,13 +2974,13 @@ sub save_new_screen {
   }
   close IN; 
   
-  print "<p>";
-  print "<p><div id=\"Note\">Generated QC plots...</div></p>";
-  print "</p>";
+  #print "<p>";
+  #print "<p><div id=\"Note\">Generated QC plots...</div></p>";
+  #print "</p>";
   
-  print "<p>";
-  print "<p><div id=\"Note\">Calculated correlation coefficient...</div></p>";
-  print "</p>";
+  #print "<p>";
+  #print "<p><div id=\"Note\">Calculated correlation coefficient...</div></p>";
+  #print "</p>";
   
   # =====================
   # Populate the database
