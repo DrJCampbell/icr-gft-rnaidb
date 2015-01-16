@@ -2450,7 +2450,7 @@ sub add_new_screen {
 
 
   # =================================================================================
-  # Subroutine for downloading/uploading new/edited plateconf/platelist/library files
+  # Subroutine for downloading/uploading new plateconf/platelist/library files
   # =================================================================================
 
 sub add_new_files {
@@ -2496,13 +2496,13 @@ sub add_new_files {
   print "<p></p>";
   
   print $q -> textfield ( -name => "new_plateconf_filename",
-                          -value => 'e.g. plateconf_384_ver_02',
+                          -value => 'e.g. KS_TS_CGC_WNT_384_plateconf',
                           -size => "30",
                           -maxlength => "45" );
 
   print "<p></p>";
   
-  print"<p><div id=\"Note\">NOTE: Please make sure that the name of the new uploaded plateconf file is unique and different from the names of existing plateconf files. The words in the filename must be joined with an underscore ( _ ). For example, an edited 'Plateconf_384' file can be renamed as 'Plateconf_384_ver_02' or 'Plateconf_384_edited_Aug-2014'.</div></p>";
+  print"<p><div id=\"Note\">NOTE: The name of the new uploaded plateconf file should be different from the names of existing plateconf files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
   
   ## create a hidden field ##
   #hidden fields pass information along with the user-entered input that is not to be manipulated by the user ## a way to have web forms to remember previous information 
@@ -2558,12 +2558,12 @@ sub add_new_files {
   print "<p></p>";
    
   print $q -> textfield ( -name => "new_platelist_filename",
-                          -value => 'e.g. platelist_384_ver_02',
+                          -value => 'e.g. platelist_p9_v2',
                           -size => "30",
                           -maxlength => "45" ); 
   print "<p></p>";
   
-  print"<p><div id=\"Note\">NOTE: Please make sure that the name of the new uploaded platelist file is unique and different from the names of existing platelist files. The words in the filename must be joined with an underscore ( _ ). For example, an edited 'Platelist_384' file can be renamed as 'Platelist_384_ver_02' or 'Platelist_edited_384_Aug-2014'.</div></p>";
+  print"<p><div id=\"Note\">NOTE: The name of the new uploaded platelist file should be different from the names of existing platelist files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
   
   ## create a hidden field ##
   #hidden fields pass information along with the user-entered input that is not to be manipulated by the user-a way to have web forms to remember previous information 
@@ -2604,7 +2604,7 @@ sub add_new_files {
   
   ## get new template library file ##
   
-  print "<p>Upload edited template library file:<br />";
+  print "<p>Upload new template library file:<br />";
   print "<p></p>";
   
   print $q -> filefield( -name=>'new_uploaded_templib_file',
@@ -2618,12 +2618,12 @@ sub add_new_files {
   print "<p></p>";
 
   print $q -> textfield ( -name => "new_templib_filename",
-                          -value => 'e.g. KS_TS_DR_x_y_z_template', 
+                          -value => 'e.g. KS_TS_CGC_WNT_384_template', 
                           -size => "30",
                           -maxlength => "45" );  
   print "<p></p>";
   
-  print"<p><div id=\"Note\">NOTE: Please make sure that the name of the new uploaded library file is unique and different from the names of the existing library files. The words in the filename must be joined with an underscore ( _ ). For example, an edited 'Kinome_template' file can be renamed as 'Kinome_template_ver_02' and a new library file can be named as 'KS_TS_DR_x_y_z_template'.</div></p>";
+  print"<p><div id=\"Note\">NOTE: The name of the new uploaded library file should be different from the names of the existing library files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
   
   ## create a hidden field ##
   #hidden fields pass information along with the user-entered input that is not to be manipulated by the user-a way to have web forms to remember previous information 
@@ -3272,7 +3272,7 @@ sub save_new_screen {
   print "<p>";
   
   print "<p>";
-  print "<a href=\"$rnai_screen_link_to_qc_plots\">View QC plot </a>";
+  print "<a href=" . $configures{'hostname'} . "cgi-bin/$script_name?show_qc=1\&screen_dir_name=$screen_dir_name\&plate_conf=$plateconf\">QC</a>";
   print "</p>"; 
   
   print "$page_footer";
@@ -3308,16 +3308,16 @@ sub save_new_uploaded_plateconf_file {
   #rename the newly uploaded plateconf file
   my $new_plateconf_filename = $q -> param ( "new_plateconf_filename" );
   
-  if ( !$new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. plateconf_384_ver_02" ) {
+  if ( !$new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. KS_TS_CGC_WNT_384_plateconf" ) {
     #displayErrorMessage($q, $error_message_templib);
     $set_plateconf_error = 1;
     $processing_status = 1;
   }
-  elsif ( $new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. plateconf_384_ver_02" ) {
+  elsif ( $new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. KS_TS_CGC_WNT_384_plateconf" ) {
     $set_plateconf_error = 2;
     $processing_status = 1;
   }
-  elsif ( !$new_uploaded_plateconf_file && $new_plateconf_filename ne "e.g. plateconf_384_ver_02" ) {
+  elsif ( !$new_uploaded_plateconf_file && $new_plateconf_filename ne "e.g. KS_TS_CGC_WNT_384_plateconf" ) {
     $set_plateconf_error = 3;
     $processing_status = 1;
   }
@@ -3513,18 +3513,18 @@ sub save_new_uploaded_platelist_file {
   my $set_platelist_error = undef;
   my $processing_status = undef;
        
-  #rename the newly uploaded plateconf file
+  #rename the newly uploaded platelist file
   my $new_platelist_filename = $q -> param ( "new_platelist_filename" );
   
-  if ( !$new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_384_ver_02" ) {
+  if ( !$new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_p9_v2" ) {
     $set_platelist_error = 1;
     $processing_status = 1;
   }
-  elsif ( $new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_384_ver_02" ) {
+  elsif ( $new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_p9_v2" ) {
     $set_platelist_error = 2;
     $processing_status = 1;
   }
-  elsif ( !$new_uploaded_platelist_file && $new_platelist_filename ne "e.g. platelist_384_ver_02" ) {
+  elsif ( !$new_uploaded_platelist_file && $new_platelist_filename ne "e.g. platelist_p9_v2" ) {
     $set_platelist_error = 3;
     $processing_status = 1;
   }
@@ -3721,15 +3721,15 @@ sub save_new_uploaded_templib_file {
   #rename the newly uploaded plateconf file
   my $new_templib_filename = $q->param( "new_templib_filename" );
   
-  if ( !$new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_DR_x_y_z_template" ) {
+  if ( !$new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_CGC_WNT_384_template" ) {
     $set_templib_error = 1;
     $processing_status = 1;
   }
-  elsif ( $new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_DR_x_y_z_template" ) {
+  elsif ( $new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_CGC_WNT_384_template" ) {
     $set_templib_error = 2;
     $processing_status = 1;
   }
-  elsif ( !$new_uploaded_templib_file && $new_templib_filename ne "e.g. KS_TS_DR_x_y_z_template") {
+  elsif ( !$new_uploaded_templib_file && $new_templib_filename ne "e.g. KS_TS_CGC_WNT_384_template") {
     $set_templib_error = 3;
     $processing_status = 1;
   }
@@ -4837,7 +4837,7 @@ sub authenticate_user {
     $q -> param(
       -name => "login_message",
       -value => "Login failed - please check your username and password are correct"
-    )
+    );
     &login($q);
     exit(1);
   }
