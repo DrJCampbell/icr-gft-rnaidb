@@ -1964,7 +1964,7 @@ sub add_new_screen {
  
   ## get the CTG excel file ##
   
-  print "<p>Plate excel file:<br />";
+  print "<p>Plate excel file(s):<br />";
   
   print $q -> filefield ( -name => 'uploaded_excel_file',
                          -default => 'starting value',
@@ -2857,7 +2857,8 @@ sub save_new_screen {
       "reportdir_file\t", 
       "xls_file\t", 
       "qc_file\t", 
-      "corr_file\n"; 
+      "corr_file\t",
+      "separate_zprime_file\n"; 
   
     print GUIDEFILE 
       "$cell_line_name\t", 
@@ -2873,7 +2874,8 @@ sub save_new_screen {
       "$screen_dir_name"."_reportdir\t", 
       "$xls_files\t", 
       "$screen_dir_name"."_controls_qc.png\t", 
-      "$screen_dir_name"."_corr.txt\n";  
+      "$screen_dir_name"."_corr.txt\t",
+      "$screen_dir_name"."_separate_zprime.txt";  
   
     print "<p><div id=\"Note\">Created guide file...</div></p>";
     print "<p><div id=\"Note\">Analysing...</div></p>"; 
