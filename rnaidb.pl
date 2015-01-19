@@ -1780,7 +1780,8 @@ my $page_header_for_add_new_screen_sub = "<html>
 										      alert ( \"Please select instrument used for this screen.\" );
 										      return false;
 										    } 
-										  return true;
+										    var answer = confirm(\"Click OK button to proceed.\")
+										  	return answer;
 										  }
 										  </script>
 				   						  </head>
