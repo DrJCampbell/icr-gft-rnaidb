@@ -2946,6 +2946,10 @@ sub save_new_screen {
   my $rnai_screen_corr_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_corr_new_path'}; 		
   `cp -r $rnai_screen_corr_original_path $rnai_screen_corr_new_path`;
   
+  my $rnai_screen_sep_zprime_original_path = $file_path."/" . $screen_dir_name . "_separate_zprime.txt"; 		
+  my $rnai_screen_sep_zprime_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_sep_zprime_new_path'}; 		
+  `cp -r $rnai_screen_sep_zprime_original_path $rnai_screen_sep_zprime_new_path`;
+  
   ## Display the link to screen analysis qc plots on the save new screen page ##
   
   my $rnai_screen_link_to_qc_plots = $configures{'hostname'} . $configures{'rnai_screen_qc_new_path'} . $screen_dir_name . "_controls_qc.png";
@@ -4589,25 +4593,82 @@ sub show_qc {
   print "<p>";
   print "<img src=\"$show_qc_page\" alt=\"QC plots:\">";
   print "</p>";
-
-  my $coco_file = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_corr_new_path'} . $screen_dir_name . "_corr.txt";
+ 
   
-  open ( IN, "< $coco_file" )
-    or die "Cannot open $coco_file:$!\n";
-  while ( <IN> ) {
-    if ($_ =~ /Min/) {
-      next;
-    }
-    my $line = $_;
-    #print $line;
-    my( $coco_min, $coco_max ) = split(/\t/, $line);
-    $coco_min = sprintf "%.4f", $coco_min;
-    $coco_max = sprintf "%.4f", $coco_max;
 
-    print "<p></p>";
-    print "<p></p>";
+  
+  
+  print "</td>";
+  
+	##display separate zprime values
+	print "<td align=left valign=top>\n";
+  
+	my $sep_zprime_file = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_sep_zprime_new_path'} . $screen_dir_name . "_separate_zprime.txt";
+	print "<p></p>";
+	print "<p></p>";
+	print "<h2>Zprimes with sicon1, sicon2 or allstar as negative and plk1 as positive controls:</h2>";
+	print "<p></p>";
+  
+	print "<table>";
+	print "<th>";
+	print "Replicates";
+	print "</th>";
     
-    print "<b>Pearson's correlation:</b>";
+	print "<th>";
+	print "sicon1";
+	print "</th>";
+	
+	print "<th>";
+	print "sicon2";
+	print "</th>";
+    
+	print "<th>";
+	print "allstar";
+	print "</th>"; 
+    
+  
+  	open ( IN, "< $sep_zprime_file" )
+    	or die "Cannot open $sep_zprime_file:$!\n";
+  	while ( <IN> ) {
+    	if ($_ =~ /zp_sicon1/) {
+      		next;
+    	}
+    	my $line = $_;
+    	#print $line;
+		my( $replicates, $zp_sicon1, $zp_sicon2, $zp_allstar ) = split(/\t/, $line);
+    	$zp_sicon1 = sprintf "%.2f", $zp_sicon1;
+    	$zp_sicon2 = sprintf "%.2f", $zp_sicon2;
+    	$zp_allstar = sprintf "%.2f", $zp_allstar;
+      
+    	print "<tr>";
+    
+    	print "<td>";
+    	$replicates=~ s/\"//g;
+    	print $replicates;
+    	print "</td>";
+    
+    	print "<td align=right>";
+    	print $zp_sicon1;
+    	print "</td>";
+    
+    	print "<td align=right>";
+    	print $zp_sicon2;
+    	print "</td>";
+    
+    	print "<td align=right>";
+    	print $zp_allstar;
+    	print "</td>";
+    
+    	print "</tr>";
+  	}
+  	close IN;
+  	
+   	print "</table>";
+   	
+   	
+   	print "<p></p>";
+    
+    print "<h2>Pearson's correlation:</h2>";
     
     print "<p></p>";
     
@@ -4628,36 +4689,50 @@ sub show_qc {
     print "<th>";
     print "Max correlation";
     print "</th>";
-    
-    print "<tr>";
-    
-    print "<td>";
-    print "$coco_min";
-    print "</td>";
-    
-    print "<td>";
-    print "     ";
-    print "</td>";
-    
-    print "<td>";
-    print "    ";
-    print "</td>";
-    
-    print "<td>";
-    print "$coco_max";
-    print "</td>";
-    
-    print "</tr>";
-    
-    print "</table>";
-
-  }
-  close IN;
+   	my $coco_file = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_corr_new_path'} . $screen_dir_name . "_corr.txt";
   
-  print "</td>";
+  	open ( IN, "< $coco_file" )
+    	or die "Cannot open $coco_file:$!\n";
+ 	while ( <IN> ) {
+    	if ($_ =~ /Min/) {
+      		next;
+    	}
+    	my $line = $_;
+    	#print $line;
+    	my( $coco_min, $coco_max ) = split(/\t/, $line);
+    	$coco_min = sprintf "%.2f", $coco_min;
+    	$coco_max = sprintf "%.2f", $coco_max;
+
+    	
+    
+    	print "<tr>";
+    
+    	print "<td>";
+    	print "$coco_min";
+    	print "</td>";
+    
+    	print "<td>";
+    	print "     ";
+    	print "</td>";
+    
+    	print "<td>";
+    	print "    ";
+    	print "</td>";
+    
+    	print "<td>";
+    	print "$coco_max";
+   	 	print "</td>";
+    
+    	print "</tr>";
+    
+    	print "</table>";
+
+  	}
+  	close IN;
+  
+  	print "</td>";
   
   #print "<td align=left valign=top>\n";
-  
   #print "<p>";
   #print "<h1>Reanalysis:</h1>";
   #print "<b>Modify plateconf file for reanalysis:</b>";
