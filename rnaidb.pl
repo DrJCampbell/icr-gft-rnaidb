@@ -4668,7 +4668,7 @@ sub show_qc {
    	
    	print "<p></p>";
     
-    print "<h2>Pearson's correlation:</h2>";
+    print "<h2>Pearson's correlation among normalized data of replicates:</h2>";
     
     print "<p></p>";
     
