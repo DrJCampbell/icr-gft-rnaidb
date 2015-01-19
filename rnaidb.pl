@@ -3308,8 +3308,8 @@ sub save_new_uploaded_plateconf_file {
   my $error_message_plateconf_2 = "ERROR: Please enter a suitable name for the uploaded plateconf file and upload the plateconf file again if needed."; 
   my $error_message_plateconf_3 = "ERROR: Please upload a plateconf file and enter a suitable plateconf file name again if needed.";
   
-  my $set_plateconf_error = undef;
-  my $processing_status = undef;
+  my $set_plateconf_error = 0;
+  my $processing_status = 0;
   
   #rename the newly uploaded plateconf file
   my $new_plateconf_filename = $q -> param ( "new_plateconf_filename" );
@@ -3347,7 +3347,7 @@ sub save_new_uploaded_plateconf_file {
       open ( $new_plateconf_file_renamed,'>', $target )
         or die "Cannot move $new_plateconf_file_renamed to $target:$!\n";
       if ( $new_plateconf_file_renamed ) {
-        $set_plateconf_error = undef;
+        $set_plateconf_error = 0;
       }
       else { 
         $set_plateconf_error = 4;
@@ -3358,7 +3358,7 @@ sub save_new_uploaded_plateconf_file {
       while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) {
         my $print_plateconf = print $new_plateconf_file_renamed $buffer;
         if ( $print_plateconf ) {
-          $set_plateconf_error = undef;
+          $set_plateconf_error = 0;
         }
         else {
           $set_plateconf_error = 5;
@@ -3367,10 +3367,10 @@ sub save_new_uploaded_plateconf_file {
       }
       close $new_plateconf_file_renamed;
       #check the current position of the filehandle and set a flag if it's still in the file
-      if ( tell( $new_plateconf_file_renamed ) ne -1 ) { 
-       $set_plateconf_error = 6;
-       $processing_status = 1;
-      }   
+      #if ( tell( $new_plateconf_file_renamed ) ne -1 ) { 
+      # $set_plateconf_error = 6;
+      # $processing_status = 1;
+      #}   
     }
     #reformat the uploaded file
     `chmod 777 $target`;
@@ -3397,7 +3397,7 @@ sub save_new_uploaded_plateconf_file {
     $query_handle -> execute();
       #or die "SQL Error: ".$query_handle -> errstr();
     if ( $query_handle ) {
-      $set_plateconf_error = undef;
+      $set_plateconf_error = 0;
       #$PLATECONF_FILE_PATH = $target;
     }
     else {
@@ -3516,8 +3516,8 @@ sub save_new_uploaded_platelist_file {
   my $error_message_platelist_2 = "ERROR: Please enter a suitable name for the uploaded platelist file and upload the platelist file again if needed"; 
   my $error_message_platelist_3 = "ERROR: Please upload a platelist file and enter a suitable platelist file name again if needed";
   
-  my $set_platelist_error = undef;
-  my $processing_status = undef;
+  my $set_platelist_error = 0;
+  my $processing_status = 0;
        
   #rename the newly uploaded platelist file
   my $new_platelist_filename = $q -> param ( "new_platelist_filename" );
@@ -3554,7 +3554,7 @@ sub save_new_uploaded_platelist_file {
       open ( $new_platelist_file_renamed,'>',$target )
         or die "Cannot move $new_platelist_file_renamed to $target:$!\n";
       if ( $new_platelist_file_renamed ) {
-        $set_platelist_error = undef;
+        $set_platelist_error = 0;
       }
       else { 
         $set_platelist_error = 4;
@@ -3565,7 +3565,7 @@ sub save_new_uploaded_platelist_file {
       while ( $bytesread = $io_handle -> read ( $buffer,1024 )) {
         my $print_platelist = print $new_platelist_file_renamed $buffer;
         if ( $print_platelist ) {
-          $set_platelist_error = undef;
+          $set_platelist_error = 0;
         }
         else {
           $set_platelist_error = 5;
@@ -3574,10 +3574,10 @@ sub save_new_uploaded_platelist_file {
       }
       close $new_platelist_file_renamed;
       #check the current position of the filehandle and set a flag if it's still in the file
-      if ( tell ( $new_platelist_file_renamed ) ne -1 ) { 
-          $set_platelist_error = 6;
-          $processing_status = 1;
-      }
+      #if ( tell ( $new_platelist_file_renamed ) ne -1 ) { 
+      #    $set_platelist_error = 6;
+      #    $processing_status = 1;
+      #}
     }
     #reformat the uploaded file
     `chmod 777 $target`;
@@ -3606,7 +3606,7 @@ sub save_new_uploaded_platelist_file {
     $query_handle -> execute();
       #or die "SQL Error: ".$query_handle -> errstr();
     if ( $query_handle ) {
-      $set_platelist_error = undef;
+      $set_platelist_error = 0;
       #$PLATELIST_FILE_PATH = $target;
     }
     else {
@@ -3721,8 +3721,8 @@ sub save_new_uploaded_templib_file {
   my $error_message_templib_2 = "ERROR: Please enter a suitable name for the uploaded template library file and upload the template library file again if needed"; 
   my $error_message_templib_3 = "ERROR: Please upload a template library file and enter a suitable template library file name again if needed";
   
-  my $set_templib_error = undef;
-  my $processing_status = undef;
+  my $set_templib_error = 0;
+  my $processing_status = 0;
   
   #rename the newly uploaded plateconf file
   my $new_templib_filename = $q->param( "new_templib_filename" );
@@ -3759,7 +3759,7 @@ sub save_new_uploaded_templib_file {
       open ( $new_templib_file_renamed,'>',$target )
         or die "Cannot move $new_templib_file_renamed to $target:$!\n";
       if ( $new_templib_file_renamed ) {
-        $set_templib_error = undef;
+        $set_templib_error = 0;
      }
       else { 
         $set_templib_error = 4;
@@ -3770,7 +3770,7 @@ sub save_new_uploaded_templib_file {
       while ( $bytesread = $io_handle->read( $buffer,1024 ) ) {
         my $print_templib = print $new_templib_file_renamed $buffer;
         if ( $print_templib ) {
-          $set_templib_error = undef;
+          $set_templib_error = 0;
         }
         else {
           $set_templib_error = 5;
@@ -3779,10 +3779,10 @@ sub save_new_uploaded_templib_file {
       }
       close $new_templib_file_renamed;
       #check the current position of the filehandle and set a flag if it's still in the file
-      if ( tell ( $new_templib_file_renamed ) ne -1 ) { 
-        $set_templib_error = 6;
-        $processing_status = 1;
-      }    
+      #if ( tell ( $new_templib_file_renamed ) ne -1 ) { 
+      #  $set_templib_error = 6;
+      #  $processing_status = 1;
+      #}    
     }
     #reformat the uploaded file
     `chmod 777 $target`;
@@ -3809,7 +3809,7 @@ sub save_new_uploaded_templib_file {
     $query_handle -> execute();
       #or die "SQL Error: " . $query_handle -> errstr();
     if ($ query_handle ) {
-      $set_templib_error = undef;
+      $set_templib_error = 0;
       #$TEMPLIB_FILE_PATH = $target;
     }
     else {
