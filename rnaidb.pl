@@ -3629,7 +3629,7 @@ sub save_new_uploaded_platelist_file {
     my $firstLine = <IN>;
     if( $firstLine =~ "^Filename\t")
     {
-    	print OUT $_;
+    	print OUT $firstLine;
     }
     else
     {
@@ -3649,7 +3649,7 @@ sub save_new_uploaded_platelist_file {
     my $secondLine = <IN>;
     if( $secondLine =~ "^P1.txt\t")
     {
-    	print OUT $_;
+    	print OUT $secondLine;
     }
     else
     {
