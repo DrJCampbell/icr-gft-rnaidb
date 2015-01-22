@@ -3026,10 +3026,10 @@ sub save_new_screen {
   if ($is_isogenic eq 'ON') {
     $is_isogenic_screen = "YES";
     if ( $ISOGENIC_SET eq "Please select" ) {
-      my $query = $dbh -> do ( "INSERT INTO Name_of_set_if_isogenic ( 
+      my $query = "INSERT INTO Name_of_set_if_isogenic ( 
         					   Name_of_set_if_isogenic) 
         					   VALUES (
-        					   '$new_isogenic_set' )" );
+        					   '$new_isogenic_set' )";
       my $query_handle = $dbh -> prepare ( $query );
    					      # or die "Cannot prepare: " . $dbh -> errstr();
       $query_handle -> execute();
@@ -3049,7 +3049,7 @@ sub save_new_screen {
 
   ## 3. Store new Rnai screen metadata in the database ##
   
-  my $query = $dbh -> do( "INSERT INTO 
+  my $query = "INSERT INTO 
                           Rnai_screen_info (      
 						  Cell_line,    
 						  Rnai_screen_name,    
@@ -3097,7 +3097,7 @@ sub save_new_screen {
 						  ( SELECT Template_library_file_path_ID FROM Template_library_file_path WHERE Template_library_file_location = '$templib_file_path' ),
 						  ( SELECT Plateconf_file_path_ID FROM Plateconf_file_path WHERE Plateconf_file_location = '$plateconf_file_path' ),
 						  ( SELECT Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$platelist_file_path' ),
-						  ( SELECT Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )");
+						  ( SELECT Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )";
   
   my $query_handle = $dbh->prepare( $query );
    					    #or die "Cannot prepare: " . $dbh -> errstr();
@@ -3162,7 +3162,7 @@ sub save_new_screen {
     $well_number_for_zscore, 
     $zscore) = split(/\t/,$line);
     
-    my $query = $dbh -> do ("INSERT INTO Zscores_result (
+    my $query = "INSERT INTO Zscores_result (
 							  Compound, 
 							  Plate_number_for_zscore, 
 							  Well_number_for_zscore,
@@ -3175,7 +3175,7 @@ sub save_new_screen {
 							  '$well_number_for_zscore', 
 							  '$zscore',
 							  '$last_rnai_screen_info_id',
-							  (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')");
+							  (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')";
     my $query_handle = $dbh->prepare($query);
     $query_handle -> execute();
   }
@@ -3211,7 +3211,7 @@ sub save_new_screen {
     $gene_symbol_summary,
     $entrez_gene_id_summary) = split(/\t/, $line);
   
-    my $query = $dbh -> do("INSERT INTO Summary_of_result(
+    my $query = "INSERT INTO Summary_of_result(
     Plate_number_for_summary, 
     Position, 
     Zscore_summary, 
@@ -3254,7 +3254,7 @@ sub save_new_screen {
     '$gene_symbol_summary', 
     '$entrez_gene_id_summary', 
     '$last_rnai_screen_info_id', 
-    (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')");
+    (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')";
 	
     my $query_handle = $dbh -> prepare($query);
     $query_handle -> execute();
@@ -3389,10 +3389,10 @@ sub save_new_uploaded_plateconf_file {
     close IN;
     close OUT;
    
-    my $query = $dbh -> do ( "INSERT INTO Plateconf_file_path (
+    my $query = "INSERT INTO Plateconf_file_path (
       					  Plateconf_file_location )
      					  VALUES (
-      					  '$target' )" );
+      					  '$target' )";
     my $query_handle = $dbh -> prepare ( $query );
        					 #or die "Cannot prepare: " . $dbh -> errstr();
     $query_handle -> execute();
