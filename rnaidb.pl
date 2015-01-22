@@ -3506,50 +3506,41 @@ sub save_new_uploaded_plateconf_file {
   # ================================
 
 sub save_new_uploaded_platelist_file {
-
   	my $lightweight_fh  = $q -> upload ( 'new_uploaded_platelist_file' );
   	my $new_uploaded_platelist_file = $q -> param( "new_uploaded_platelist_file" );
   	my $platelist_folder = $configures{'WebDocumentRoot'} . $configures{'platelist_folder'};
   	my $target = "";
   	my $new_platelist_file_renamed;
-       
-  	#rename the newly uploaded platelist file
   	my $new_platelist_filename = $q -> param ( "new_platelist_filename" );
   
   	if ( !$new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_p9_v2" ) {
-  		my $error_message_platelist = "ERROR: Please upload a platelist file and enter a suitable name for the file";
+  		my $message = "ERROR: Please upload a platelist file and enter a suitable name for the file";
     	print $q -> header ( "text/html" );
-    	print "$page_header";
-  
-    	print "<div id=\"Message\"><p><b>$error_message_platelist</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-  
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
     	print "$page_footer";
     	print $q -> end_html;
     	return;
   	}
   
   	if ( $new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_p9_v2" ) {
-  		my $error_message_platelist = "ERROR: Please enter a suitable name for the uploaded platelist file and upload the platelist file again if needed";
+  		my $message = "ERROR: Please enter a suitable name for the uploaded platelist file and upload the platelist file again if needed";
     	print $q -> header ( "text/html" );
-    	print "$page_header";
-  
-    	print "<div id=\"Message\"><p><b>$error_message_platelist</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-  
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
     	print "$page_footer";
     	print $q -> end_html;
     	return;
   	}
   
   	if ( !$new_uploaded_platelist_file && $new_platelist_filename ne "e.g. platelist_p9_v2" ) {
-  		my $error_message_platelist = "ERROR: Please upload a platelist file and enter a suitable platelist file name again if needed";
+  		my $message = "ERROR: Please upload a platelist file and enter a suitable platelist file name again if needed";
     	print $q -> header ( "text/html" );
-    	print "$page_header";
-  
-    	print "<div id=\"Message\"><p><b>$error_message_platelist</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
-  
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
     	print "$page_footer";
     	print $q -> end_html;
     	return;
@@ -3563,16 +3554,29 @@ sub save_new_uploaded_platelist_file {
     
     $target = $platelist_folder."/".$new_platelist_file_renamed;
     my $tmpfile_path = $platelist_folder."/tmpfile.txt";
-   
-    # undef may be returned if it's not a valid file handle
-    if ( !defined $lightweight_fh ) {
-    	my $error_message_platelist = "ERROR: The platelist file cannot be loaded";
+    
+    my $query = "SELECT Platelist_file_path.Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$target'";
+    my $query_handle = $dbh->prepare( $query );
+	$query_handle->execute() or die "Cannot execute mysql statement: $DBI::errstr";
+	my $platelist_file_path_id = $query_handle->fetchrow_array();
+	if(defined($platelist_file_path_id))
+	{
+		my $message = "The plate list file name $new_platelist_file_basename has been used before. Please give a different name.";
     	print $q -> header ( "text/html" );
-    	print "$page_header";
-  
-    	print "<div id=\"Message\"><p><b>$error_message_platelist</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
-  
+    	print "$page_header";  
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+	}
+   
+    if ( !defined $lightweight_fh ) {
+    	my $message = "ERROR: The platelist file cannot be loaded";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
     	print "$page_footer";
     	print $q -> end_html;
     	return;   	
@@ -3586,12 +3590,11 @@ sub save_new_uploaded_platelist_file {
 	open ( $target_fh,'>',$target )
         	or die "Cannot move $new_platelist_file_renamed to $target:$!\n";
 	if ( !defined($target_fh) ) {
-    	my $warning_message_platelist = "ERROR: Cannot open $target";
+    	my $message = "ERROR: Cannot open $target";
     	print $q -> header ( "text/html" );
-    	print "$page_header";
-  
-    	print "<div id=\"Message\"><p><b>$warning_message_platelist</b></p></div>";
-  
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
     	print "$page_footer";
     	print $q -> end_html;
     	return;
@@ -3601,13 +3604,12 @@ sub save_new_uploaded_platelist_file {
 	my $buffer = undef;
 	while ( $bytesread = $io_handle -> read ( $buffer,1024 )) {
 		my $print_platelist = print $target_fh $buffer;
-		my $warning_message_platelist = "ERROR: Error writing $target";
+		my $message = "ERROR: Error writing $target";
        	if ( !$print_platelist ) {  
     		print $q -> header ( "text/html" );
-    		print "$page_header";
-  
-    		print "<div id=\"Message\"><p><b>$warning_message_platelist</b></p></div>";
-  
+    		print "$page_header"; 
+    		print "<div id=\"Message\"><p><b>$message</b></p></div>";
+  			print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
     		print "$page_footer";
     		print $q -> end_html;
     		close $target_fh;
@@ -3633,10 +3635,9 @@ sub save_new_uploaded_platelist_file {
     {
     	print $q -> header ( "text/html" );
     	print "$page_header";
-  		my $warning_message_platelist = "ERROR: The first column name of the plate list file should be \"Filename\"";
-    	print "<div id=\"Message\"><p><b>$warning_message_platelist</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
-  
+  		my $message = "ERROR: The first column name of the plate list file should be \"Filename\"";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
     	print "$page_footer";
     	print $q -> end_html;
     	close IN;
@@ -3653,10 +3654,9 @@ sub save_new_uploaded_platelist_file {
     {
     	print $q -> header ( "text/html" );
     	print "$page_header";
-  		my $warning_message_platelist = "ERROR: The filenames of the plate list file should be P1.txt, P2.txt, etc.";
-    	print "<div id=\"Message\"><p><b>$warning_message_platelist</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
-  
+  		my $message = "ERROR: The filenames of the plate list file should be P1.txt, P2.txt, etc.";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
     	print "$page_footer";
     	print $q -> end_html;
     	close IN;
@@ -3671,26 +3671,18 @@ sub save_new_uploaded_platelist_file {
       }
     close IN;
     close OUT;
-    
-   	# `cp $tmpfile_path $target`;
-  
-    my $query = $dbh -> do ( "INSERT INTO 
-                             Platelist_file_path (
-      					     Platelist_file_location )
-      					     VALUES (
-      					     '$target' )");
-    my $query_handle = $dbh -> prepare ( $query );
+     
+    $query = "INSERT INTO Platelist_file_path (Platelist_file_location ) VALUES ('$target' )";
+    $query_handle = $dbh -> prepare ( $query );
    					     #or die "Cannot prepare: " . $dbh -> errstr();
     $query_handle -> execute();
       #or die "SQL Error: ".$query_handle -> errstr();
     if ( !$query_handle ) {   	
-    	my $warning_message_platelist = "ERROR: Couldn't execute sql statement for adding new platelist file location to the database";
-    
+    	my $message = "ERROR: Couldn't execute sql statement for adding new platelist file location to the database";    
     	print $q -> header ( "text/html" );
-    	print "$page_header";
-  
-    	print "<div id=\"Message\"><p><b>$warning_message_platelist</b></p></div>";
-  
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+  		print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
     	print "$page_footer";
     	print $q -> end_html;
       	return;
