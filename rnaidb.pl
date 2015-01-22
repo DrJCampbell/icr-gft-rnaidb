@@ -3506,37 +3506,46 @@ sub save_new_uploaded_plateconf_file {
   # ================================
 
 sub save_new_uploaded_platelist_file {
-
-  my $lightweight_fh  = $q -> upload ( 'new_uploaded_platelist_file' );
-  my $new_uploaded_platelist_file = $q -> param( "new_uploaded_platelist_file" );
-  my $platelist_folder = $configures{'WebDocumentRoot'} . $configures{'platelist_folder'};
-  my $target = "";
-  my $new_platelist_file_renamed;
+  	my $lightweight_fh  = $q -> upload ( 'new_uploaded_platelist_file' );
+  	my $new_uploaded_platelist_file = $q -> param( "new_uploaded_platelist_file" );
+  	my $platelist_folder = $configures{'WebDocumentRoot'} . $configures{'platelist_folder'};
+  	my $target = "";
+  	my $new_platelist_file_renamed;
+  	my $new_platelist_filename = $q -> param ( "new_platelist_filename" );
   
-  my $error_message_platelist_1 = "ERROR: Please upload a platelist file and enter a suitable name for the file";
-  my $error_message_platelist_2 = "ERROR: Please enter a suitable name for the uploaded platelist file and upload the platelist file again if needed"; 
-  my $error_message_platelist_3 = "ERROR: Please upload a platelist file and enter a suitable platelist file name again if needed";
+  	if ( !$new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_p9_v2" ) {
+  		my $message = "ERROR: Please upload a platelist file and enter a suitable name for the file";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+  	}
   
-  my $set_platelist_error = 0;
-  my $processing_status = 0;
-       
-  #rename the newly uploaded platelist file
-  my $new_platelist_filename = $q -> param ( "new_platelist_filename" );
+  	if ( $new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_p9_v2" ) {
+  		my $message = "ERROR: Please enter a suitable name for the uploaded platelist file and upload the platelist file again if needed";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+  	}
   
-  if ( !$new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_p9_v2" ) {
-    $set_platelist_error = 1;
-    $processing_status = 1;
-  }
-  elsif ( $new_uploaded_platelist_file && $new_platelist_filename eq "e.g. platelist_p9_v2" ) {
-    $set_platelist_error = 2;
-    $processing_status = 1;
-  }
-  elsif ( !$new_uploaded_platelist_file && $new_platelist_filename ne "e.g. platelist_p9_v2" ) {
-    $set_platelist_error = 3;
-    $processing_status = 1;
-  }
-  else{
-    $set_platelist_error = 0;
+  	if ( !$new_uploaded_platelist_file && $new_platelist_filename ne "e.g. platelist_p9_v2" ) {
+  		my $message = "ERROR: Please upload a platelist file and enter a suitable platelist file name again if needed";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+  	}
+  
     my $new_platelist_filename_wo_spaces = $new_platelist_filename;
     $new_platelist_filename_wo_spaces =~ s/\s+/_/g;
     my $new_platelist_file_basename = $new_platelist_filename_wo_spaces;
@@ -3545,41 +3554,70 @@ sub save_new_uploaded_platelist_file {
     
     $target = $platelist_folder."/".$new_platelist_file_renamed;
     my $tmpfile_path = $platelist_folder."/tmpfile.txt";
+    
+    my $query = "SELECT Platelist_file_path.Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$target'";
+    my $query_handle = $dbh->prepare( $query );
+	$query_handle->execute() or die "Cannot execute mysql statement: $DBI::errstr";
+	my $platelist_file_path_id = $query_handle->fetchrow_array();
+	if(defined($platelist_file_path_id))
+	{
+		my $message = "The plate list file name $new_platelist_file_basename has been used before. Please give a different name.";
+    	print $q -> header ( "text/html" );
+    	print "$page_header";  
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+	}
    
-    # undef may be returned if it's not a valid file handle
-    if ( defined $lightweight_fh ) {
-      # Upgrade the handle to one compatible with IO::Handle:
-      my $io_handle = $lightweight_fh -> handle;
-
-      #save the uploaded file on the server
-      open ( $new_platelist_file_renamed,'>',$target )
-        or die "Cannot move $new_platelist_file_renamed to $target:$!\n";
-      if ( $new_platelist_file_renamed ) {
-        $set_platelist_error = 0;
-      }
-      else { 
-        $set_platelist_error = 4;
-        $processing_status = 1;
-      }	    
-      my $bytesread = undef;
-      my $buffer = undef;
-      while ( $bytesread = $io_handle -> read ( $buffer,1024 )) {
-        my $print_platelist = print $new_platelist_file_renamed $buffer;
-        if ( $print_platelist ) {
-          $set_platelist_error = 0;
-        }
-        else {
-          $set_platelist_error = 5;
-          $processing_status = 1;
-        }  
-      }
-      close $new_platelist_file_renamed;
-      #check the current position of the filehandle and set a flag if it's still in the file
-      #if ( tell ( $new_platelist_file_renamed ) ne -1 ) { 
-      #    $set_platelist_error = 6;
-      #    $processing_status = 1;
-      #}
+    if ( !defined $lightweight_fh ) {
+    	my $message = "ERROR: The platelist file cannot be loaded";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;   	
     }
+		
+	# Upgrade the handle to one compatible with IO::Handle:
+    my $io_handle = $lightweight_fh -> handle;
+
+	#save the uploaded file on the server
+	my $target_fh = undef;
+	open ( $target_fh,'>',$target )
+        	or die "Cannot move $new_platelist_file_renamed to $target:$!\n";
+	if ( !defined($target_fh) ) {
+    	my $message = "ERROR: Cannot open $target";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+    }	    
+	
+	my $bytesread = undef;
+	my $buffer = undef;
+	while ( $bytesread = $io_handle -> read ( $buffer,1024 )) {
+		my $print_platelist = print $target_fh $buffer;
+		my $message = "ERROR: Error writing $target";
+       	if ( !$print_platelist ) {  
+    		print $q -> header ( "text/html" );
+    		print "$page_header"; 
+    		print "<div id=\"Message\"><p><b>$message</b></p></div>";
+  			print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
+    		print "$page_footer";
+    		print $q -> end_html;
+    		close $target_fh;
+  			return;
+        }  
+    }
+    close $target_fh;
+
     #reformat the uploaded file
     `chmod 777 $target`;
     `tr '\r' '\n'  < $target > $tmpfile_path`;
@@ -3587,6 +3625,45 @@ sub save_new_uploaded_platelist_file {
       or die "Cannot open $tmpfile_path:$!\n";
     open OUT, "> $target"
       or die "Cannot open $target:$!\n";
+    
+    my $firstLine = <IN>;
+    if( $firstLine =~ "^Filename\t")
+    {
+    	print OUT $firstLine;
+    }
+    else
+    {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: The first column name of the plate list file should be \"Filename\"";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+    	close IN;
+    	close OUT;
+  		return;  	
+    }
+    
+    my $secondLine = <IN>;
+    if( $secondLine =~ "^P1.txt\t")
+    {
+    	print OUT $secondLine;
+    }
+    else
+    {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: The filenames of the plate list file should be P1.txt, P2.txt, etc.";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+    	close IN;
+    	close OUT;
+  		return;  	
+    }
+    
     while ( <IN> ) {
       if( /\S/ ) {
         print OUT $_;
@@ -3594,114 +3671,28 @@ sub save_new_uploaded_platelist_file {
       }
     close IN;
     close OUT;
-    
-   # `cp $tmpfile_path $target`;
-  
-    my $query = $dbh -> do ( "INSERT INTO 
-                             Platelist_file_path (
-      					     Platelist_file_location )
-      					     VALUES (
-      					     '$target' )");
-    my $query_handle = $dbh -> prepare ( $query );
+     
+    $query = "INSERT INTO Platelist_file_path (Platelist_file_location ) VALUES ('$target' )";
+    $query_handle = $dbh -> prepare ( $query );
    					     #or die "Cannot prepare: " . $dbh -> errstr();
     $query_handle -> execute();
       #or die "SQL Error: ".$query_handle -> errstr();
-    if ( $query_handle ) {
-      $set_platelist_error = 0;
-      #$PLATELIST_FILE_PATH = $target;
+    if ( !$query_handle ) {   	
+    	my $message = "ERROR: Couldn't execute sql statement for adding new platelist file location to the database";    
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+  		print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+      	return;
     }
-    else {
-      $set_platelist_error = 7;
-      $processing_status = 1;
-    }
-   # $query_handle -> finish();
-   } #end of else loop
   
-  my $warning_message_platelist_1 = "ERROR: Cannot open $target";
-  my $warning_message_platelist_2 = "ERROR: Error writing $target";
-  my $warning_message_platelist_3 = "ERROR: Cannot close $target";
-  my $warning_message_platelist_4 = "ERROR: Couldn't execute sql statement for adding new platelist file location to the database";
-  
-  my $file_upload_message = $q -> param ( -name => 'file_upload_message',
+	my $file_upload_message = $q -> param ( -name => 'file_upload_message',
   			  							  -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
   
-  if ( $processing_status == 0 && $set_platelist_error == 0 ) {
-      &add_new_screen($file_upload_message); 
-  }
-  elsif ( $processing_status == 1 && $set_platelist_error == 1 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$error_message_platelist_1</b></p></div>";
-    print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_platelist_error == 2 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$error_message_platelist_2</b></p></div>";
-    print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_platelist_error == 3 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$error_message_platelist_3</b></p></div>";
-    print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_platelist_error == 4 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_platelist_1</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_platelist_error == 5 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_platelist_2</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_platelist_error == 6 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_platelist_3</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_platelist_error == 7 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_platelist_4</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  print $q -> hidden ( -name => 'file_upload_message',
+	&add_new_screen($file_upload_message);
+  	print $q -> hidden ( -name => 'file_upload_message',
   					   -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
 } #end of save_new_uploaded_platelist_file subroutine
   
@@ -3711,80 +3702,149 @@ sub save_new_uploaded_platelist_file {
   # ================================
        
 sub save_new_uploaded_templib_file {
+  	my $lightweight_fh  = $q -> upload( 'new_uploaded_templib_file' );
+  	my $new_uploaded_templib_file = $q -> param( "new_uploaded_templib_file" );
+  	my $templib_folder = $configures{'WebDocumentRoot'} . $configures{'templib_folder'};
+  	my $target = "";
+  	my $new_templib_file_renamed;
+  	my $new_templib_filename = $q->param( "new_templib_filename" );
+  
+  	if ( !$new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_CGC_WNT_384_template" ) {
+  		my $message = "ERROR: Please upload a template library file and enter a suitable name for the file"; 
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+  	}
+  
+  	if ( $new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_CGC_WNT_384_template" ) {
+    	my $message = "ERROR: Please enter a suitable name for the uploaded template library file and upload the template library file again if needed"; 
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+  	}
+  
+  	if ( !$new_uploaded_templib_file && $new_templib_filename ne "e.g. KS_TS_CGC_WNT_384_template") {
+		my $message = "ERROR: Please upload a template library file and enter a suitable template library file name again if needed";  
+    	print $q -> header ( "text/html" );
+ 		print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+  	}
 
-  my $lightweight_fh  = $q -> upload( 'new_uploaded_templib_file' );
-  my $new_uploaded_templib_file = $q -> param( "new_uploaded_templib_file" );
-  my $templib_folder = $configures{'WebDocumentRoot'} . $configures{'templib_folder'};
-  my $target = "";
-  my $new_templib_file_renamed;
-  
-  my $error_message_templib_1 = "ERROR: Please upload a template library file and enter a suitable name for the file";
-  my $error_message_templib_2 = "ERROR: Please enter a suitable name for the uploaded template library file and upload the template library file again if needed"; 
-  my $error_message_templib_3 = "ERROR: Please upload a template library file and enter a suitable template library file name again if needed";
-  
-  my $set_templib_error = 0;
-  my $processing_status = 0;
-  
-  #rename the newly uploaded plateconf file
-  my $new_templib_filename = $q->param( "new_templib_filename" );
-  
-  if ( !$new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_CGC_WNT_384_template" ) {
-    $set_templib_error = 1;
-    $processing_status = 1;
-  }
-  elsif ( $new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_CGC_WNT_384_template" ) {
-    $set_templib_error = 2;
-    $processing_status = 1;
-  }
-  elsif ( !$new_uploaded_templib_file && $new_templib_filename ne "e.g. KS_TS_CGC_WNT_384_template") {
-    $set_templib_error = 3;
-    $processing_status = 1;
-  }
-  else{
-    $set_templib_error = 0;
     my $new_templib_filename_wo_spaces = $new_templib_filename;
     $new_templib_filename_wo_spaces =~ s/\s+/_/g;
     my $new_templib_file_basename = $new_templib_filename_wo_spaces;
     $new_templib_file_basename =~ s/[^A-Za-z0-9_-]*//g;
     $new_templib_file_renamed = $new_templib_file_basename.".txt";
     
+    my $query = "SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$new_templib_file_basename'";
+    my $query_handle = $dbh->prepare( $query );
+	$query_handle->execute() or die "Cannot execute mysql statement: $DBI::errstr";
+	my $template_library_id = $query_handle->fetchrow_array();
+	if(defined($template_library_id))
+	{
+		my $message = "The template library name $new_templib_file_basename has been used before. Please give a different name.";
+    	print $q -> header ( "text/html" );
+    	print "$page_header";  
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+	}
+    
     $target = $templib_folder."/".$new_templib_file_renamed;
     my $tmpfile_path = $templib_folder."/tmpfile.txt";  
 
-    # undef may be returned if it's not a valid file handle
-    if ( defined $lightweight_fh ) {
-      # Upgrade the handle to one compatible with IO::Handle:
-      my $io_handle = $lightweight_fh->handle;
-      
-      #save the uploaded file on the server
-      open ( $new_templib_file_renamed,'>',$target )
-        or die "Cannot move $new_templib_file_renamed to $target:$!\n";
-      if ( $new_templib_file_renamed ) {
-        $set_templib_error = 0;
-     }
-      else { 
-        $set_templib_error = 4;
-        $processing_status = 1;
-      }	      
-      my $bytesread = undef;
-      my $buffer = undef;
-      while ( $bytesread = $io_handle->read( $buffer,1024 ) ) {
-        my $print_templib = print $new_templib_file_renamed $buffer;
-        if ( $print_templib ) {
-          $set_templib_error = 0;
-        }
-        else {
-          $set_templib_error = 5;
-          $processing_status = 1;
-        } 
-      }
-      close $new_templib_file_renamed;
-      #check the current position of the filehandle and set a flag if it's still in the file
-      #if ( tell ( $new_templib_file_renamed ) ne -1 ) { 
-      #  $set_templib_error = 6;
-      #  $processing_status = 1;
-      #}    
+    if ( !defined $lightweight_fh ) {
+    	my $message = "ERROR: The template library file cannot be loaded";
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;   	
     }
+    
+   	# Upgrade the handle to one compatible with IO::Handle:
+	my $io_handle = $lightweight_fh->handle;
+      
+	#save the uploaded file on the server
+	my $target_fh = undef;
+	open ( $target_fh,'>',$target )
+      	or die "Cannot move $new_templib_file_renamed to $target:$!\n";
+  	if ( !$target_fh ) 
+  	{    
+    	my $message = "ERROR: Cannot open $target";
+    	print $q -> header ( "text/html" );
+    	print "$page_header";  
+    	print "<p><b><div id=\"Message\">$message</b></p></div>"; 
+    	print "$page_footer";
+    	print $q -> end_html;
+		return;
+	}	     
+	 
+	my $bytesread = undef;
+	my $buffer = undef;
+	while ( $bytesread = $io_handle->read( $buffer,1024 ) ) 
+	{
+		my $print_templib = print $target_fh $buffer;
+     	if ( !$print_templib ) {
+          	my $message = "ERROR: Error writing $target";
+    		print $q -> header ( "text/html" );
+    		print "$page_header"; 
+    		print "<div id=\"Message\"><p><b>$message</b></p></div>"; 
+    		print "$page_footer";
+    		print $q -> end_html;
+    		return;
+       	} 
+   	}
+	close $target_fh; 
+	
+ 	$query = "INSERT INTO Template_library_file_path (Template_library_file_location) VALUES ('$target' )";
+    $query_handle = $dbh->prepare( $query );
+    $query_handle -> execute();
+      #or die "SQL Error: " . $query_handle -> errstr();
+    if ( !$query_handle ) {
+      	my $message = "ERROR: Couldn't execute sql statement for adding new template library file location to the database";
+    	print $q -> header ( "text/html" );
+    	print "$page_header";  
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+    }
+    
+    $query = "INSERT INTO Template_library (Template_library_name) VALUES ('$new_templib_file_basename')";
+   	$query_handle = $dbh->prepare( $query );
+    $query_handle -> execute();
+    if ( !$query_handle ) {
+      	my $message = "ERROR: Couldn't execute sql statement for adding new template library name to the database";
+    	print $q -> header ( "text/html" );
+    	print "$page_header";  
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>"; 
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+    }
+    
+    $query = "SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$new_templib_file_basename'";
+    $query_handle = $dbh->prepare( $query );
+	$query_handle->execute() or die "Cannot execute sql statement: $DBI::errstr";
+	$template_library_id = $query_handle->fetchrow_array();
+    		
     #reformat the uploaded file
     `chmod 777 $target`;
     `tr '\r' '\n'  < $target > $tmpfile_path`;
@@ -3792,119 +3852,96 @@ sub save_new_uploaded_templib_file {
       or die "Cannot open $tmpfile_path:$!\n";
     open OUT, "> $target"
       or die "Cannot open $target:$!\n";
-    while ( <IN> ) {
-      if( /\S/ ) {
-        print OUT $_;
+    
+   	my $firstLine = <IN>;
+    if( ($firstLine =~ "^Plate\t") && ($firstLine =~ "\tWell\t") && ($firstLine =~ "\tGeneID\t") && ($firstLine =~ "\tEntrez_gene_ID\t") && ($firstLine =~ "\tsublib") )
+    {
+    	print OUT $firstLine;
+    }
+    else
+    {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: The column names of the template library file should be \"Plate\", \"Well\", \"GeneID\", \"Entrez_gene_ID\" and \"sublib\" ";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";     	 
+    	print "$page_footer";
+    	print $q -> end_html;
+    	close IN;
+    	close OUT;
+  		return;  	
+    }
+    
+    # follow http://stackoverflow.com/questions/13671195/working-perl-ascript-now-says-dbdmysqldb-do-failed-you-have-an-error-in-yo
+    $query = "INSERT INTO Template_library_file (
+							  Plate_templib, 
+							  Well_templib,
+							  Gene_symbol_templib,
+							  Entrez_gene_id_templib,
+							  Sub_lib,
+							  Template_library_Template_library_ID) 
+							  VALUES( ?, ?, ?, ?, ?, ?)";
+    $query_handle = $dbh->prepare($query);
+    my $line = undef;
+    while ( <IN> ) 
+    {
+		if( /\S/ ) 
+		{
+			$line = $_;
+        	print OUT $line;
+        	chomp $line;
+    		my ($plate, $well, $gene_symbol, $entrez_gene_id, $sublib) = split(/\t/,$line);  
+    		
+    		$query_handle -> execute($plate, $well, $gene_symbol, $entrez_gene_id, $sublib, $template_library_id);
+    		if ( !$query_handle ) {
+      			my $message = "ERROR: Couldn't execute sql statement for adding new template library data to the database";
+    			print $q -> header ( "text/html" );
+    			print "$page_header";  
+    			print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    			print "<p> Plate: $plate</p>";
+    			print "<p> Well: $well</p>";
+    			print "<p> Gene Symbol: $gene_symbol</p>";
+    			if(!defined($gene_symbol))
+    			{
+    				print "<p> variable gene_symbol not defined</p>";
+    			}
+    			else
+    			{
+    				print "<p> variable gene_symbol is defined</p>";
+    			}
+    			print "<p> Entrez gene ID: $entrez_gene_id</p>";
+    			if(!defined($gene_symbol))
+    			{
+    				print "<p> variable entrez_gene_id not defined</p>";
+    			}
+    			else
+    			{
+    				print "<p> variable entrez_gene_id is defined</p>";
+    			}
+  				print "<p> Sublib: $sublib</p>";
+  				if(!defined($sublib))
+    			{
+    				print "<p> variable sublib not defined</p>";
+    			}
+    			else
+    			{
+    				print "<p> variable sublib is defined</p>";
+    			}
+  				print "<p> Template_library_name: $new_templib_file_basename</p>";
+    			print "$page_footer";
+    			print $q -> end_html;
+    			return;
+    		}        	
         }
-      }
+    }
     close IN;
     close OUT;
-  
-    my $query = $dbh -> do ( "INSERT INTO 
-                             Template_library_file_path (
-      					     Template_library_file_location)
-      					     VALUES (
-      					     '$target' )" );
-    my $query_handle = $dbh->prepare( $query );
-       					 #or die "Cannot prepare: " . $dbh -> errstr();
-    $query_handle -> execute();
-      #or die "SQL Error: " . $query_handle -> errstr();
-    if ($ query_handle ) {
-      $set_templib_error = 0;
-      #$TEMPLIB_FILE_PATH = $target;
-    }
-    else {
-      $set_templib_error = 7;
-      $processing_status = 1;
-    }
-    #$query_handle -> finish();
-  } #end of else loop
-  
-  my $warning_message_templib_1 = "ERROR: Cannot open $target";
-  my $warning_message_templib_2 = "ERROR: Error writing $target";
-  my $warning_message_templib_3 = "ERROR: Cannot close $target";
-  my $warning_message_templib_4 = "ERROR: Couldn't execute sql statement for adding new template library file location to the database";
-  
-  my $file_upload_message = $q -> param( -name => 'file_upload_message',
+    
+  	my $file_upload_message = $q -> param( -name => 'file_upload_message',
   			  							-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
-  
-  if ( $processing_status == 0 && $set_templib_error == 0 ) {
-      &add_new_screen( $file_upload_message ); 
-  }
-  elsif ($ processing_status == 1 && $set_templib_error == 1 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$error_message_templib_1</b></p></div>";
-    print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_templib_error == 2 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$error_message_templib_2</b></p></div>";
-    print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_templib_error == 3 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$error_message_templib_3</b></p></div>";
-    print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-    
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_templib_error == 4 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<p><b><div id=\"Message\">$warning_message_templib_1</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_templib_error == 5 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_templib_2</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_templib_error == 6 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_templib_3</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_templib_error == 7 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_templib_4</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  print $q -> hidden ( -name => 'file_upload_message',
+  			  							
+    &add_new_screen( $file_upload_message ); 
+  	print $q -> hidden ( -name => 'file_upload_message',
   					   -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
 } #end of save_new_uploaded_templib_file subroutine
   
