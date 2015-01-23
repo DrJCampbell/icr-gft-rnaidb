@@ -3150,46 +3150,48 @@ sub save_new_screen {
   ## 5. Store file with zscores in the database ##
   
   #Remove the header in zscore file#  
-  my $zscores_file_complete = $file_path."/".$screen_dir_name."_zscores.txt";
-  my $zscores_file_wo_header = $file_path."/".$screen_dir_name."_zscores_wo_header.txt";
-  `cat $zscores_file_complete | grep -v ^Compound > $zscores_file_wo_header`;
+  #my $zscores_file_complete = $file_path."/".$screen_dir_name."_zscores.txt";
+  #my $zscores_file_wo_header = $file_path."/".$screen_dir_name."_zscores_wo_header.txt";
+  #`cat $zscores_file_complete | grep -v ^Compound > $zscores_file_wo_header`;
   
-  open (FILE, $zscores_file_wo_header);
-  foreach my $line(<FILE>) {
-    chomp $line;
-    my ($compound, 
-    $plate_number_for_zscore, 
-    $well_number_for_zscore, 
-    $zscore) = split(/\t/,$line);
+  #open (FILE, $zscores_file_complete);
+  #my $line = <FILE>; #skip the first line
+  #while ($line = <FILE>) {
+    #chomp $line;
+    #my ($compound, 
+    #$plate_number_for_zscore, 
+    #$well_number_for_zscore, 
+    #$zscore) = split(/\t/,$line);
     
-    my $query = "INSERT INTO Zscores_result (
-							  Compound, 
-							  Plate_number_for_zscore, 
-							  Well_number_for_zscore,
-							  Zscore,
-							  Rnai_screen_info_Rnai_screen_info_ID,
-							  Template_library_Template_library_ID) 
-							  SELECT 
-							  '$compound', 
-							  '$plate_number_for_zscore',
-							  '$well_number_for_zscore', 
-							  '$zscore',
-							  '$last_rnai_screen_info_id',
-							  (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')";
-    my $query_handle = $dbh->prepare($query);
-    $query_handle -> execute();
-  }
-  close FILE;
+    #my $query = "INSERT INTO Zscores_result (
+	#						  Compound, 
+	#						  Plate_number_for_zscore, 
+	#						  Well_number_for_zscore,
+	#						  Zscore,
+	#						  Rnai_screen_info_Rnai_screen_info_ID,
+	#						  Template_library_Template_library_ID) 
+	#						  SELECT 
+	#						  '$compound', 
+	#						  '$plate_number_for_zscore',
+	#						  '$well_number_for_zscore', 
+	#						  '$zscore',
+	#						  '$last_rnai_screen_info_id',
+	#						  (SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$templib')";
+    #my $query_handle = $dbh->prepare($query);
+    #$query_handle -> execute();
+  #}
+  #close FILE;
   
   ## 6. Store file with summary of result in the database ##
   
   #Remove the header in summary file#
   my $summary_file_complete = $file_path."/".$screen_dir_name."_summary.txt"; 
-  my $summary_file_wo_header = $file_path."/".$screen_dir_name."_summary_wo_header.txt";
-  `cat $summary_file_complete | grep -v ^plate > $summary_file_wo_header`;
+  #my $summary_file_wo_header = $file_path."/".$screen_dir_name."_summary_wo_header.txt";
+  #`cat $summary_file_complete | grep -v ^plate > $summary_file_wo_header`;
   
-  open (FILE, $summary_file_wo_header);
-  foreach my $line(<FILE>) {
+  open (FILE, $summary_file_complete);
+  my $line = <FILE>; #skip the header
+  while ( $line = <FILE> ) {
     chomp $line;
     my ($plate_number_for_summary, 
     $position, 
