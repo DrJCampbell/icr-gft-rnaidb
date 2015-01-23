@@ -94,7 +94,7 @@ insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/ic
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p7r3.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p7r3_TKCC07.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p7r3c1.txt');
-insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p9.txt');
+insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p9_v1.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p9_v2.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p12_v2.txt');
 insert into Platelist_file_path(Platelist_file_location) values ('/Rnaidb_git/icr-gft-rnaidb/plate_list_folder/platelist_p15_v2.txt');
