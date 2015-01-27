@@ -2605,7 +2605,7 @@ sub add_new_files {
   print "</p>";
   
   ## get new template library file ##
-  
+  		  
   print "<p>Upload new template library file:<br />";
   print "<p></p>";
   
@@ -2614,7 +2614,7 @@ sub add_new_files {
                          -size=>35,
                          -maxlength=>256 );
   print "</p>";
-  
+    
   #enter new template library file name
   print "<p>Enter new template library file name:<br />";
   print "<p></p>";
@@ -3742,12 +3742,17 @@ sub save_new_uploaded_templib_file {
     	print $q -> end_html;
     	return;
   	}
+  	
+  	my $tmpfile_path1 = $templib_folder . "/tmpfile1.txt";
+    my $tmpfile_path2 = $templib_folder . "/tmpfile2.txt";
 
     my $new_templib_filename_wo_spaces = $new_templib_filename;
     $new_templib_filename_wo_spaces =~ s/\s+/_/g;
     my $new_templib_file_basename = $new_templib_filename_wo_spaces;
     $new_templib_file_basename =~ s/[^A-Za-z0-9_-]*//g;
     $new_templib_file_renamed = $new_templib_file_basename.".txt";
+       
+    $target = $templib_folder."/".$new_templib_file_renamed;
     
     my $query = "SELECT Template_library.Template_library_ID FROM Template_library WHERE Template_library_name = '$new_templib_file_basename'";
     my $query_handle = $dbh->prepare( $query );
@@ -3764,9 +3769,18 @@ sub save_new_uploaded_templib_file {
     	print $q -> end_html;
     	return;
 	}
-    
-    $target = $templib_folder."/".$new_templib_file_renamed;
-    my $tmpfile_path = $templib_folder."/tmpfile.txt";  
+	
+	if (-e $target)
+    {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+    	my $message = "The template file name has been used before. Please give a different name.";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";	  
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+  		return; 
+    }
 
     if ( !defined $lightweight_fh ) {
     	my $message = "ERROR: The template library file cannot be loaded";
@@ -3782,13 +3796,13 @@ sub save_new_uploaded_templib_file {
    	# Upgrade the handle to one compatible with IO::Handle:
 	my $io_handle = $lightweight_fh->handle;
       
-	#save the uploaded file on the server
-	my $target_fh = undef;
-	open ( $target_fh,'>',$target )
-      	or die "Cannot move $new_templib_file_renamed to $target:$!\n";
-  	if ( !$target_fh ) 
+	#save the uploaded file in tmpfile1.txt on the server
+	my $fh = undef;
+	open ( $fh,'>', $tmpfile_path1 )
+      	or die "Cannot upload the template file:$!\n";
+  	if ( !$fh ) 
   	{    
-    	my $message = "ERROR: Cannot open $target";
+    	my $message = "ERROR: Cannot open temporary file $tmpfile_path1";
     	print $q -> header ( "text/html" );
     	print "$page_header";  
     	print "<p><b><div id=\"Message\">$message</b></p></div>"; 
@@ -3801,9 +3815,9 @@ sub save_new_uploaded_templib_file {
 	my $buffer = undef;
 	while ( $bytesread = $io_handle->read( $buffer,1024 ) ) 
 	{
-		my $print_templib = print $target_fh $buffer;
+		my $print_templib = print $fh $buffer;
      	if ( !$print_templib ) {
-          	my $message = "ERROR: Error writing $target";
+          	my $message = "ERROR: Error writing temporary file $tmpfile_path1";
     		print $q -> header ( "text/html" );
     		print "$page_header"; 
     		print "<div id=\"Message\"><p><b>$message</b></p></div>"; 
@@ -3812,8 +3826,30 @@ sub save_new_uploaded_templib_file {
     		return;
        	} 
    	}
-	close $target_fh; 
+	close $fh;
 	
+	#reformat the uploaded file
+    `tr '\r' '\n'  < $tmpfile_path1  > $tmpfile_path2`;
+    unlink $tmpfile_path1;
+
+   	open IN, "<$tmpfile_path2"
+      or die "Cannot open $tmpfile_path2:$!\n";
+    
+   	my $firstLine = <IN>;
+   	my $OK = ($firstLine =~ "^Plate\t") && ($firstLine =~ "\tWell\t") && ($firstLine =~ "\tGeneID\t") && ($firstLine =~ "\tEntrez_gene_ID\t") && ($firstLine =~ "\tsublib");
+    if( !$OK )
+    {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: The column names of the template library file should be \"Plate\", \"Well\", \"GeneID\", \"Entrez_gene_ID\" and \"sublib\" ";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";     	 
+    	print "$page_footer";
+    	print $q -> end_html;
+    	close IN;
+  		return;  	
+    }
+    		
  	$query = "INSERT INTO Template_library_file_path (Template_library_file_location) VALUES ('$target' )";
     $query_handle = $dbh->prepare( $query );
     $query_handle -> execute();
@@ -3846,33 +3882,6 @@ sub save_new_uploaded_templib_file {
 	$query_handle->execute() or die "Cannot execute sql statement: $DBI::errstr";
 	$template_library_id = $query_handle->fetchrow_array();
     		
-    #reformat the uploaded file
-    `chmod 777 $target`;
-    `tr '\r' '\n'  < $target > $tmpfile_path`;
-    open IN, "< $tmpfile_path"
-      or die "Cannot open $tmpfile_path:$!\n";
-    open OUT, "> $target"
-      or die "Cannot open $target:$!\n";
-    
-   	my $firstLine = <IN>;
-    if( ($firstLine =~ "^Plate\t") && ($firstLine =~ "\tWell\t") && ($firstLine =~ "\tGeneID\t") && ($firstLine =~ "\tEntrez_gene_ID\t") && ($firstLine =~ "\tsublib") )
-    {
-    	print OUT $firstLine;
-    }
-    else
-    {
-    	print $q -> header ( "text/html" );
-    	print "$page_header";
-  		my $message = "ERROR: The column names of the template library file should be \"Plate\", \"Well\", \"GeneID\", \"Entrez_gene_ID\" and \"sublib\" ";
-    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";     	 
-    	print "$page_footer";
-    	print $q -> end_html;
-    	close IN;
-    	close OUT;
-  		return;  	
-    }
-    
     # follow http://stackoverflow.com/questions/13671195/working-perl-ascript-now-says-dbdmysqldb-do-failed-you-have-an-error-in-yo
     $query = "INSERT INTO Template_library_file (
 							  Plate_templib, 
@@ -3889,7 +3898,6 @@ sub save_new_uploaded_templib_file {
 		if( /\S/ ) 
 		{
 			$line = $_;
-        	print OUT $line;
         	chomp $line;
     		my ($plate, $well, $gene_symbol, $entrez_gene_id, $sublib) = split(/\t/,$line);  
     		
@@ -3936,7 +3944,7 @@ sub save_new_uploaded_templib_file {
         }
     }
     close IN;
-    close OUT;
+    move $tmpfile_path2, $target;
     
   	my $file_upload_message = $q -> param( -name => 'file_upload_message',
   			  							-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
