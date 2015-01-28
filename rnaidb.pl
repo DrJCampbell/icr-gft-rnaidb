@@ -3302,37 +3302,46 @@ sub save_new_screen {
 
 sub save_new_uploaded_plateconf_file {
   
-  my $lightweight_fh = $q -> upload ( 'new_uploaded_plateconf_file' );
-  my $new_uploaded_plateconf_file = $q -> param( "new_uploaded_plateconf_file" );
-  my $plateconf_folder = $configures{'WebDocumentRoot'} . $configures{'plateconf_folder'};
-  my $target= "";
-  my $new_plateconf_file_renamed;
+  	my $lightweight_fh = $q -> upload ( 'new_uploaded_plateconf_file' );
+  	my $new_uploaded_plateconf_file = $q -> param( "new_uploaded_plateconf_file" );
+  	my $plateconf_folder = $configures{'WebDocumentRoot'} . $configures{'plateconf_folder'};
+  	my $target= "";
+  	my $new_plateconf_file_renamed; 
+  	my $new_plateconf_filename = $q -> param ( "new_plateconf_filename" );
   
-  my $error_message_plateconf_1 = "ERROR: Please upload a plateconf file and enter a suitable name for the file.";
-  my $error_message_plateconf_2 = "ERROR: Please enter a suitable name for the uploaded plateconf file and upload the plateconf file again if needed."; 
-  my $error_message_plateconf_3 = "ERROR: Please upload a plateconf file and enter a suitable plateconf file name again if needed.";
+  	if ( !$new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. KS_TS_CGC_WNT_384_plateconf" ) {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: Please upload a plateconf file and enter a suitable name for the file.";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+  	}
   
-  my $set_plateconf_error = 0;
-  my $processing_status = 0;
+  	if ( $new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. KS_TS_CGC_WNT_384_plateconf" ) {  
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: Please enter a suitable name for the uploaded plateconf file and upload the plateconf file again if needed."; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+		return;
+  	}
   
-  #rename the newly uploaded plateconf file
-  my $new_plateconf_filename = $q -> param ( "new_plateconf_filename" );
+  	if ( !$new_uploaded_plateconf_file && $new_plateconf_filename ne "e.g. KS_TS_CGC_WNT_384_plateconf" ) {   
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: Please upload a plateconf file and enter a suitable plateconf file name again if needed.";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+		return;
+  	}
   
-  if ( !$new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. KS_TS_CGC_WNT_384_plateconf" ) {
-    #displayErrorMessage($q, $error_message_templib);
-    $set_plateconf_error = 1;
-    $processing_status = 1;
-  }
-  elsif ( $new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. KS_TS_CGC_WNT_384_plateconf" ) {
-    $set_plateconf_error = 2;
-    $processing_status = 1;
-  }
-  elsif ( !$new_uploaded_plateconf_file && $new_plateconf_filename ne "e.g. KS_TS_CGC_WNT_384_plateconf" ) {
-    $set_plateconf_error = 3;
-    $processing_status = 1;
-  }
-  else {
-    $set_plateconf_error = 0;
     my $new_plateconf_filename_wo_spaces = $new_plateconf_filename;
     $new_plateconf_filename_wo_spaces =~ s/\s+/_/g;
     my $new_plateconf_file_basename = $new_plateconf_filename_wo_spaces;
@@ -3340,167 +3349,174 @@ sub save_new_uploaded_plateconf_file {
     $new_plateconf_file_renamed = $new_plateconf_file_basename.".txt";    
     
     $target = $plateconf_folder."/".$new_plateconf_file_renamed;
-    my $tmpfile_path = $plateconf_folder."/tmpfile.txt";
-    
-    # undef may be returned if it's not a valid file handle
-    if ( defined $lightweight_fh ) {
-      # Upgrade the handle to one compatible with IO::Handle
-      my $io_handle = $lightweight_fh->handle;
-    
-      #save the uploaded file on the server
-      open ( $new_plateconf_file_renamed,'>', $target )
-        or die "Cannot move $new_plateconf_file_renamed to $target:$!\n";
-      if ( $new_plateconf_file_renamed ) {
-        $set_plateconf_error = 0;
-      }
-      else { 
-        $set_plateconf_error = 4;
-        $processing_status = 1;
-      }	    
-      my $bytesread = undef;
-      my $buffer = undef;
-      while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) {
-        my $print_plateconf = print $new_plateconf_file_renamed $buffer;
-        if ( $print_plateconf ) {
-          $set_plateconf_error = 0;
-        }
-        else {
-          $set_plateconf_error = 5;
-          $processing_status = 1;
-        }
-      }
-      close $new_plateconf_file_renamed;
-      #check the current position of the filehandle and set a flag if it's still in the file
-      #if ( tell( $new_plateconf_file_renamed ) ne -1 ) { 
-      # $set_plateconf_error = 6;
-      # $processing_status = 1;
-      #}   
+    if (-e $target)
+    {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+    	my $message = "The plate configure file name has been used previously. Please check!";
+		print "<div id=\"Message\"><p><b>$message</b></p></div>";		  
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+  		return; 
     }
+    
+    my $query = "SELECT Plateconf_file_path.Plateconf_file_path_ID FROM Plateconf_file_path  WHERE Plateconf_file_location = '$target'";
+    my $query_handle = $dbh->prepare( $query );
+	$query_handle->execute() or die "Cannot execute mysql statement: $DBI::errstr";
+	my $plateconf_file_path_id = $query_handle->fetchrow_array();
+	if(defined($plateconf_file_path_id))
+	{
+		my $message = "The plate configure file name $new_plateconf_file_basename has been used before. Please give a different name.";
+    	print $q -> header ( "text/html" );
+    	print "$page_header";  
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;
+	}
+    
+    my $tmpfile_path1 = $plateconf_folder."/tmpfile1.txt";
+    my $tmpfile_path2 = $plateconf_folder."/tmpfile2.txt";
+        
+    # undef may be returned if it's not a valid file handle
+    if ( !defined $lightweight_fh ) {
+    	my $message = "ERROR: The plate configure file cannot be loaded";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;   	
+    }
+        
+   	# Upgrade the handle to one compatible with IO::Handle
+	my $io_handle = $lightweight_fh->handle;
+    
+	#save the uploaded file on the server
+	my $fh = undef;
+	open ( $fh,'>', $tmpfile_path1 )
+        	or die "Cannot upload the plate configure file:$!\n";
+	if ( !$fh ) {
+    	my $message = "ERROR: Cannot open temporary file $tmpfile_path1";
+    	print $q -> header ( "text/html" );
+    	print "$page_header";  
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>"; 
+    	print "$page_footer";
+    	print $q -> end_html;
+		return;
+	}
+		    
+	my $bytesread = undef;
+	my $buffer = undef;
+	while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) {
+     	my $print_plateconf = print $fh $buffer;
+     	if ( !$print_plateconf ) {  
+    		print $q -> header ( "text/html" );
+    		print "$page_header";
+  			my $message = "ERROR: Error writing temporary file $tmpfile_path1";
+    		print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    		print "$page_footer";
+    		print $q -> end_html;
+    		return;
+      	}
+ 	}
+	close $fh;
+    
     #reformat the uploaded file
-    `chmod 777 $target`;
-    `tr '\r' '\n' < $target > $tmpfile_path`;
-    `cp $tmpfile_path $target`;
-    open IN, "< $tmpfile_path"
-      or die "Cannot open $tmpfile_path:$!\n";
-    open OUT, ">$target"
-      or die "Cannot open $target:$!\n";
-    while ( <IN> ){
-      if( /\S/ ){
-        print OUT $_;
-        }
-      }
+    `tr '\r' '\n'  < $tmpfile_path1  > $tmpfile_path2`;
+    unlink $tmpfile_path1;
+    
+    open IN, "<$tmpfile_path2"
+      or die "Cannot open $tmpfile_path2:$!\n";
+    
+    my $firstLine = <IN>;
+    if( !($firstLine =~ "^Wells") )
+    {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: The first line of the plate configure file should begin with \"Wells\"";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+    	close IN;
+    	unlink $tmpfile_path2;
+  		return;  	
+    }
+    
+    my $secondLine = <IN>;
+    if( !($secondLine =~ "^Plates") )
+    {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: The second line of the plate configure file should begin with \"Plates\"";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+    	close IN;
+    	unlink $tmpfile_path2;
+  		return;  	
+    }
+    
+    my $thirdLine = <IN>;
+  	my $OK = ($thirdLine =~ "^Plate\t") && ($thirdLine =~ "\tWell\t") && ($thirdLine =~ "\tContent") ;
+    if( !$OK )
+    {
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: The third line of the plate configure file should be \"Plate\", \"Well\", \"Content\"";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    	print "$page_footer";
+    	print $q -> end_html;
+    	close IN;
+    	unlink $tmpfile_path2;
+  		return;  	
+    }
+    
     close IN;
-    close OUT;
-   
-    my $query = "INSERT INTO Plateconf_file_path (
+   	    
+    $query = "INSERT INTO Plateconf_file_path (
       					  Plateconf_file_location )
      					  VALUES (
       					  '$target' )";
-    my $query_handle = $dbh -> prepare ( $query );
+   	$query_handle = $dbh -> prepare ( $query );
        					 #or die "Cannot prepare: " . $dbh -> errstr();
     $query_handle -> execute();
       #or die "SQL Error: ".$query_handle -> errstr();
-    if ( $query_handle ) {
-      $set_plateconf_error = 0;
-      #$PLATECONF_FILE_PATH = $target;
+    if ( !$query_handle ) {  
+    	print $q -> header ( "text/html" );
+    	print "$page_header";
+  		my $message = "ERROR: Couldn't execute sql statement for adding new plateconf file location to the database";
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>"; 
+    	print "$page_footer";
+    	print $q -> end_html;
+    	unlink $tmpfile_path2;
+    	return;
     }
-    else {
-      $set_plateconf_error = 7;
-      $processing_status = 1;
-    }
-   # $query_handle -> finish();
-    #print $q->redirect (-uri=>"http://www.gft.icr.ac.uk/cgi-bin/$script_name?add_new_screen=1");
-  
-  } #end of else statement loop
-  
-  my $warning_message_plateconf_1 = "ERROR: Cannot open $target";
-  my $warning_message_plateconf_2 = "ERROR: Error writing $target";
-  my $warning_message_plateconf_3 = "ERROR: Cannot close $target";
-  my $warning_message_plateconf_4 = "ERROR: Couldn't execute sql statement for adding new plateconf file location to the database";
-  
-  my $file_upload_message = $q -> param ( -name => 'file_upload_message',
-  			  							  -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
-
-  if ( $processing_status == 0 && $set_plateconf_error == 0 ) {
-      #my $message = "NOTE: Successfully added new plateconf file: $new_plateconf_file_renamed. It can now be selected for analysis from the dropdown menu.";
-      &add_new_screen( $file_upload_message );
-      #&add_new_screen; 
-  }
-  elsif ( $processing_status == 1 && $set_plateconf_error == 1 ) {
     
+    move $tmpfile_path2, $target;
+    
+    my $message = "Plate configure file uploaded successfully! It can now be selected for analysis from the drop down menu.";    
     print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$error_message_plateconf_1</b></p></div>";
-    print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-  
+    print "$page_header"; 
+    print "<div id=\"Message\"><p><b>$message</b></p></div>";
+  	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
     print "$page_footer";
     print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_plateconf_error == 2 ) {
+    return;
     
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$error_message_plateconf_2</b></p></div>";
-    print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_plateconf_error == 3 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$error_message_plateconf_3</b></p></div>";
-    print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";
-    
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_plateconf_error == 4 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_plateconf_1</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_plateconf_error == 5 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_plateconf_2</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_plateconf_error == 6 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_plateconf_3</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  elsif ( $processing_status == 1 && $set_plateconf_error == 7 ) {
-    
-    print $q -> header ( "text/html" );
-    print "$page_header";
-  
-    print "<div id=\"Message\"><p><b>$warning_message_plateconf_4</b></p></div>";
-  
-    print "$page_footer";
-    print $q -> end_html;
-  }
-  print $q -> hidden ( -name => 'file_upload_message',
-  					   -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
+   	# $query_handle -> finish();
+    #print $q->redirect (-uri=>"http://www.gft.icr.ac.uk/cgi-bin/$script_name?add_new_screen=1"); 
+  	#my $file_upload_message = $q -> param ( -name => 'file_upload_message',
+  	#		  							  -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' ); 
+   	#&add_new_screen( $file_upload_message );  
+  	#print $q -> hidden ( -name => 'file_upload_message',
+  	#				   -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
 } #end of save_new_uploaded_plateconf_file subroutine 
   
   
@@ -3526,7 +3542,6 @@ sub save_new_uploaded_platelist_file {
     	return;
   	}
   
-
     my $tmpfile_path1 = $platelist_folder."/tmpfile1.txt";
     my $tmpfile_path2 = $platelist_folder."/tmpfile2.txt";
       
@@ -3556,6 +3571,7 @@ sub save_new_uploaded_platelist_file {
     	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
     	print "$page_footer";
     	print $q -> end_html;
+    	unlink $tmpfile_path1;
     	return;
     }	    
 	
@@ -3572,13 +3588,13 @@ sub save_new_uploaded_platelist_file {
     		print "$page_footer";
     		print $q -> end_html;
     		close $fh;
+    		unlink $tmpfile_path1;
   			return;
         }  
     }
     close $fh;
     
     #reformat the uploaded file
-    #`chmod 777 $target`;
     `tr '\r' '\n'  < $tmpfile_path1  > $tmpfile_path2`;
     unlink $tmpfile_path1;
 
@@ -3601,6 +3617,7 @@ sub save_new_uploaded_platelist_file {
     	print "$page_footer";
     	print $q -> end_html;
     	close IN;
+    	unlink $tmpfile_path2; 
   		return;  	
     }
     
@@ -3635,6 +3652,7 @@ sub save_new_uploaded_platelist_file {
     	print "$page_footer";
     	print $q -> end_html;
     	close IN;
+    	unlink $tmpfile_path2;
   		return;  	
     }
         
@@ -3675,12 +3693,13 @@ sub save_new_uploaded_platelist_file {
   		print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
     	print "$page_footer";
     	print $q -> end_html;
+    	unlink $tmpfile_path2;
       	return;
     }
     
     move $tmpfile_path2, $target;
     
-    my $message = "File uploaded successfully! It is renamed as ". $new_platelist_file_renamed . ". It can now be selected for analysis from the drop down menu.";    
+    my $message = "Plate list file uploaded successfully! It is renamed as ". $new_platelist_file_renamed . ". It can now be selected for analysis from the drop down menu.";    
     print $q -> header ( "text/html" );
     print "$page_header"; 
     print "<div id=\"Message\"><p><b>$message</b></p></div>";
@@ -3847,6 +3866,7 @@ sub save_new_uploaded_templib_file {
     	print "$page_footer";
     	print $q -> end_html;
     	close IN;
+    	unlink $tmpfile_path2;
   		return;  	
     }
     		
@@ -3861,6 +3881,7 @@ sub save_new_uploaded_templib_file {
     	print "<div id=\"Message\"><p><b>$message</b></p></div>";  
     	print "$page_footer";
     	print $q -> end_html;
+    	unlink $tmpfile_path2;
     	return;
     }
     
@@ -3874,6 +3895,7 @@ sub save_new_uploaded_templib_file {
     	print "<div id=\"Message\"><p><b>$message</b></p></div>"; 
     	print "$page_footer";
     	print $q -> end_html;
+    	unlink $tmpfile_path2;
     	return;
     }
     
@@ -3939,6 +3961,7 @@ sub save_new_uploaded_templib_file {
   				print "<p> Template_library_name: $new_templib_file_basename</p>";
     			print "$page_footer";
     			print $q -> end_html;
+    			unlink $tmpfile_path2;
     			return;
     		}        	
         }
@@ -3946,12 +3969,21 @@ sub save_new_uploaded_templib_file {
     close IN;
     move $tmpfile_path2, $target;
     
-  	my $file_upload_message = $q -> param( -name => 'file_upload_message',
-  			  							-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
+    my $message = "Template library file uploaded successfully! It can now be selected for analysis from the drop down menu.";    
+    print $q -> header ( "text/html" );
+    print "$page_header"; 
+    print "<div id=\"Message\"><p><b>$message</b></p></div>";
+  	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
+    print "$page_footer";
+    print $q -> end_html;
+    return;
+    
+  	#my $file_upload_message = $q -> param( -name => 'file_upload_message',
+  	#		  							-value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
   			  							
-    &add_new_screen( $file_upload_message ); 
-  	print $q -> hidden ( -name => 'file_upload_message',
-  					   -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
+    #&add_new_screen( $file_upload_message ); 
+  	#print $q -> hidden ( -name => 'file_upload_message',
+  	#				   -value => 'File uploaded successfully! It can now be selected for analysis from the drop down menu.' );
 } #end of save_new_uploaded_templib_file subroutine
   
 
