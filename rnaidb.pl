@@ -3343,10 +3343,11 @@ sub save_new_uploaded_plateconf_file {
   	}
   
     my $new_plateconf_filename_wo_spaces = $new_plateconf_filename;
+    $new_plateconf_filename_wo_spaces =~ s/\.txt$//;
     $new_plateconf_filename_wo_spaces =~ s/\s+/_/g;
     my $new_plateconf_file_basename = $new_plateconf_filename_wo_spaces;
     $new_plateconf_file_basename =~ s/[^A-Za-z0-9_-]*//g;
-    $new_plateconf_file_renamed = $new_plateconf_file_basename.".txt";    
+    $new_plateconf_file_renamed = $new_plateconf_file_basename.".txt";
     
     $target = $plateconf_folder."/".$new_plateconf_file_renamed;
     if (-e $target)
@@ -3766,6 +3767,7 @@ sub save_new_uploaded_templib_file {
     my $tmpfile_path2 = $templib_folder . "/tmpfile2.txt";
 
     my $new_templib_filename_wo_spaces = $new_templib_filename;
+    $new_templib_filename_wo_spaces =~ s/\.txt$//;
     $new_templib_filename_wo_spaces =~ s/\s+/_/g;
     my $new_templib_file_basename = $new_templib_filename_wo_spaces;
     $new_templib_file_basename =~ s/[^A-Za-z0-9_-]*//g;
