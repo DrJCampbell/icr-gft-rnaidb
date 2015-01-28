@@ -2483,8 +2483,8 @@ sub add_new_files {
   
   ## get new Plateconf file ##
   
-  print "<p>Upload new plateconf file:<br />";
-  print "<p></p>";
+  #print "<p>Upload new plateconf file:<br />";
+  #print "<p></p>";
   
   print $q -> filefield ( -name=>'new_uploaded_plateconf_file',
                          -default=>'starting value',
@@ -2494,17 +2494,17 @@ sub add_new_files {
   
   ## enter new plateconf file name ##
   
-  print "<p>Enter new plateconf file name:<br />";
-  print "<p></p>";
+  #print "<p>Enter new plateconf file name:<br />";
+  #print "<p></p>";
   
-  print $q -> textfield ( -name => "new_plateconf_filename",
-                          -value => 'e.g. KS_TS_CGC_WNT_384_plateconf',
-                          -size => "30",
-                          -maxlength => "45" );
+  #print $q -> textfield ( -name => "new_plateconf_filename",
+  #                        -value => 'e.g. KS_TS_CGC_WNT_384_plateconf',
+  #                        -size => "30",
+  #                        -maxlength => "45" );
 
-  print "<p></p>";
+  #print "<p></p>";
   
-  print"<p><div id=\"Note\">NOTE: The name of the new uploaded plateconf file should be different from the names of existing plateconf files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
+  #print"<p><div id=\"Note\">NOTE: The name of the new uploaded plateconf file should be different from the names of existing plateconf files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
   
   ## create a hidden field ##
   #hidden fields pass information along with the user-entered input that is not to be manipulated by the user ## a way to have web forms to remember previous information 
@@ -2545,8 +2545,8 @@ sub add_new_files {
   
   ## get new platelist file ##
   
-  print "<p>Upload new platelist file:<br />";
-  print "<p></p>";
+  #print "<p>Upload new platelist file:<br />";
+  #print "<p></p>";
   
   print $q -> filefield ( -name=>"new_uploaded_platelist_file",
                          -default=>'starting value',
@@ -2606,9 +2606,9 @@ sub add_new_files {
   
   ## get new template library file ##
   		  
-  print "<p>Upload new template library file:<br />";
-  print "<p></p>";
-  
+  #print "<p>Upload new template library file:<br />";
+  #print "<p></p>";
+    
   print $q -> filefield( -name=>'new_uploaded_templib_file',
                          -default=>'starting value',
                          -size=>35,
@@ -2616,16 +2616,16 @@ sub add_new_files {
   print "</p>";
     
   #enter new template library file name
-  print "<p>Enter new template library file name:<br />";
-  print "<p></p>";
+  #print "<p>Enter new template library file name:<br />";
+  #print "<p></p>";
 
-  print $q -> textfield ( -name => "new_templib_filename",
-                          -value => 'e.g. KS_TS_CGC_WNT_384_template', 
-                          -size => "30",
-                          -maxlength => "45" );  
-  print "<p></p>";
+  #print $q -> textfield ( -name => "new_templib_filename",
+  #                        -value => 'e.g. KS_TS_CGC_WNT_384_template', 
+  #                        -size => "30",
+  #                        -maxlength => "45" );  
+  #print "<p></p>";
   
-  print"<p><div id=\"Note\">NOTE: The name of the new uploaded library file should be different from the names of the existing library files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
+  #print"<p><div id=\"Note\">NOTE: The name of the new uploaded library file should be different from the names of the existing library files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
   
   ## create a hidden field ##
   #hidden fields pass information along with the user-entered input that is not to be manipulated by the user-a way to have web forms to remember previous information 
@@ -3307,12 +3307,12 @@ sub save_new_uploaded_plateconf_file {
   	my $plateconf_folder = $configures{'WebDocumentRoot'} . $configures{'plateconf_folder'};
   	my $target= "";
   	my $new_plateconf_file_renamed; 
-  	my $new_plateconf_filename = $q -> param ( "new_plateconf_filename" );
+  	#my $new_plateconf_filename = $q -> param ( "new_plateconf_filename" );
   
-  	if ( !$new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. KS_TS_CGC_WNT_384_plateconf" ) {
+  	if ( !$new_uploaded_plateconf_file ) {
     	print $q -> header ( "text/html" );
     	print "$page_header";
-  		my $message = "ERROR: Please upload a plateconf file and enter a suitable name for the file.";
+  		my $message = "ERROR: Please upload a plateconf file.";
     	print "<div id=\"Message\"><p><b>$message</b></p></div>";
     	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
     	print "$page_footer";
@@ -3320,29 +3320,7 @@ sub save_new_uploaded_plateconf_file {
     	return;
   	}
   
-  	if ( $new_uploaded_plateconf_file && $new_plateconf_filename eq "e.g. KS_TS_CGC_WNT_384_plateconf" ) {  
-    	print $q -> header ( "text/html" );
-    	print "$page_header";
-  		my $message = "ERROR: Please enter a suitable name for the uploaded plateconf file and upload the plateconf file again if needed."; 
-    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";  
-    	print "$page_footer";
-    	print $q -> end_html;
-		return;
-  	}
-  
-  	if ( !$new_uploaded_plateconf_file && $new_plateconf_filename ne "e.g. KS_TS_CGC_WNT_384_plateconf" ) {   
-    	print $q -> header ( "text/html" );
-    	print "$page_header";
-  		my $message = "ERROR: Please upload a plateconf file and enter a suitable plateconf file name again if needed.";
-    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
-    	print "$page_footer";
-    	print $q -> end_html;
-		return;
-  	}
-  
-    my $new_plateconf_filename_wo_spaces = $new_plateconf_filename;
+    my $new_plateconf_filename_wo_spaces = $new_uploaded_plateconf_file;
     $new_plateconf_filename_wo_spaces =~ s/\.txt$//;
     $new_plateconf_filename_wo_spaces =~ s/\s+/_/g;
     my $new_plateconf_file_basename = $new_plateconf_filename_wo_spaces;
@@ -3728,10 +3706,9 @@ sub save_new_uploaded_templib_file {
   	my $templib_folder = $configures{'WebDocumentRoot'} . $configures{'templib_folder'};
   	my $target = "";
   	my $new_templib_file_renamed;
-  	my $new_templib_filename = $q->param( "new_templib_filename" );
   
-  	if ( !$new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_CGC_WNT_384_template" ) {
-  		my $message = "ERROR: Please upload a template library file and enter a suitable name for the file"; 
+  	if ( !$new_uploaded_templib_file ) {
+  		my $message = "ERROR: Please upload a template library file"; 
     	print $q -> header ( "text/html" );
     	print "$page_header"; 
     	print "<div id=\"Message\"><p><b>$message</b></p></div>";
@@ -3740,33 +3717,11 @@ sub save_new_uploaded_templib_file {
     	print $q -> end_html;
     	return;
   	}
-  
-  	if ( $new_uploaded_templib_file && $new_templib_filename eq "e.g. KS_TS_CGC_WNT_384_template" ) {
-    	my $message = "ERROR: Please enter a suitable name for the uploaded template library file and upload the template library file again if needed"; 
-    	print $q -> header ( "text/html" );
-    	print "$page_header"; 
-    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>"; 
-    	print "$page_footer";
-    	print $q -> end_html;
-    	return;
-  	}
-  
-  	if ( !$new_uploaded_templib_file && $new_templib_filename ne "e.g. KS_TS_CGC_WNT_384_template") {
-		my $message = "ERROR: Please upload a template library file and enter a suitable template library file name again if needed";  
-    	print $q -> header ( "text/html" );
- 		print "$page_header"; 
-    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
-    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
-    	print "$page_footer";
-    	print $q -> end_html;
-    	return;
-  	}
-  	
+  	  	 	
   	my $tmpfile_path1 = $templib_folder . "/tmpfile1.txt";
     my $tmpfile_path2 = $templib_folder . "/tmpfile2.txt";
 
-    my $new_templib_filename_wo_spaces = $new_templib_filename;
+    my $new_templib_filename_wo_spaces = $new_uploaded_templib_file;
     $new_templib_filename_wo_spaces =~ s/\.txt$//;
     $new_templib_filename_wo_spaces =~ s/\s+/_/g;
     my $new_templib_file_basename = $new_templib_filename_wo_spaces;
