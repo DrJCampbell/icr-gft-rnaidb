@@ -96,3 +96,4 @@ zScreenSublib<-function(name,
   	zprimefile<-paste(datapath, zprimeName, sep="")
   	write.table(zp, zprimefile, sep = "\t", row.names=FALSE)
 }
+
