@@ -2468,16 +2468,16 @@ sub add_new_files {
   print "<tr>\n";
   print "<td align=left valign=top>\n";
 
-  print "<a name=\"new_plate_conf_file\"><p><b>Upload new plateconf file:</b></p>";
-  print "<p>";
+  print "<a name=\"new_plate_conf_file\"><p><b>Upload new plateconf file:</b>";
+  #print "<p>";
  
   ## download old Plateconf file ##
  
   my $plate_conf_download_link = $configures{'hostname'} . $configures{'plateconf_folder'};
   
   #print "<div id=\"Note\"><p>NOTE: For downloading existing plateconf files, click on the link below.</p></div>";
-  
-  print "<p>";
+  print " - OR  ";
+  #print "<p>";
   print "<a href=\"$plate_conf_download_link\">Download existing plate conf files</a>";
   print "</p>";
   
@@ -2530,8 +2530,8 @@ sub add_new_files {
   print "<tr>\n";
   print "<td align=left valign=top>\n";
 
-  print "<a name=\"new_plate_list_file\"><p><b>Upload new platelist file:</b></p>";
-  print "<p>";
+  print "<a name=\"new_plate_list_file\"><p><b>Upload new platelist file:</b>";
+  print " - OR  ";
  
   ## download old Platelist file ##
  
@@ -2539,7 +2539,7 @@ sub add_new_files {
 
   #print "<p><div id=\"Note\">NOTE: For downloading existing platelist files, click on the link below.</div></p>";
   
-  print "<p>";
+  #print "<p>";
   print "<a href=\"$plate_list_download_link\">Download existing plate list files</a>";
   print "</p>";
   
@@ -2591,8 +2591,8 @@ sub add_new_files {
   print "<tr>\n";
   print "<td align=left valign=top>\n";
 
-  print "<a name=\"new_plate_library_file\"><p><b>Upload new template library file:</b></p>";
-  print "<p>";
+  print "<a name=\"new_plate_library_file\"><p><b>Upload new template library file:</b>";
+  print " - OR  ";
  
   ## download old template library file ##
  
@@ -2600,7 +2600,7 @@ sub add_new_files {
   
   #print "<p><div id=\"Note\">NOTE: For downloading the library file for editing, right click on the relevant link below and select the 'Save Link As...' option for saving the file on your computer.</div></p>";
   
-  print "<p>";
+  #print "<p>";
   print "<a href=\"$library_download_link\">Download existing library files</a>";
   print "</p>";
   
