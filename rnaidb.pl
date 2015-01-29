@@ -1749,6 +1749,11 @@ my $page_header_for_add_new_screen_sub = "<html>
 										    g.value = \"\";
 										  }  
 										  function checkForm ( form ) {
+										    if ( document.addNewScreen.uploaded_excel_file.value == '') {
+										      alert ( \"Please select an Excel data file.\" );
+										      return false;
+										    }
+										    
 										    if ( document.addNewScreen.plate_conf.selectedIndex == 0 ) {
 										      alert ( \"Please select plateconf file.\" );
 										      return false;
@@ -1781,7 +1786,7 @@ my $page_header_for_add_new_screen_sub = "<html>
 										      alert ( \"Please select instrument used for this screen.\" );
 										      return false;
 										    } 
-										    var answer = confirm(\"Click OK button to proceed.\")
+										    var answer = confirm(\"Please make sure the data are correct. The data will be saved in the database and cannot be easily changed. Click OK button to proceed.\")
 										  	return answer;
 										  }
 										  </script>
@@ -1938,7 +1943,7 @@ sub add_new_screen {
   print $q -> header ( "text/html" );
   my $user = $q -> param( 'user' );
   print "$page_header_for_add_new_screen_sub";
-  print "<h1>Add new screen:</h1>";
+  print "<h2>Add new screen:</h2><p></p>";
   
   print $q -> start_multipart_form ( -method => "POST",
   									 -name => "addNewScreen",
@@ -1967,23 +1972,28 @@ sub add_new_screen {
   ## get the CTG excel file ##
   
   print "<p>Plate excel file(s):<br />";
+  #print "<p>";
   
   print $q -> filefield ( -name => 'uploaded_excel_file',
                          -default => 'starting value',
                          -size => 35,
                          -maxlength => 256,
                          -id => "xls_file" );
+  print "<br />";
+  #print "<p>";
+ 
   print $q -> filefield ( -name => 'uploaded_excel_file2',
                          -default => 'starting value',
                          -size => 35,
                          -maxlength => 256,
                          -id => "xls_file2" );
+  print "<br />";
   print $q -> filefield ( -name => 'uploaded_excel_file3',
                          -default => 'starting value',
                          -size => 35,
                          -maxlength => 256,
                          -id => "xls_file3" );
-  print "</p>";
+  print "<br />";
 
   ## get the existing platelist filenames from the database and display them in the popup menu ##
   
@@ -2015,21 +2025,20 @@ sub add_new_screen {
    						  -default => 'Please select',
    						  -id => "plist_file" );
   
-  print " - OR";
+  print " - OR <br />";
   
    ## View old Platelist file ## 
   my $plate_list_download_link = $configures{'hostname'} . $configures{'platelist_folder'}; 
   print "    ";
   print "<a href=\"$plate_list_download_link\">View existing plate list files</a>";
   
-  print " - OR";
+  print " - OR<br />";
   
   #link to the form for adding new platelist file 
   ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_platelist_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
-  print "<p>";  
+  #print "<p>";  
   print "<a href =" . $configures{'hostname'} .  "cgi-bin/$script_name?add_new_files=1\">Add new platelist file</a>";
   print "</p>";  
-  print "</p>";  	
   		
   ## get the existing template library filenames from the database and display them in the popup menu ##
   
@@ -2062,18 +2071,18 @@ sub add_new_screen {
    						  -default => 'Please select',
    						  -id => "tlib_file" );
   
-  print " - OR";
+  print " - OR<br />";
   
   ## View old template library ## 
   my $template_library_download_link = $configures{'hostname'} . $configures{'templib_folder'}; 
   print "    ";
   print "<a href=\"$template_library_download_link\">View existing template library files</a>";
   
-  print " - OR";
+  print " - OR<br />";
   
   #link to the form for adding new template library file
   ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plate_library_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages 
-  print "<p>";  	
+  #print "<p>";  	
   print "<a href =" . $configures{'hostname'} .  "cgi-bin/$script_name?add_new_files=1\"> Add new template library file</a>";
   print "</p>";
   print "</p>";
@@ -2107,23 +2116,42 @@ sub add_new_screen {
   						  -value => \@plateconf_path,
   						  -default => 'Please select',
   						  -id => "pconf_file" );							    		  
-  print " - OR";
+  print " - OR<br />";
   
   ## View old Plateconf file ## 
   my $plate_conf_download_link = $configures{'hostname'} . $configures{'plateconf_folder'}; 
   print "    ";
   print "<a href=\"$plate_conf_download_link\">View existing plate conf files</a>";
   
-  print " - OR";
+  print " - OR<br />";
   
   #link to the form for adding new plateconf file 
   ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plateconf_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
-  print "<p>";
+  #print "<p>";
   print "<a href =" . $configures{'hostname'} . "cgi-bin/$script_name?add_new_files=1\"> Add new plateconf file</a>";
   print "</p>";
-  print "</p>";
+  
+ ## Enter information to store in the Description.txt file ##
 
+  print "<p>";
+  print "Notes about this screen:<br />";
+  print $q -> textarea ( -name => "notes",
+                         -default => 'write notes for Description.txt',
+                         -rows => "8",
+                         -columns => "40",
+                         -onClick => "make_notes_Blank()",
+                         -id => "NoteS" );
+  print "</p>"; 
+  
+  print "</td>\n";
+  
   ## get new tissue type ##
+  print "<td align=left valign=top>\n"; 
+  print "<p><b>&nbsp&nbsp&nbsp&nbsp&nbsp</b></p>";
+  print "</td>\n";
+  
+  print "<td align=left valign=top>\n"; 
+  print "<p><b>&nbsp&nbsp&nbsp&nbsp&nbsp</b></p>";
   
   print "Tissue of origin:<br />";
   print $q -> textfield ( -name => "tissue_type",
@@ -2187,13 +2215,19 @@ sub add_new_screen {
   					       -value => \@instrument,
   						   -default => 'Please select',
   						   -id => "InstrumenT" );
+  print "<p><b>Analyse and save results:</b><br />";
+  print "<input type=\"submit\" id=\"save_new_screen\" value=\"Analyse and save results\" name=\"save_new_screen\" />";
+  print "</p>";
 
   print "</td>\n";
 
   # ======================
   # add isogenic info here
   # ======================
-
+  print "<td align=left valign=top>\n"; 
+  print "<p><b>&nbsp&nbsp&nbsp&nbsp&nbsp</b></p>";
+  print "</td>\n";
+  
   print "<td align=left valign=top>\n";
   
   print "<p><b>Isogenic screens:</b></p>";
@@ -2286,31 +2320,10 @@ sub add_new_screen {
   # add drug screen info here
   # =========================
 
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
+  print "<td align=left valign=top>\n"; 
+  print "<p><b>&nbsp&nbsp&nbsp&nbsp&nbsp</b></p>";
+  print "</td>\n";
   
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
-  print "<td align=left valign=top>\n";
   print "<td align=left valign=top>\n";
   
   print "<p><b>Drug screens:</b></p>";
@@ -2385,64 +2398,7 @@ sub add_new_screen {
                          -rows => "8",
                          -columns => "40" );                              
   print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n"; 
-  
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";
-  print "</td>\n";                  
-  
-  ## put notes text field for new screen and submit button here ##
-  
-  print "<tr colspan=2>\n";
-  print "<td align=left valign=top>\n";
-
-  ## Enter information to store in the Description.txt file ##
-
-  print "<p>";
-  print "Notes about this screen:<br />";
-  print $q -> textarea ( -name => "notes",
-                         -default => 'write notes for Description.txt',
-                         -rows => "8",
-                         -columns => "40",
-                         -onClick => "make_notes_Blank()",
-                         -id => "NoteS" );
-  print "</p>";                       
-  ## submit the form ##
-                                                
-  print "<p>";
-  print "<input type=\"submit\" id=\"save_new_screen\" value=\"Analyse and save results\" name=\"save_new_screen\" />";
-  print "</p>";
-  
-  ## button for viewing all screens ##
-  
-  #print "<p>";
-  #print "<input type=\"submit\" id=\"show_all_screens\" value=\"Show all analysed RNAi screens\" name=\"show_all_screens\" />";
-  #print "</p>";
-  
-  print "</td>\n";
-  
-  print "</tr>\n";
-  
+                    
   print $q -> end_multipart_form(); 
   
   print "$page_footer";
