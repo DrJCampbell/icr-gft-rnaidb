@@ -8,6 +8,7 @@ use CGI::Carp qw ( fatalsToBrowser );
 use DBI;
 use Digest::MD5 qw ( md5 md5_hex md5_base64 );
 use FileHandle;
+use File::Copy qw(copy);
 use File::Copy qw(move);
 # for new file upload - fixes the error :- use string ("test_plateconf.txt") as a symbol ref while "strict refs" in use at...
 no strict 'refs';
@@ -2672,7 +2673,10 @@ sub save_new_screen {
   my $file_path = "$screenDir_path/$screen_dir_name";
   
   if (( -e $file_path ) && ( $sicon1 ne 'ON' ) && ( $sicon2 ne 'ON' ) && ( $allstar ne 'ON' )) {
-     die "Cannot make new RNAi screen directory $screen_dir_name in $screenDir_path: $!"; 
+     	#die "Cannot make new RNAi screen directory $screen_dir_name in $screenDir_path: $!";
+  		my $message = "A screen with the same name already exists. Cannot make new RNAi screen directory $screen_dir_name in $screenDir_path";
+  		print "<div id=\"Message\"><p><b>$message</b></p></div>";
+  		return;
    }
   
   if ( ! -e $file_path ) {
@@ -2686,7 +2690,7 @@ sub save_new_screen {
 
     $plateconf_file_path = $configures{'WebDocumentRoot'} . $configures{'plateconf_folder'}.$plateconf.".txt";
     $plateconf_target = $file_path."/".$screen_dir_name."_".$plateconf.".txt";
-    `cp $plateconf_file_path $plateconf_target`;
+    copy $plateconf_file_path, $plateconf_target;
     
     #print "<p><div id=\"Note\">Selected plateconf file saved in the new screen directory...</div></p>";  
   
@@ -2694,7 +2698,7 @@ sub save_new_screen {
       
     $platelist_file_path = $configures{'WebDocumentRoot'} . $configures{'platelist_folder'}.$platelist.".txt";
     $platelist_target = $file_path."/".$screen_dir_name."_".$platelist.".txt";
-    `cp $platelist_file_path $platelist_target`;
+    copy $platelist_file_path, $platelist_target;
     $platelist_tmp_file = $file_path."/tmp_platelist_file.txt";
     
     #print "<p><div id=\"Note\">Selected platelist file saved in the new screen directory...</div></p>";  
@@ -2715,13 +2719,13 @@ sub save_new_screen {
     }
     close IN;
     close OUT; 
-    `mv $platelist_tmp_file $platelist_target`;
+    move $platelist_tmp_file, $platelist_target;
     
     ## match templib name, selected from the drop down menu, to the file and store it in a variable ##
 
     $templib_file_path = $configures{'WebDocumentRoot'} . $configures{'templib_folder'}.$templib.".txt";
     $templib_target = $file_path."/".$screen_dir_name."_".$templib.".txt"; 
-    `cp $templib_file_path $templib_target`; 
+    copy $templib_file_path, $templib_target; 
     
     #print "<p><div id=\"Note\">Selected template library file saved in the new screen directory...</div></p>";  
   
@@ -2765,7 +2769,7 @@ sub save_new_screen {
       		## rename uploaded excel file ##
       		my $new_excel_filename_wo_spaces = $excelFile;
     		$new_excel_filename_wo_spaces =~ s/\s+/_/g;
-      		my $new_xls_file = rename ( $file_path."/".$excelFile, $file_path."/".$new_excel_filename_wo_spaces ) or die "Cannot rename $excelFile :$!";
+      		my $new_xls_file = move ( $file_path."/".$excelFile, $file_path."/".$new_excel_filename_wo_spaces ) or die "Cannot rename $excelFile :$!";
       		if (!defined($xls_files))
       		{
       			$xls_files = $new_excel_filename_wo_spaces;
