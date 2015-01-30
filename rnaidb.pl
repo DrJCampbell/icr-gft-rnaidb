@@ -2021,7 +2021,7 @@ sub add_new_screen {
   #$query_handle -> finish();
   unshift ( @platelist_path, "Please select" );
   
-  print "<p>Platelist file:<br />";
+  print "<p>Plate list file:<br />";
   
   print $q -> popup_menu ( -name => 'plate_list',
   						  -value => \@platelist_path,
@@ -2040,7 +2040,7 @@ sub add_new_screen {
   #link to the form for adding new platelist file 
   ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_platelist_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
   #print "<p>";  
-  print "<a href =" . $configures{'hostname'} .  "cgi-bin/$script_name?add_new_files=1\">Add new platelist file</a>";
+  print "<a href =" . $configures{'hostname'} .  "cgi-bin/$script_name?add_new_files=1\">Add new plate list file</a>";
   print "</p>";  
   		
   ## get the existing template library filenames from the database and display them in the popup menu ##
@@ -2124,14 +2124,14 @@ sub add_new_screen {
   ## View old Plateconf file ## 
   my $plate_conf_download_link = $configures{'hostname'} . $configures{'plateconf_folder'}; 
   print "    ";
-  print "<a href=\"$plate_conf_download_link\">View existing plate conf files</a>";
+  print "<a href=\"$plate_conf_download_link\">View existing plate configure files</a>";
   
   print " - OR<br />";
   
   #link to the form for adding new plateconf file 
   ##### http://gft.icr.ac.uk/cgi-bin/$script_name?add_new_files=1\#add_new_plateconf_file ---- does not allow navigation to add_new_plateconf_file/add_new_platelist_file/add_new_plate_library_file pages
   #print "<p>";
-  print "<a href =" . $configures{'hostname'} . "cgi-bin/$script_name?add_new_files=1\"> Add new plateconf file</a>";
+  print "<a href =" . $configures{'hostname'} . "cgi-bin/$script_name?add_new_files=1\"> Add new plate configure file</a>";
   print "</p>";
   
  ## Enter information to store in the Description.txt file ##
