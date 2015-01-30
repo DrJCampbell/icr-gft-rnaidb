@@ -2067,7 +2067,7 @@ sub add_new_screen {
   unshift( @templib_path, "Please select" );
   
   
-  print "<p>Template library:<br />";
+  print "<p>Template library file:<br />";
   
   print $q -> popup_menu ( -name => 'template_library',
   						  -value => \@templib_path,
@@ -2113,7 +2113,7 @@ sub add_new_screen {
   }
   #$query_handle -> finish();
   unshift( @plateconf_path, "Please select" );
-  print "<p>Plateconf file:<br />";
+  print "<p>Plate configure file:<br />";
   
   print $q -> popup_menu ( -name => 'plate_conf',
   						  -value => \@plateconf_path,
