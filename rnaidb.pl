@@ -2427,7 +2427,7 @@ sub add_new_files {
   print "<tr>\n";
   print "<td align=left valign=top>\n";
 
-  print "<a name=\"new_plate_conf_file\"><p><b>Upload new plateconf file:</b>";
+  print "<a name=\"new_plate_conf_file\"><p><b>Upload new plate configure file:</b>";
   #print "<p>";
  
   ## download old Plateconf file ##
@@ -2437,7 +2437,7 @@ sub add_new_files {
   #print "<div id=\"Note\"><p>NOTE: For downloading existing plateconf files, click on the link below.</p></div>";
   print " - OR  ";
   #print "<p>";
-  print "<a href=\"$plate_conf_download_link\">Download existing plate conf files</a>";
+  print "<a href=\"$plate_conf_download_link\">View existing plate configure files</a>";
   print "</p>";
   
   ## get new Plateconf file ##
@@ -2463,7 +2463,7 @@ sub add_new_files {
 
   #print "<p></p>";
   
-  #print"<p><div id=\"Note\">NOTE: The name of the new uploaded plateconf file should be different from the names of existing plateconf files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
+  #print"<p><div id=\"Note\">NOTE: The name of the new uploaded plate configure file should be different from the names of existing plate conf files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
   
   ## create a hidden field ##
   #hidden fields pass information along with the user-entered input that is not to be manipulated by the user ## a way to have web forms to remember previous information 
@@ -2474,7 +2474,7 @@ sub add_new_files {
   ## submit the form for uploading plateconf file ##
   
   print "<p>";
-  print "<input type=\"submit\" id=\"save_new_uploaded_plateconf_file\" value=\"Save the uploaded plateconf file\" name=\"save_new_uploaded_plateconf_file\" />";
+  print "<input type=\"submit\" id=\"save_new_uploaded_plateconf_file\" value=\"Save the uploaded plate configure file\" name=\"save_new_uploaded_plateconf_file\" />";
   print "</p>";
   
   print "</td>\n";
@@ -2489,7 +2489,7 @@ sub add_new_files {
   print "<tr>\n";
   print "<td align=left valign=top>\n";
 
-  print "<a name=\"new_plate_list_file\"><p><b>Upload new platelist file:</b>";
+  print "<a name=\"new_plate_list_file\"><p><b>Upload new plate list file:</b>";
   print " - OR  ";
  
   ## download old Platelist file ##
@@ -2499,7 +2499,7 @@ sub add_new_files {
   #print "<p><div id=\"Note\">NOTE: For downloading existing platelist files, click on the link below.</div></p>";
   
   #print "<p>";
-  print "<a href=\"$plate_list_download_link\">Download existing plate list files</a>";
+  print "<a href=\"$plate_list_download_link\">View existing plate list files</a>";
   print "</p>";
   
   ## get new platelist file ##
@@ -2524,7 +2524,7 @@ sub add_new_files {
   #                        -maxlength => "45" ); 
   #print "<p></p>";
   
-  #print"<p><div id=\"Note\">NOTE: The name of the new uploaded platelist file should be different from the names of existing platelist files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
+  #print"<p><div id=\"Note\">NOTE: The name of the new uploaded plate list file should be different from the names of existing platelist files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
   
   ## create a hidden field ##
   #hidden fields pass information along with the user-entered input that is not to be manipulated by the user-a way to have web forms to remember previous information 
@@ -2535,7 +2535,7 @@ sub add_new_files {
   ## submit newly uploaded plateconf file ##
   
   print "<p>";
-  print "<input type=\"submit\" id=\"save_new_uploaded_platelist_file\" value=\"Save the uploaded platelist file\" name=\"save_new_uploaded_platelist_file\" />";
+  print "<input type=\"submit\" id=\"save_new_uploaded_platelist_file\" value=\"Save the uploaded plate list file\" name=\"save_new_uploaded_platelist_file\" />";
   print "</p>";
   
   print "</td>\n";
@@ -2560,7 +2560,7 @@ sub add_new_files {
   #print "<p><div id=\"Note\">NOTE: For downloading the library file for editing, right click on the relevant link below and select the 'Save Link As...' option for saving the file on your computer.</div></p>";
   
   #print "<p>";
-  print "<a href=\"$library_download_link\">Download existing library files</a>";
+  print "<a href=\"$library_download_link\">View existing template library files</a>";
   print "</p>";
   
   ## get new template library file ##
@@ -3648,7 +3648,7 @@ sub save_new_uploaded_platelist_file {
     my $query_handle = $dbh -> prepare ( $query );
     $query_handle -> execute();
     if ( !$query_handle ) {   	
-    	my $message = "ERROR: Couldn't execute sql statement for adding new platelist file location to the database";    
+    	my $message = "ERROR: Couldn't execute sql statement for adding new plate list file location to the database";    
     	print $q -> header ( "text/html" );
     	print "$page_header"; 
     	print "<div id=\"Message\"><p><b>$message</b></p></div>";
