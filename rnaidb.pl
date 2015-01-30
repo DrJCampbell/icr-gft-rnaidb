@@ -3280,6 +3280,17 @@ sub save_new_uploaded_plateconf_file {
     	print $q -> end_html;
     	return;
   	}
+  	
+  	if ( !($new_uploaded_plateconf_file =~ /\.txt$/) ) {
+    	my $message = "ERROR: You uploaded $new_uploaded_plateconf_file. Please upload a valid text file with extension .txt.";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;   	
+    }
   
     my $new_plateconf_filename_wo_spaces = $new_uploaded_plateconf_file;
     $new_plateconf_filename_wo_spaces =~ s/\.txt$//;
@@ -3331,7 +3342,7 @@ sub save_new_uploaded_plateconf_file {
     	print $q -> end_html;
     	return;   	
     }
-        
+            
    	# Upgrade the handle to one compatible with IO::Handle
 	my $io_handle = $lightweight_fh->handle;
     
@@ -3481,6 +3492,17 @@ sub save_new_uploaded_platelist_file {
     	print $q -> end_html;
     	return;
   	}
+  	
+  	if ( !($new_uploaded_platelist_file =~ /\.txt$/) ) {
+    	my $message = "ERROR: You uploaded $new_uploaded_platelist_file. Please upload a valid text file with extension .txt.";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;   	
+    }
   
     my $tmpfile_path1 = $platelist_folder."/tmpfile1.txt";
     my $tmpfile_path2 = $platelist_folder."/tmpfile2.txt";
@@ -3678,6 +3700,17 @@ sub save_new_uploaded_templib_file {
     	print $q -> end_html;
     	return;
   	}
+  	
+  	if ( !($new_uploaded_templib_file =~ /\.txt$/) ) {
+    	my $message = "ERROR: You uploaded $new_uploaded_templib_file. Please upload a valid text file with extension .txt.";
+    	print $q -> header ( "text/html" );
+    	print "$page_header"; 
+    	print "<div id=\"Message\"><p><b>$message</b></p></div>";
+    	print "<a href=\"$ADD_NEW_FILES_LINK\">Back</a>";   
+    	print "$page_footer";
+    	print $q -> end_html;
+    	return;   	
+    }
   	  	 	
   	my $tmpfile_path1 = $templib_folder . "/tmpfile1.txt";
     my $tmpfile_path2 = $templib_folder . "/tmpfile2.txt";
