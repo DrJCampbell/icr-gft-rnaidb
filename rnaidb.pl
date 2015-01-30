@@ -10,6 +10,8 @@ use Digest::MD5 qw ( md5 md5_hex md5_base64 );
 use FileHandle;
 use File::Copy qw(copy);
 use File::Copy qw(move);
+use File::Path qw(rmtree);
+
 # for new file upload - fixes the error :- use string ("test_plateconf.txt") as a symbol ref while "strict refs" in use at...
 no strict 'refs';
 # to check if an error is due to dbi or not
@@ -2734,42 +2736,41 @@ sub save_new_screen {
     ## Upload excel file and save it to new screen directory ##
     foreach my $excel_filefield ('uploaded_excel_file', 'uploaded_excel_file2', 'uploaded_excel_file3')
     { 
-    	my $lightweight_fh  = $q -> upload ( $excel_filefield );
-    	my $excelFile = $q->param( $excel_filefield );
-    	#unless ( $excelFile =~ /(xls)$/ ) {
-    	#  `rm -r $file_path`;
-    	#  print "<div id=\"Message\"><p>ERROR: Please upload a valid excel file for analysis.</p></div>";
-    	#  print "<p>Deleted new screen directory: $screen_dir_name.</p>";
-     	# die "Please upload a valid excel file for analysis.";
-      
-    	#}
-
-    	my $target = $file_path."/".$excelFile;
-    	# undef may be returned if it's not a valid file handle
-  
+    	my $lightweight_fh  = $q -> upload ( $excel_filefield );	
+		my $tmpfile = $file_path . "/tmpfile.xls";
+    	
+    	# undef may be returned if it's not a valid file handle  
     	if ( defined $lightweight_fh ) 
     	{
+    		my $excelFile = $q->param( $excel_filefield );
+    		if ( !($excelFile =~ /xls$/) ){
+				print "<div id=\"Message\"><p>ERROR: You uploaded $excelFile. Please upload a valid excel file.</p></div>";
+				rmtree $file_path;
+				return;
+			}
+		
     		# Upgrade the handle to one compatible with IO::Handle:
       		my $io_handle = $lightweight_fh->handle;
- 
-      		open ( $excelFile,'>',$target )
-        		or die "Cannot move $excelFile to $target:$!\n";
+ 			my $fh = undef;
+      		open ( $fh, '>', $tmpfile )
+        		or die "Cannot upload $excelFile:$!\n";
       
       		my $bytesread = undef;
       		my $buffer = undef;
     
       		while ( $bytesread = $io_handle -> read ( $buffer,1024 ) ) 
       		{
-        		print $excelFile $buffer
-          		or die "Error writing '$target' : $!";
+        		print $fh $buffer
+          		or die "Error writing '$tmpfile' : $!";
       		}
-      		close $excelFile
-        		or die "Error writing '$target' : $!";
+      		close $fh
+        		or die "Error writing '$tmpfile' : $!";
         		 
       		## rename uploaded excel file ##
       		my $new_excel_filename_wo_spaces = $excelFile;
     		$new_excel_filename_wo_spaces =~ s/\s+/_/g;
-      		my $new_xls_file = move ( $file_path."/".$excelFile, $file_path."/".$new_excel_filename_wo_spaces ) or die "Cannot rename $excelFile :$!";
+    		my $target = $file_path . "/". $new_excel_filename_wo_spaces;
+      		move ($tmpfile, $target) or die "Cannot rename $tmpfile :$!";
       		if (!defined($xls_files))
       		{
       			$xls_files = $new_excel_filename_wo_spaces;
