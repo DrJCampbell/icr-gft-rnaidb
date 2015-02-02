@@ -4013,7 +4013,7 @@ sub show_all_screens {
 			  r.Method_of_isogenic_knockdown != 'NA' AND
 			  n.Name_of_set_if_isogenic_ID != '9' AND
 			  r.Name_of_set_if_isogenic_Name_of_set_if_isogenic_ID = n.Name_of_set_if_isogenic_ID GROUP BY 
-			  r.Rnai_screen_info_ID";
+			  r.Rnai_screen_info_ID order by Date_of_run DESC";
     
   my $query_handle = $dbh -> prepare ( $query );
    					   #or die "Cannot prepare: " . $dbh -> errstr();
