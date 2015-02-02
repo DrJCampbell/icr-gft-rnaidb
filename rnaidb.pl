@@ -4210,9 +4210,9 @@ sub show_all_screens {
   print "    ";
   print "</th>";  
   
-  print "<th>";
-  print "Zprime";
-  print "</th>"; 
+  #print "<th>";
+  #print "Zprime";
+  #print "</th>"; 
   
   print "</td>";
  
@@ -4418,9 +4418,9 @@ sub show_all_screens {
     print "    ";
     print "</td>"; 
     
-    print "<td>";
-    print "$row[16]";
-    print "</td>"; 
+    #print "<td>";
+    #print "$row[16]";
+    #print "</td>"; 
     
     print "</td>";
     
