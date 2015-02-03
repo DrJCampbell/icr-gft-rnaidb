@@ -396,7 +396,7 @@ sub add_new_screen {
   ## get the existing tissue type from the database ##
   my $tissueType;
   my @tissueType;
- 
+  
   my $query = "SELECT Tissue_of_origin FROM Tissue_type order by Tissue_of_origin";
   my $query_handle = $dbh -> prepare ( $query );
      				#or die "Cannot prepare: " . $dbh -> errstr();
@@ -1124,6 +1124,26 @@ sub save_new_screen {
   my $allstar = $q -> param( "allstar_empty" );
   my $xls_files;
   
+  ##################Check cell line name and tissue of origin	  		
+	my $query = "SELECT Tissue_type_Tissue_type_ID FROM Cell_line where Cell_line_name= '$cell_line_name'";
+	my $query_handle = $dbh -> prepare ( $query );
+	$query_handle->execute();
+	my $tissue_type_tissue_type_id = $query_handle -> fetchrow_array;
+	
+	$query = "SELECT Tissue_of_origin FROM Tissue_type where Tissue_type_ID = $tissue_type_tissue_type_id";
+	$query_handle = $dbh -> prepare ( $query );
+	$query_handle->execute();
+	my $tissue_type_in_data_base = $query_handle -> fetchrow_array;
+
+	if ($tissue_type ne $tissue_type_in_data_base)
+	{
+		my $message = "Error: The tissue of origin you entered for cell line $cell_line_name was $tissue_type. It is $tissue_type_in_data_base in the database. Please check!";
+		print "<div id=\"Message\"><p><b>$message</b></p></div>";  
+		print "$page_footer";
+		print $q -> end_html;
+		return;
+	}	
+  
   ################################################[[[get params to check the previous page is working as expected]]]
   
   ################################################[[[my $tmp_file_path = "/home/agulati/data/tmp_file";]]]
@@ -1497,7 +1517,7 @@ sub save_new_screen {
 
   ## 3. Store new Rnai screen metadata in the database ##
   
-  my $query = "INSERT INTO 
+  $query = "INSERT INTO 
                           Rnai_screen_info (      
 						  Cell_line,    
 						  Rnai_screen_name,    
@@ -1547,7 +1567,7 @@ sub save_new_screen {
 						  ( SELECT Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$platelist_file_path' ),
 						  ( SELECT Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )";
   
-  my $query_handle = $dbh->prepare( $query );
+  $query_handle = $dbh->prepare( $query );
    					    #or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle -> execute(); 
     #or die "SQL Error: " . $query_handle -> errstr();
