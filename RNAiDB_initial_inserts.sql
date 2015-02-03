@@ -29,7 +29,7 @@ insert into Tissue_type (Tissue_of_origin) values ('LARGE_INTESTINE');
 insert into Tissue_type (Tissue_of_origin) values ('LIVER');
 insert into Tissue_type (Tissue_of_origin) values ('LUNG');
 insert into Tissue_type (Tissue_of_origin) values ('LYMPHOBLASTOMA');
-insert into Tissue_type (Tissue_of_origin) values ('NA');
+insert into Tissue_type (Tissue_of_origin) values ('UNKNOWN');
 insert into Tissue_type (Tissue_of_origin) values ('OESOPHAGUS');
 insert into Tissue_type (Tissue_of_origin) values ('OVARY');
 insert into Tissue_type (Tissue_of_origin) values ('PANCREAS');

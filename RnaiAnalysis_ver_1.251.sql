@@ -41,6 +41,22 @@ CREATE TABLE IF NOT EXISTS `RNAi_analysis_database`.`Tissue_type` (
 ENGINE = InnoDB;
 
 
+-- --------------------------------------------
+-- Table `RNAi_analysis_database`.`Cell_line`
+-- --------------------------------------------
+CREATE TABLE IF NOT EXISTS `RNAi_analysis_database`.`Cell_line` (
+  `Cell_line_ID` INT NOT NULL AUTO_INCREMENT,
+  `Cell_line_name` VARCHAR(45) NULL,
+  `Tissue_type_Tissue_type_ID` INT NULL,
+  PRIMARY KEY (`Cell_line_ID`),
+  CONSTRAINT `fk_Cell_line_Tissue_type1`
+    FOREIGN KEY (`Tissue_type_Tissue_type_ID`)
+    REFERENCES `RNAi_analysis_database`.`Tissue_type` (`Tissue_type_ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
 -- ----------------------------------------------------------
 -- Table `RNAi_analysis_database`.`Transfection_reagent_used`
 -- ----------------------------------------------------------
