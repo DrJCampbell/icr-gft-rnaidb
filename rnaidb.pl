@@ -1129,20 +1129,44 @@ sub save_new_screen {
 	my $query_handle = $dbh -> prepare ( $query );
 	$query_handle->execute();
 	my $tissue_type_tissue_type_id = $query_handle -> fetchrow_array;
-	
-	$query = "SELECT Tissue_of_origin FROM Tissue_type where Tissue_type_ID = $tissue_type_tissue_type_id";
-	$query_handle = $dbh -> prepare ( $query );
-	$query_handle->execute();
-	my $tissue_type_in_data_base = $query_handle -> fetchrow_array;
+	if (defined ($tissue_type_tissue_type_id))
+	{	
+		$query = "SELECT Tissue_of_origin FROM Tissue_type where Tissue_type_ID = $tissue_type_tissue_type_id";
+		$query_handle = $dbh -> prepare ( $query );
+		$query_handle->execute();
+		my $tissue_type_in_data_base = $query_handle -> fetchrow_array;
 
-	if ($tissue_type ne $tissue_type_in_data_base)
+		if ($tissue_type ne $tissue_type_in_data_base)
+		{
+			my $message = "Error: The tissue of origin you entered for cell line $cell_line_name was $tissue_type. It is $tissue_type_in_data_base in the database. Please check!";
+			print "<div id=\"Message\"><p><b>$message</b></p></div>";  
+			print "$page_footer";
+			print $q -> end_html;
+			return;
+		}
+	} else
 	{
-		my $message = "Error: The tissue of origin you entered for cell line $cell_line_name was $tissue_type. It is $tissue_type_in_data_base in the database. Please check!";
-		print "<div id=\"Message\"><p><b>$message</b></p></div>";  
-		print "$page_footer";
-		print $q -> end_html;
-		return;
-	}	
+        $query = "select Tissue_type_ID from Tissue_type where Tissue_of_origin = '$tissue_type'";
+        $query_handle = $dbh -> prepare ( $query );
+		$query_handle->execute();
+		my $tissue_type_id = $query_handle -> fetchrow_array;
+        if (!defined ($tissue_type_id))
+        {
+			$query = "INSERT into Tissue_type (Tissue_of_origin) values ('$tissue_type')";
+			$query_handle = $dbh -> prepare ( $query );
+			$query_handle->execute();
+			$query = "select Tissue_type_ID from Tissue_type where Tissue_of_origin = '$tissue_type'";
+        	$query_handle = $dbh -> prepare ( $query );
+			$query_handle->execute();
+			$tissue_type_id = $query_handle -> fetchrow_array;
+        }
+		
+		$query = "INSERT into Cell_line (Cell_line_name, Tissue_type_Tissue_type_ID) values ('$cell_line_name', '$tissue_type_id')";
+		$query_handle = $dbh -> prepare ( $query );
+		$query_handle->execute();
+		my $message = "New cell line and corresponding tissue of origin have been added to the database.";
+		print "<div id=\"Message\"><p><b>$message</b></p></div>";
+	}
   
   ################################################[[[get params to check the previous page is working as expected]]]
   
