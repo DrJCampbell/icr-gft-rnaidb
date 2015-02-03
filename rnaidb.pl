@@ -59,8 +59,6 @@ my $sqldb_pass = $configures{'sqldb_pass'};
 
 my $ISOGENIC_SET;
 my $ADD_NEW_FILES_LINK = $configures{'hostname'} . "cgi-bin/$script_name?add_new_files=1";
-my $JS_TISSUE_TYPE = "";
-my $JS_CELL_LINE = "";
 
 #my $username;
 #my $password;
@@ -135,121 +133,7 @@ my $page_header = "<html>
 #chomp $cell_line_list;
 #close IN;
  
-my $page_header_for_add_new_screen_sub = "<html>
-				   						  <head>
-				   						  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
-				   						  <title>GFT RNAi database</title>
-				   						  <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"  href=\"/css/rnaidb.css\" />
-				   						  <meta name=\"viewport\" content=\"width=1000, initial-scale=0.5, minimum-scale=0.45\" />
-				   						  <link rel=\"stylesheet\" href=\"http://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css\">
-				    					  <script src=\"http://code.jquery.com/jquery-1.10.2.js\"></script>
-				   						  <script src=\"http://code.jquery.com/ui/1.11.1/jquery-ui.js\"></script>
-				   						  <script>
-										   \$(function() {
-											   var availableTissues = $JS_TISSUE_TYPE;
-											   var availableCellLines = $JS_CELL_LINE;					
-										    \$( \"#tissues\" ).autocomplete ({
-										    source: availableTissues
-										    });
-										    \$( \"#celllines\" ).autocomplete ({
-										    source: availableCellLines
-										    });
-										  });									  
-										  function make_tissues_Blank() {
-										    var a = document.getElementById( \"tissues\" );
-										    a.value = \"\";
-										    }
-										  function make_cellLines_Blank() {
-										    var b = document.getElementById( \"celllines\" );
-										    b.value = \"\";
-										  }    
-										  function enableText() {
-										    if(document.addNewScreen.is_isogenic.checked) {
-										      document.addNewScreen.gene_name_if_isogenic.disabled = false;
-										      document.addNewScreen.isogenicSet.disabled = false;
-										      document.addNewScreen.name_of_set_if_isogenic.disabled = false;
-										      document.addNewScreen.isogenic_mutant_description.disabled = false;
-										      document.addNewScreen.method_of_isogenic_knockdown.disabled = false; 
-										    }
-										    else {
-										      document.addNewScreen.gene_name_if_isogenic.disabled = true;
-										      document.addNewScreen.isogenicSet.disabled = true;
-										      document.addNewScreen.name_of_set_if_isogenic.disabled = true;
-										      document.addNewScreen.isogenic_mutant_description.disabled = true;
-										      document.addNewScreen.method_of_isogenic_knockdown.disabled = true;
-										    }
-										  } 
-										  function make_geneName_Blank() {
-										    var c = document.getElementById( \"geneName\" );
-										    c.value = \"\";
-										  } 
-										  function make_isogenic_Set_Blank() {
-										    var d = document.getElementById( \"isogenic_Set\" );
-										    d.value = \"\";
-										  } 
-										  function make_isogenicDescription_Blank() {
-										    var e = document.getElementById( \"isogenicDescription\" );
-										    e.value = \"\";
-										  } 
-										  function make_isogenicKnockdown_Blank() {
-										    var f = document.getElementById( \"isogenicKnockdown\" );
-										    f.value = \"\";
-										  }  
-										  function make_notes_Blank() {
-										    var g = document.getElementById( \"NoteS\" );
-										    g.value = \"\";
-										  }  
-										  function checkForm ( form ) {
-										    if ( document.addNewScreen.uploaded_excel_file.value == '') {
-										      alert ( \"Please select an Excel data file.\" );
-										      return false;
-										    }
-										    
-										    if ( document.addNewScreen.plate_conf.selectedIndex == 0 ) {
-										      alert ( \"Please select plateconf file.\" );
-										      return false;
-										    }
-										    if ( document.addNewScreen.plate_list.selectedIndex == 0 ) {
-										      alert ( \"Please select platelist file.\" );
-										      return false;
-										    }
-										    if ( document.addNewScreen.template_library.selectedIndex == 0 ) {
-										      alert ( \"Please select template library file.\" );
-										      return false;
-										    }
-										    if (( form[\"tissue_type\"].value == \"Enter tissue type\") || ( form[\"tissue_type\"].value == \"\")) {
-										      alert ( \"Please enter tissue type.\" );
-										      return false;
-										    } 
-										    if (( form[\"cell_line_name\"].value == \"Enter cell line name\") || ( form[\"cell_line_name\"].value == \"\")) {
-										      alert ( \"Please enter cell line name.\" );
-										      return false;
-										    }
-										    if ( form[\"operator\"].value == \"\" ) {
-										      alert ( \"Please enter your name.\" );
-										      return false;
-										    }
-										    if ( document.addNewScreen.transfection_reagent.selectedIndex == 0 ) {
-										      alert ( \"Please select transfection reagent used for this screen.\" );
-										      return false;
-										    }
-										    if ( document.addNewScreen.instrument.selectedIndex == 0 ) {
-										      alert ( \"Please select instrument used for this screen.\" );
-										      return false;
-										    } 
-										    var answer = confirm(\"Please make sure the data are correct. The data will be saved in the database and cannot be easily changed. Click OK button to proceed.\")
-										  	return answer;
-										  }
-										  </script>
-				   						  </head>
-				   						  <body>
-				   						  <div id=\"Box\"></div><div id=\"MainFullWidth\">
-				   						  <a href=$configures{'hostname'}><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>
-				   						  <p>
-				   						  <a href=\"/cgi-bin/$script_name?add_new_screen=1\">Add new screen</a>\&nbsp;\&nbsp;
-				    					  <a href=\"/cgi-bin/$script_name?show_all_screens=1\">Show all screens</a>\&nbsp;\&nbsp;
-				   						  <a href=\"/cgi-bin/$script_name?configure_export=1\">Configure export</a>\&nbsp;\&nbsp;
-				   						  </p>";
+
 				   						 				   						  				   
 my $page_footer = "</div> <!-- end Main --></div> 
 				   <!-- end Box -->
@@ -393,7 +277,164 @@ sub home {
 sub add_new_screen {
   print $q -> header ( "text/html" );
   my $user = $q -> param( 'user' );
-  print "$page_header_for_add_new_screen_sub";
+  my $page_header_for_add_new_screen_sub1 = "<html>
+				   						  <head>
+				   						  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
+				   						  <title>GFT RNAi database</title>
+				   						  <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"  href=\"/css/rnaidb.css\" />
+				   						  <meta name=\"viewport\" content=\"width=1000, initial-scale=0.5, minimum-scale=0.45\" />
+				   						  <link rel=\"stylesheet\" href=\"http://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css\">
+				    					  <script src=\"http://code.jquery.com/jquery-1.10.2.js\"></script>
+				   						  <script src=\"http://code.jquery.com/ui/1.11.1/jquery-ui.js\"></script>
+				   						  <script>
+										   \$(function() {
+											   var availableTissues = [";
+ my $page_header_for_add_new_screen_sub2=  "\$( \"#tissues\" ).autocomplete ({
+										    source: availableTissues
+										    });
+										    \$( \"#celllines\" ).autocomplete ({
+										    source: availableCellLines
+										    });
+										  });									  
+										  function make_tissues_Blank() {
+										    var a = document.getElementById( \"tissues\" );
+										    a.value = \"\";
+										    }
+										  function make_cellLines_Blank() {
+										    var b = document.getElementById( \"celllines\" );
+										    b.value = \"\";
+										  }    
+										  function enableText() {
+										    if(document.addNewScreen.is_isogenic.checked) {
+										      document.addNewScreen.gene_name_if_isogenic.disabled = false;
+										      document.addNewScreen.isogenicSet.disabled = false;
+										      document.addNewScreen.name_of_set_if_isogenic.disabled = false;
+										      document.addNewScreen.isogenic_mutant_description.disabled = false;
+										      document.addNewScreen.method_of_isogenic_knockdown.disabled = false; 
+										    }
+										    else {
+										      document.addNewScreen.gene_name_if_isogenic.disabled = true;
+										      document.addNewScreen.isogenicSet.disabled = true;
+										      document.addNewScreen.name_of_set_if_isogenic.disabled = true;
+										      document.addNewScreen.isogenic_mutant_description.disabled = true;
+										      document.addNewScreen.method_of_isogenic_knockdown.disabled = true;
+										    }
+										  } 
+										  function make_geneName_Blank() {
+										    var c = document.getElementById( \"geneName\" );
+										    c.value = \"\";
+										  } 
+										  function make_isogenic_Set_Blank() {
+										    var d = document.getElementById( \"isogenic_Set\" );
+										    d.value = \"\";
+										  } 
+										  function make_isogenicDescription_Blank() {
+										    var e = document.getElementById( \"isogenicDescription\" );
+										    e.value = \"\";
+										  } 
+										  function make_isogenicKnockdown_Blank() {
+										    var f = document.getElementById( \"isogenicKnockdown\" );
+										    f.value = \"\";
+										  }  
+										  function make_notes_Blank() {
+										    var g = document.getElementById( \"NoteS\" );
+										    g.value = \"\";
+										  }  
+										  function checkForm ( form ) {
+										    if ( document.addNewScreen.uploaded_excel_file.value == '') {
+										      alert ( \"Please select an Excel data file.\" );
+										      return false;
+										    }
+										    
+										    if ( document.addNewScreen.plate_conf.selectedIndex == 0 ) {
+										      alert ( \"Please select plateconf file.\" );
+										      return false;
+										    }
+										    if ( document.addNewScreen.plate_list.selectedIndex == 0 ) {
+										      alert ( \"Please select platelist file.\" );
+										      return false;
+										    }
+										    if ( document.addNewScreen.template_library.selectedIndex == 0 ) {
+										      alert ( \"Please select template library file.\" );
+										      return false;
+										    }
+										    if (( form[\"tissue_type\"].value == \"Enter tissue type\") || ( form[\"tissue_type\"].value == \"\")) {
+										      alert ( \"Please enter tissue type.\" );
+										      return false;
+										    } 
+										    if (( form[\"cell_line_name\"].value == \"Enter cell line name\") || ( form[\"cell_line_name\"].value == \"\")) {
+										      alert ( \"Please enter cell line name.\" );
+										      return false;
+										    }
+										    if ( form[\"operator\"].value == \"\" ) {
+										      alert ( \"Please enter your name.\" );
+										      return false;
+										    }
+										    if ( document.addNewScreen.transfection_reagent.selectedIndex == 0 ) {
+										      alert ( \"Please select transfection reagent used for this screen.\" );
+										      return false;
+										    }
+										    if ( document.addNewScreen.instrument.selectedIndex == 0 ) {
+										      alert ( \"Please select instrument used for this screen.\" );
+										      return false;
+										    } 
+										    var answer = confirm(\"Please make sure the data are correct. The data will be saved in the database and cannot be easily changed. Click OK button to proceed.\")
+										  	return answer;
+										  }
+										  </script>
+				   						  </head>
+				   						  <body>
+				   						  <div id=\"Box\"></div><div id=\"MainFullWidth\">
+				   						  <a href=$configures{'hostname'}><img src=\"http://www.jambell.com/sample_tracking/ICR_GFTRNAiDB_logo_placeholder.png\" width=415px height=160px></a>
+				   						  <p>
+				   						  <a href=\"/cgi-bin/$script_name?add_new_screen=1\">Add new screen</a>\&nbsp;\&nbsp;
+				    					  <a href=\"/cgi-bin/$script_name?show_all_screens=1\">Show all screens</a>\&nbsp;\&nbsp;
+				   						  <a href=\"/cgi-bin/$script_name?configure_export=1\">Configure export</a>\&nbsp;\&nbsp;
+				   						  </p>";
+				   						  
+  print "$page_header_for_add_new_screen_sub1";
+  ## get the existing tissue type from the database ##
+  my $tissueType;
+  my @tissueType;
+ 
+  my $query = "SELECT Tissue_of_origin FROM Tissue_type order by Tissue_of_origin";
+  my $query_handle = $dbh -> prepare ( $query );
+     				#or die "Cannot prepare: " . $dbh -> errstr();
+  $query_handle->execute();
+  
+  while ( $tissueType = $query_handle -> fetchrow_array ){
+    push ( @tissueType, $tissueType );  
+  }
+
+  my $number_of_tissue_type = scalar @tissueType;
+  my $i = undef;
+  for ($i = 0; $i < $number_of_tissue_type-1; $i++)
+  {
+  	print "\"$tissueType[$i]\",\n";
+  }
+  print "\"$tissueType[$i]\"];\n";
+  
+  print "var availableCellLines = [";
+  
+  my $cellLineName;
+  my @cellLineName;
+ 
+  $query = "SELECT Cell_line_name FROM Cell_line order by Cell_line_name";
+  $query_handle = $dbh -> prepare ( $query );
+  $query_handle->execute();
+
+  while ( $cellLineName = $query_handle -> fetchrow_array ){  
+    push ( @cellLineName, $cellLineName );
+  }
+  my $number_of_cell_line = scalar @cellLineName;
+  for ($i = 0; $i < $number_of_cell_line-1; $i++)
+  {
+  	print "\"$cellLineName[$i]\",\n";
+  }
+  print "\"$cellLineName[$i]\"];\n";
+   
+  print "$page_header_for_add_new_screen_sub2";
+  
   print "<h2>Add new screen:</h2><p></p>";
   
   print $q -> start_multipart_form ( -method => "POST",
@@ -448,8 +489,8 @@ sub add_new_screen {
 
   ## get the existing platelist filenames from the database and display them in the popup menu ##
   
-  my $query = "SELECT Platelist_file_location FROM Platelist_file_path";
-  my $query_handle = $dbh -> prepare ( $query );
+  $query = "SELECT Platelist_file_location FROM Platelist_file_path";
+  $query_handle = $dbh -> prepare ( $query );
      				#or die "Cannot prepare: " . $dbh -> errstr();
   $query_handle->execute();
     #or die "SQL Error: " . $query_handle -> errstr();
@@ -603,24 +644,6 @@ sub add_new_screen {
   print "<td align=left valign=top>\n"; 
   print "<p><b>&nbsp&nbsp&nbsp&nbsp&nbsp</b></p>";
   
-  
- ## get the existing tissue type from the database ##
- my $tissueType;
- my @tissueType;
- 
-  my $query = "SELECT Tissue_of_origin FROM Tissue_type";
-  my $query_handle = $dbh -> prepare ( $query );
-     				#or die "Cannot prepare: " . $dbh -> errstr();
-  $query_handle->execute();
-  
-  while ( $tissueType = $query_handle -> fetchrow_array ){
- 
-    push ( @tissueType, $tissueType );
-   
-  }
-  #$query_handle -> finish();
-  unshift( @tissueType, "Please select" );
-  
   print "Tissue of origin:<br />";
   print $q -> textfield ( -name => "tissue_type",
                           -value => 'Enter tissue type',
@@ -629,28 +652,7 @@ sub add_new_screen {
                           -onClick => "make_tissues_Blank()",
                           -id => "tissues" );
   print "</p><p>";
-
-  foreach my $Tissue_Type (@tissueType) {
-    $JS_TISSUE_TYPE = "\t\\\"$Tissue_Type\\\"\n";
-    #print $JS_TISSUE_TYPE;
-  }
   
- ## get the cell line name from the database  ##
-  
- my $cellLineName;
- my @cellLineName;
- 
-  my $query = "SELECT Cell_line_name FROM Cell_line";
-  my $query_handle = $dbh -> prepare ( $query );
-     				#or die "Cannot prepare: " . $dbh -> errstr();
-  $query_handle->execute();
-
- while ( $cellLineName = $query_handle -> fetchrow_array ){
-   
-    push ( @cellLineName, $cellLineName );
-  }
-  #$query_handle -> finish();
-  unshift( @cellLineName, "Please select" );
   print "Cell line name:<br />";
   print $q -> textfield ( -name => "cell_line_name",
                           -value => 'Enter cell line name',
@@ -660,10 +662,6 @@ sub add_new_screen {
                           -id => "celllines" );
   print "</p><p>";
   
-  foreach my $Cell_Line (@cellLineName) {
-    $JS_CELL_LINE = "\t\\\"$Cell_Line\\\"\n";
-  }
-
   ## get the current date ##
   
   my ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime ( time );
