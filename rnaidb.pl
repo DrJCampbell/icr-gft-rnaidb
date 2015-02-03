@@ -644,15 +644,6 @@ sub add_new_screen {
   print "<td align=left valign=top>\n"; 
   print "<p><b>&nbsp&nbsp&nbsp&nbsp&nbsp</b></p>";
   
-  print "Tissue of origin:<br />";
-  print $q -> textfield ( -name => "tissue_type",
-                          -value => 'Enter tissue type',
-                          -size => "30",
-                          -maxlength => "45",
-                          -onClick => "make_tissues_Blank()",
-                          -id => "tissues" );
-  print "</p><p>";
-  
   print "Cell line name:<br />";
   print $q -> textfield ( -name => "cell_line_name",
                           -value => 'Enter cell line name',
@@ -662,6 +653,15 @@ sub add_new_screen {
                           -id => "celllines" );
   print "</p><p>";
   
+  print "Tissue of origin:<br />";
+  print $q -> textfield ( -name => "tissue_type",
+                          -value => 'Enter tissue type',
+                          -size => "30",
+                          -maxlength => "45",
+                          -onClick => "make_tissues_Blank()",
+                          -id => "tissues" );
+  print "</p><p>";
+   
   ## get the current date ##
   
   my ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime ( time );
