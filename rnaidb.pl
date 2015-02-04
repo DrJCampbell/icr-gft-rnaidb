@@ -1124,7 +1124,14 @@ sub save_new_screen {
   my $allstar = $q -> param( "allstar_empty" );
   my $xls_files;
   
-  ##################Check cell line name and tissue of origin	  		
+  ##################Check cell line name and tissue of origin
+  	$tissue_type = uc $tissue_type;
+  	$cell_line_name = uc $cell_line_name;
+  	$tissue_type =~ s/^\s+//g;
+	$tissue_type =~ s/[^A-Z0-9_]*//g;
+	$cell_line_name =~ s/^\s+//g;
+	$cell_line_name =~ s/[^A-Z0-9]*//g;
+		  		
 	my $query = "SELECT Tissue_type_Tissue_type_ID FROM Cell_line where Cell_line_name= '$cell_line_name'";
 	my $query_handle = $dbh -> prepare ( $query );
 	$query_handle->execute();
