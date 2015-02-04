@@ -298,11 +298,17 @@ sub add_new_screen {
 										  });									  
 										  function make_tissues_Blank() {
 										    var a = document.getElementById( \"tissues\" );
-										    a.value = \"\";
+										    if (a.value == \"Enter tissue type\")
+										    {
+										    	a.value = \"\";
 										    }
+										  }
 										  function make_cellLines_Blank() {
 										    var b = document.getElementById( \"celllines\" );
-										    b.value = \"\";
+										    if (b.value ==\"Enter cell line name\")
+										    {
+										    	b.value = \"\";
+										    }
 										  }    
 										  function enableText() {
 										    if(document.addNewScreen.is_isogenic.checked) {
@@ -322,23 +328,38 @@ sub add_new_screen {
 										  } 
 										  function make_geneName_Blank() {
 										    var c = document.getElementById( \"geneName\" );
-										    c.value = \"\";
+										    if(c.value == \"Enter gene name\")
+										    {
+										    	c.value = \"\";
+										    }
 										  } 
 										  function make_isogenic_Set_Blank() {
 										    var d = document.getElementById( \"isogenic_Set\" );
-										    d.value = \"\";
+										    if (d.value == \"Enter isogenic set name\")
+										    {
+										    	d.value = \"\";
+										    }
 										  } 
 										  function make_isogenicDescription_Blank() {
 										    var e = document.getElementById( \"isogenicDescription\" );
-										    e.value = \"\";
+										    if (e.value == \"e.g. parental\")
+										    {
+										    	e.value = \"\";
+										    }
 										  } 
 										  function make_isogenicKnockdown_Blank() {
 										    var f = document.getElementById( \"isogenicKnockdown\" );
-										    f.value = \"\";
+										    if (f.value = \"e.g. ZFN or shRNA\")
+										    {
+										    	f.value = \"\";
+										    }
 										  }  
 										  function make_notes_Blank() {
 										    var g = document.getElementById( \"NoteS\" );
-										    g.value = \"\";
+										    if (g.value == \"write notes for Description.txt\")
+										    {
+										    	g.value = \"\";
+										    }
 										  }  
 										  function checkForm ( form ) {
 										    if ( document.addNewScreen.uploaded_excel_file.value == '') {
