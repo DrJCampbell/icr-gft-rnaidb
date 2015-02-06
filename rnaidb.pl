@@ -926,67 +926,7 @@ sub add_new_files {
   print "$page_header";
   print "<h1>Add new file(s):</h1>";
   
-  ## Downloading/uploading plateconf file ##
-  
-  print $q -> start_multipart_form ( -method => "POST" ); 
-  
-  print "<table width = 100%>\n";
-  print "<tr>\n";
-  print "<td align=left valign=top>\n";
 
-  print "<a name=\"new_plate_conf_file\"><p><b>Upload new plate configure file:</b>";
-  #print "<p>";
- 
-  ## download old Plateconf file ##
- 
-  my $plate_conf_download_link = $configures{'hostname'} . $configures{'plateconf_folder'};
-  
-  #print "<div id=\"Note\"><p>NOTE: For downloading existing plateconf files, click on the link below.</p></div>";
-  print " - OR  ";
-  #print "<p>";
-  print "<a href=\"$plate_conf_download_link\">View existing plate configure files</a>";
-  print "</p>";
-  
-  ## get new Plateconf file ##
-  
-  #print "<p>Upload new plateconf file:<br />";
-  #print "<p></p>";
-  
-  print $q -> filefield ( -name=>'new_uploaded_plateconf_file',
-                         -default=>'starting value',
-                         -size=>35,
-                         -maxlength=>256 );
-  print "</p>";
-  
-  ## enter new plateconf file name ##
-  
-  #print "<p>Enter new plateconf file name:<br />";
-  #print "<p></p>";
-  
-  #print $q -> textfield ( -name => "new_plateconf_filename",
-  #                        -value => 'e.g. KS_TS_CGC_WNT_384_plateconf',
-  #                        -size => "30",
-  #                        -maxlength => "45" );
-
-  #print "<p></p>";
-  
-  #print"<p><div id=\"Note\">NOTE: The name of the new uploaded plate configure file should be different from the names of existing plate conf files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
-  
-  ## create a hidden field ##
-  #hidden fields pass information along with the user-entered input that is not to be manipulated by the user ## a way to have web forms to remember previous information 
-  
-  print $q -> hidden ( -name=>'save_new_uploaded_plateconf_file',
-  					   -default=>'save_new_uploaded_plateconf_file' );
-  
-  ## submit the form for uploading plateconf file ##
-  
-  print "<p>";
-  print "<input type=\"submit\" id=\"save_new_uploaded_plateconf_file\" value=\"Save the uploaded plate configure file\" name=\"save_new_uploaded_plateconf_file\" />";
-  print "</p>";
-  
-  print "</td>\n";
-  print "</tr>\n";
-  print $q -> end_multipart_form(); 
   
   ## Downloading/uploading platelist file ## 
   
@@ -1111,6 +1051,68 @@ sub add_new_files {
   print "</td>\n";
   print "</tr>\n";
   print $q -> end_multipart_form();
+  
+    ## Downloading/uploading plateconf file ##
+  
+  print $q -> start_multipart_form ( -method => "POST" ); 
+  
+  print "<table width = 100%>\n";
+  print "<tr>\n";
+  print "<td align=left valign=top>\n";
+
+  print "<a name=\"new_plate_conf_file\"><p><b>Upload new plate configure file:</b>";
+  #print "<p>";
+ 
+  ## download old Plateconf file ##
+ 
+  my $plate_conf_download_link = $configures{'hostname'} . $configures{'plateconf_folder'};
+  
+  #print "<div id=\"Note\"><p>NOTE: For downloading existing plateconf files, click on the link below.</p></div>";
+  print " - OR  ";
+  #print "<p>";
+  print "<a href=\"$plate_conf_download_link\">View existing plate configure files</a>";
+  print "</p>";
+  
+  ## get new Plateconf file ##
+  
+  #print "<p>Upload new plateconf file:<br />";
+  #print "<p></p>";
+  
+  print $q -> filefield ( -name=>'new_uploaded_plateconf_file',
+                         -default=>'starting value',
+                         -size=>35,
+                         -maxlength=>256 );
+  print "</p>";
+  
+  ## enter new plateconf file name ##
+  
+  #print "<p>Enter new plateconf file name:<br />";
+  #print "<p></p>";
+  
+  #print $q -> textfield ( -name => "new_plateconf_filename",
+  #                        -value => 'e.g. KS_TS_CGC_WNT_384_plateconf',
+  #                        -size => "30",
+  #                        -maxlength => "45" );
+
+  #print "<p></p>";
+  
+  #print"<p><div id=\"Note\">NOTE: The name of the new uploaded plate configure file should be different from the names of existing plate conf files. The words in the filename must be joined with an underscore ( _ ).</div></p>";
+  
+  ## create a hidden field ##
+  #hidden fields pass information along with the user-entered input that is not to be manipulated by the user ## a way to have web forms to remember previous information 
+  
+  print $q -> hidden ( -name=>'save_new_uploaded_plateconf_file',
+  					   -default=>'save_new_uploaded_plateconf_file' );
+  
+  ## submit the form for uploading plateconf file ##
+  
+  print "<p>";
+  print "<input type=\"submit\" id=\"save_new_uploaded_plateconf_file\" value=\"Save the uploaded plate configure file\" name=\"save_new_uploaded_plateconf_file\" />";
+  print "</p>";
+  
+  print "</td>\n";
+  print "</tr>\n";
+  print $q -> end_multipart_form(); 
   
   print "$page_footer";
   print $q -> end_html; 
