@@ -851,14 +851,14 @@ sub add_new_screen {
   
   ##  select control from dropdown menu ##
   
-  print "<p>";
+  #print "<p>";
   
-  my @CONTROL = ( "Please select", "DMSO", "DNS" ); # this should be read from a text file or from the SQL database
-  print "Control:<br />";
-  print $q -> popup_menu( -name => 'Control',
-  					      -value => \@CONTROL,
-  						  -default => 'Please select' );
-  print "</p>";
+  #my @CONTROL = ( "Please select", "DMSO", "DNS" ); # this should be read from a text file or from the SQL database
+  #print "Control:<br />";
+  #print $q -> popup_menu( -name => 'Control',
+  #					      -value => \@CONTROL,
+  #						  -default => 'Please select' );
+  #print "</p>";
   
   ## çompound used ##
   
@@ -902,11 +902,11 @@ sub add_new_screen {
   
   print "<p></p>";
   print "</p></p>";
-  print "Notes about the drug screen:<br />";
-  print $q -> textarea ( -name => "drug_screen_notes",
-                         -default => 'write notes for drug screen',
-                         -rows => "8",
-                         -columns => "40" );                              
+  #print "Notes about the drug screen:<br />";
+  #print $q -> textarea ( -name => "drug_screen_notes",
+  #                      -default => 'write notes for drug screen',
+  #                       -rows => "8",
+  #                       -columns => "40" );                              
   print "</td>\n";
                     
   print $q -> end_multipart_form(); 
@@ -1137,7 +1137,9 @@ sub save_new_screen {
   my $transfection_reagent = $q -> param( "transfection_reagent" );
   my $instrument = $q -> param( "instrument" );
   my $is_isogenic = $q -> param( "is_isogenic" );
+  my $is_drug_screen = $q -> param ( "is_drug_screen" );
   my $gene_name_if_isogenic = $q -> param( "gene_name_if_isogenic" );
+  my $compound = $q -> param( "compound" );
   my $new_isogenic_set = $q ->  param( "name_of_set_if_isogenic" );
   my $isogenic_mutant_description = $q -> param( "isogenic_mutant_description" );
   my $method_of_isogenic_knockdown = $q -> param( "method_of_isogenic_knockdown" );
@@ -1230,6 +1232,14 @@ sub save_new_screen {
   
   if ( not defined ( $screen_dir_name ) ) {
     $screen_dir_name = $tissue_type."_".$cell_line_name."_".$templib."_".$date_of_run;
+    if ($is_isogenic eq 'ON')
+    {
+    	$screen_dir_name = "IS" . "_" . $tissue_type . "_" . $cell_line_name . "_" . $templib . "_" . $gene_name_if_isogenic . "_" . $date_of_run;
+    }
+    if ($is_drug_screen eq 'ON')
+    {
+    	$screen_dir_name = "DS" . "_" . $tissue_type . "_" . $cell_line_name . "_" . $templib . "_" . $compound . "_" . $date_of_run;
+    }
   }
   my $screenDir_path = $configures{'screenDir_path'};
   my $file_path = "$screenDir_path/$screen_dir_name";
