@@ -1139,10 +1139,12 @@ sub save_new_screen {
   my $is_isogenic = $q -> param( "is_isogenic" );
   my $is_drug_screen = $q -> param ( "is_drug_screen" );
   my $gene_name_if_isogenic = $q -> param( "gene_name_if_isogenic" );
-  my $compound = $q -> param( "compound" );
   my $new_isogenic_set = $q ->  param( "name_of_set_if_isogenic" );
   my $isogenic_mutant_description = $q -> param( "isogenic_mutant_description" );
   my $method_of_isogenic_knockdown = $q -> param( "method_of_isogenic_knockdown" );
+  my $compound = $q -> param( "compound" );
+  my $compound_concentration = $q -> param( "concentration" );
+  my $dosing_regime = $q -> param( "dosing regime" );
   my $notes = $q -> param( "notes" );
   my $sicon1 = $q -> param( "sicon1_empty" );
   my $sicon2 = $q -> param( "sicon2_empty" );
@@ -1577,7 +1579,16 @@ sub save_new_screen {
     $method_of_isogenic_knockdown = "NA";
     $ISOGENIC_SET = "NA";
     $new_isogenic_set = "NA";
-  }  
+  }
+  
+  if ($is_drug_screen eq 'ON')
+  {
+  	$is_drug_screen = "YES";
+  }
+  else
+  {
+  	$is_drug_screen = "NO";
+  }
 
   ## 3. Store new Rnai screen metadata in the database ##
   
@@ -1590,7 +1601,10 @@ sub save_new_screen {
 						  Is_isogenic,    
 						  Gene_name_if_isogenic,    
 						  Isogenic_mutant_description,    
-						  Method_of_isogenic_knockdown,    
+						  Method_of_isogenic_knockdown,
+						  Compound,
+						  Compound_concentration,   
+						  Dosing_regime,
 						  Rnai_template_library,    
 						  Plate_list_file_name,    
 						  Plate_conf_file_name,   
@@ -1615,6 +1629,9 @@ sub save_new_screen {
 						  '$gene_name_if_isogenic',
 						  '$isogenic_mutant_description',
 						  '$method_of_isogenic_knockdown',
+						  '$compound',
+						  '$compound_concentration',
+						  '$dosing_regime',
 						  '$templib',
 						  '$platelist',
 						  '$plateconf',
@@ -2520,7 +2537,7 @@ sub show_all_screens {
   print "<table>";
  
   my $query = "SELECT
-			  r.Rnai_screen_name,
+              r.Rnai_screen_name,
 			  t.Tissue_of_origin,
 		      r.Cell_line, 
 			  r.Date_of_run,
@@ -2535,6 +2552,9 @@ sub show_all_screens {
 			  (SELECT n.Name_of_set_if_isogenic FROM Name_of_set_if_isogenic n WHERE n.Name_of_set_if_isogenic = 'NA'),
 		      r.Isogenic_mutant_description,
 			  r.Method_of_isogenic_knockdown,
+			  r.Compound,
+			  r.Compound_concentration,
+			  r.Dosing_regime,
 			  r.Rnai_screen_link_to_report,
 			  r.Zprime FROM
 			  Rnai_screen_info r,
@@ -2567,6 +2587,9 @@ sub show_all_screens {
 			  n.Name_of_set_if_isogenic,
 			  r.Isogenic_mutant_description,
 			  r.Method_of_isogenic_knockdown,
+			  r.Compound,
+			  r.Compound_concentration,
+			  r.Dosing_regime,
 			  r.Rnai_screen_link_to_report, 
 			  r.Zprime FROM
 			  Rnai_screen_info r,
@@ -2762,7 +2785,43 @@ sub show_all_screens {
   
   print "<th>";
   print "    ";
-  print "</th>";  
+  print "</th>";
+  
+  print "<th>";
+  print "Compound";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
+  
+  print "<th>";
+  print "Compound concentration";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
+  
+   print "<th>";
+  print "Dosing regime";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>";
+  
+  print "<th>";
+  print "    ";
+  print "</th>"; 
   
   print "<th>";
   print "Link to cellHTS2 analysis report";
@@ -2963,9 +3022,45 @@ sub show_all_screens {
     print "<td>";
     print "    ";
     print "</td>"; 
+    
+    print "<td>";
+    print "$row[15]";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>"; 
+    
+     print "<td>";
+    print "$row[16]";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>"; 
+    
+     print "<td>";
+    print "$row[17]";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>";
+    
+    print "<td>";
+    print "    ";
+    print "</td>"; 
    
     print "<td>";
-    print "<a href=\"$row[15]\" >Analysis report</a>";
+    print "<a href=\"$row[18]\" >Analysis report</a>";
     print "</td>"; 
     
     print "<td>";
