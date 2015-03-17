@@ -383,7 +383,7 @@ Plate	Well	GeneID	Entrez_gene_ID	sublib
 1	P22			
 1	P23	siPLK1	pos	
 1	P24			
-;;;;;;;;;;;;;;;;;	A01	siCON1	neg	
+2	A01	siCON1	neg	
 2	A02	siCON1	neg	
 2	A03	RCOR1	23186	EPI
 2	A04	GPS2	2874	EPI
