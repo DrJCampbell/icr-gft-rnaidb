@@ -67,6 +67,10 @@ zScreenSublib<-function(name,
 	
   	# top table	
   	summary_info<-getTopTable(list("raw"=x, "normalized"=xn, "scored"=xsc), file=paste(datapath,summaryName, sep=""))
+  	setSettings(list(
+        plateList=list(reproducibility=list(include=TRUE, map=TRUE),
+      	intensities=list(include=TRUE, map=TRUE)),
+      	screenSummary=list(scores=list(range=c(-20, 10), map=TRUE)))) 
 
   	###########################################################	
   	# write a QC report for zscores
