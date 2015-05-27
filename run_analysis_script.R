@@ -40,6 +40,9 @@ SummaryName=guide$summary_file
 ZprimeName=guide$zprime_file
 ReportdirName=guide$reportdir_file
 Controls_qc=guide$qc_file
+Qc_plot_1=guide$plot_1_file
+Qc_plot_2=guide$plot_2_file
+Qc_plot_3=guide$plot_3_file
 Corr_coeff=guide$corr_file
 separateZprimeFile=guide$separate_zprime_file
 
@@ -48,30 +51,30 @@ separateZprimeFile=guide$separate_zprime_file
 #
 
 res_1 <- xls2platelist(
-		 datapath=Datapath,
-		 xls=Xls
-		 )
+  datapath=Datapath,
+  xls=Xls
+)
 
 #
 ## function for cellHTS2 analysis
 #
 
 res_2 <- zScreenSublib(
-		 name=Cell_line,
-		 datapath=Datapath,
-		 poscontrols=Poscontrols,
-		 negcontrols=Negcontrols,
-		 descripFile=DescripFile,
-		 annotationfile=Annotationfile,
-		 reportHTML=ReportHTML,
-		 plateconf=Plateconf,
-		 platelist=Platelist,
-		 replicate_summary="median",
-		 zscoreName=ZscoreName,
-		 summaryName=SummaryName,
-		 zprimeName=ZprimeName,
- 		 reportdirName=ReportdirName
-		 )
+  name=Cell_line,
+  datapath=Datapath,
+  poscontrols=Poscontrols,
+  negcontrols=Negcontrols,
+  descripFile=DescripFile,
+  annotationfile=Annotationfile,
+  reportHTML=ReportHTML,
+  plateconf=Plateconf,
+  platelist=Platelist,
+  replicate_summary="median",
+  zscoreName=ZscoreName, 
+  summaryName=SummaryName,
+  zprimeName=ZprimeName,
+  reportdirName=ReportdirName
+)
 
 #
 ## function using gdata for converting xls to txt file for storing in the database
@@ -81,25 +84,28 @@ res_2 <- zScreenSublib(
 #		 datapath=Datapath,
 #		 xls=Xls)
 
+separateZprime(
+  name= Cell_line,
+  datapath= Datapath,
+  poscontrols= Poscontrols,
+  negcontrols= Negcontrols,
+  descripFile= DescripFile,
+  plateconf= Plateconf,
+  platelist= Platelist,
+  separateZprimeFile = separateZprimeFile
+)
+
 #
 ## function for qc - creating boxplots and calculating correlation coefficient
 #
-
-res_4 <- Zscreen_qc(
-		 datapath=Datapath,
-		 summaryName=SummaryName,
-		 ReportdirName = ReportdirName,
- 		 controls_qc=Controls_qc,
- 		 corr_coeff=Corr_coeff
-		 )
 		 
-separateZprime(
-		 name= Cell_line,
-		 datapath= Datapath,
-		 poscontrols= Poscontrols,
-		 negcontrols= Negcontrols,
-		 descripFile= DescripFile,
-		 plateconf= Plateconf,
-		 platelist= Platelist,
-		 separateZprimeFile = separateZprimeFile
-		 )
+res_4 <- Zscreen_qc(
+  datapath=Datapath,
+  summaryName=SummaryName,
+  controls_qc=Controls_qc,
+  qc_plot_1=Qc_plot_1,
+  qc_plot_2=Qc_plot_2,
+  qc_plot_3=Qc_plot_3,
+  corr_coeff=Corr_coeff
+)
+

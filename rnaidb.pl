@@ -1392,6 +1392,9 @@ sub save_new_screen {
       "reportdir_file\t", 
       "xls_file\t", 
       "qc_file\t", 
+      "plot_1_file\t", 
+      "plot_2_file\t",
+      "plot_3_file\t",
       "corr_file\t",
       "separate_zprime_file\n"; 
   
@@ -1408,7 +1411,10 @@ sub save_new_screen {
       "$screen_dir_name"."_zprime.txt\t", 
       "$screen_dir_name"."_reportdir\t", 
       "$xls_files\t", 
-      "$screen_dir_name"."_controls_qc.png\t", 
+      "$screen_dir_name"."_controls_qc.png\t",
+      "$screen_dir_name"."_qc_plot_file_1.png\t",
+      "$screen_dir_name"."_qc_plot_file_2.png\t",
+      "$screen_dir_name"."_qc_plot_file_3.png\t", 
       "$screen_dir_name"."_corr.txt\t",
       "$screen_dir_name"."_separate_zprime.txt";  
   
@@ -1477,9 +1483,31 @@ sub save_new_screen {
   my $rnai_screen_qc_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_qc_new_path'};
   `cp -r $rnai_screen_qc_original_path $rnai_screen_qc_new_path`;
   
+  ## copy the file with rep1 vs rep2 scatter plots to the /usr/local/www/html/RNAi_screen_analysis_qc_plots ##
+  
+  my $scatter_plot_1_original_path = $file_path."/".$screen_dir_name."_qc_plot_file_1.png"; 
+  $rnai_screen_qc_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_qc_new_path'};
+  `cp -r $scatter_plot_1_original_path $rnai_screen_qc_new_path`;
+  
+  ## copy the file with rep2 vs rep3 scatter plots to the /usr/local/www/html/RNAi_screen_analysis_qc_plots ##
+  
+  my $scatter_plot_2_original_path = $file_path."/".$screen_dir_name."_qc_plot_file_2.png"; 
+  $rnai_screen_qc_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_qc_new_path'};
+  `cp -r $scatter_plot_2_original_path $rnai_screen_qc_new_path`;
+  
+  ## copy the file with rep1 vs rep3 scatter plots to the /usr/local/www/html/RNAi_screen_analysis_qc_plots ##
+  
+  my $scatter_plot_3_original_path = $file_path."/".$screen_dir_name."_qc_plot_file_3.png"; 
+  $rnai_screen_qc_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_qc_new_path'};
+  `cp -r $scatter_plot_3_original_path $rnai_screen_qc_new_path`;
+  
+  ## copy the file with correlation coefficients for the reps to the /usr/local/www/html/RNAi_screen_analysis_correlation_folder ##
+  
   my $rnai_screen_corr_original_path = $file_path."/".$screen_dir_name."_corr.txt"; 		
   my $rnai_screen_corr_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_corr_new_path'}; 		
   `cp -r $rnai_screen_corr_original_path $rnai_screen_corr_new_path`;
+  
+  ## copy the file with correlation coefficients for the reps to the /usr/local/www/html/RNAi_screen_analysis_separate_zprime_folder ##
   
   my $rnai_screen_sep_zprime_original_path = $file_path."/" . $screen_dir_name . "_separate_zprime.txt"; 		
   my $rnai_screen_sep_zprime_new_path = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_sep_zprime_new_path'}; 		
@@ -1592,8 +1620,7 @@ sub save_new_screen {
 
   ## 3. Store new Rnai screen metadata in the database ##
   
-  $query = "INSERT INTO 
-                          Rnai_screen_info (      
+  $query = "INSERT INTO Rnai_screen_info (      
 						  Cell_line,    
 						  Rnai_screen_name,    
 						  Date_of_run,    
@@ -1619,34 +1646,35 @@ sub save_new_screen {
 						  Template_library_file_path_Template_library_file_path_ID,
 						  Plateconf_file_path_Plateconf_file_path_ID,
 						  Platelist_file_path_Platelist_file_path_ID,
-						  Template_library_Template_library_ID ) 
+						  Template_library_Template_library_ID 
+						  ) 
 						  SELECT 
-						  '$cell_line_name',
-						  '$screen_dir_name',
-						  '$date_of_run', 
-						  '$operator',
-						  '$is_isogenic_screen',
-						  '$gene_name_if_isogenic',
-						  '$isogenic_mutant_description',
-						  '$method_of_isogenic_knockdown',
-						  '$compound',
-						  '$compound_concentration',
-						  '$dosing_regime',
-						  '$templib',
-						  '$platelist',
-						  '$plateconf',
-						  '$rnai_screen_link_to_report',
-						  '$rnai_screen_link_to_qc_plots',
-						  '$zp_value',
-						  '$notes', 
-						  ( SELECT Name_of_set_if_isogenic_ID FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic = '$ISOGENIC_SET' ), 
-						  ( SELECT Instrument_used_ID FROM Instrument_used WHERE Instrument_name = '$instrument' ),
-						  ( SELECT Tissue_type_ID FROM Tissue_type WHERE Tissue_of_origin = '$tissue_type' ), 
-						  ( SELECT Transfection_reagent_used_ID FROM Transfection_reagent_used WHERE Transfection_reagent = '$transfection_reagent' ), 
-						  ( SELECT Template_library_file_path_ID FROM Template_library_file_path WHERE Template_library_file_location = '$templib_file_path' ),
-						  ( SELECT Plateconf_file_path_ID FROM Plateconf_file_path WHERE Plateconf_file_location = '$plateconf_file_path' ),
-						  ( SELECT Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$platelist_file_path' ),
-						  ( SELECT Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )";
+						  	'$cell_line_name',
+						  	'$screen_dir_name',
+						  	'$date_of_run', 
+						  	'$operator',
+						  	'$is_isogenic_screen',
+						  	'$gene_name_if_isogenic',
+						  	'$isogenic_mutant_description',
+						  	'$method_of_isogenic_knockdown',
+						  	'$compound',
+						  	'$compound_concentration',
+						  	'$dosing_regime',
+						  	'$templib',
+						  	'$platelist',
+						  	'$plateconf',
+						  	'$rnai_screen_link_to_report',
+						  	'$rnai_screen_link_to_qc_plots',
+						  	'$zp_value',
+						  	'$notes', 
+						  	( SELECT Name_of_set_if_isogenic_ID FROM Name_of_set_if_isogenic WHERE Name_of_set_if_isogenic = '$ISOGENIC_SET' ), 
+						  	( SELECT Instrument_used_ID FROM Instrument_used WHERE Instrument_name = '$instrument' ),
+						  	( SELECT Tissue_type_ID FROM Tissue_type WHERE Tissue_of_origin = '$tissue_type' ), 
+						  	( SELECT Transfection_reagent_used_ID FROM Transfection_reagent_used WHERE Transfection_reagent = '$transfection_reagent' ), 
+						  	( SELECT Template_library_file_path_ID FROM Template_library_file_path WHERE Template_library_file_location = '$templib_file_path' ),
+						  	( SELECT Plateconf_file_path_ID FROM Plateconf_file_path WHERE Plateconf_file_location = '$plateconf_file_path' ),
+						  	( SELECT Platelist_file_path_ID FROM Platelist_file_path WHERE Platelist_file_location = '$platelist_file_path' ),
+						  	( SELECT Template_library_ID FROM Template_library WHERE Template_library_name = '$templib' )";
   
   $query_handle = $dbh->prepare( $query );
    					    #or die "Cannot prepare: " . $dbh -> errstr();
@@ -1783,7 +1811,8 @@ sub save_new_screen {
     Gene_symbol_summary, 
     Entrez_gene_id_summary, 
     Rnai_screen_info_Rnai_screen_info_ID,  
-    Template_library_Template_library_ID) 
+    Template_library_Template_library_ID
+    ) 
     SELECT 
     '$plate_number_for_summary', 
     '$position', 
@@ -3279,19 +3308,17 @@ sub show_qc {
   my $screen_dir_name = $q -> param ( "screen_dir_name" );
   my $plateconf = $q -> param ( "plate_conf" );
   
-  #print "<p>";
   print "<b>Screen name: $screen_dir_name</b>";
-  #print "</p>";
+
   
   my $show_qc_page = $configures{'hostname'} . $configures{'rnai_screen_qc_new_path'} . $screen_dir_name . "_controls_qc.png";
+  my $scatter_plot_1 = $configures{'hostname'} . $configures{'rnai_screen_qc_new_path'} . $screen_dir_name . "_qc_plot_file_1.png";
+  my $scatter_plot_2 = $configures{'hostname'} . $configures{'rnai_screen_qc_new_path'} . $screen_dir_name . "_qc_plot_file_2.png";
+  my $scatter_plot_3 = $configures{'hostname'} . $configures{'rnai_screen_qc_new_path'} . $screen_dir_name . "_qc_plot_file_3.png";
   
   print "<p>";
   print "<img src=\"$show_qc_page\" alt=\"QC plots:\">";
-  print "</p>";
- 
-  
-
-  
+  print "</p>"; 
   
   print "</td>";
   
@@ -3360,7 +3387,8 @@ sub show_qc {
   	
    	print "</table>";
    	
-   	
+   	print "<p></p>";
+   	print "<p></p>";
    	print "<p></p>";
     
     print "<h2>Pearson's correlation among normalized data of replicates:</h2>";
@@ -3384,6 +3412,7 @@ sub show_qc {
     print "<th>";
     print "Max correlation";
     print "</th>";
+    
    	my $coco_file = $configures{'WebDocumentRoot'} . $configures{'rnai_screen_corr_new_path'} . $screen_dir_name . "_corr.txt";
   
   	open ( IN, "< $coco_file" )
@@ -3397,8 +3426,6 @@ sub show_qc {
     	my( $coco_min, $coco_max ) = split(/\t/, $line);
     	$coco_min = sprintf "%.2f", $coco_min;
     	$coco_max = sprintf "%.2f", $coco_max;
-
-    	
     
     	print "<tr>";
     
@@ -3424,8 +3451,26 @@ sub show_qc {
 
   	}
   	close IN;
-  
-  	print "</td>";
+    
+    print "<p></p>";
+  	print "<p></p>";
+  	print "<p></p>";
+    
+    print "<h2>Scatterplots showing correlation between replicates:</h2>";
+    
+    print "<p></p>";
+     
+    print "<table>";
+    
+    print "<img src=\"$scatter_plot_1\" alt=\"Rep1 vs Rep2:\"> &nbsp;&nbsp;&nbsp;&nbsp;";
+ 
+   
+    print "<img src=\"$scatter_plot_2\" alt=\"Rep2 vs Rep3:\"> &nbsp;&nbsp;&nbsp;&nbsp;";
+   
+    print "<img src=\"$scatter_plot_3\" alt=\"Rep1 vs Rep3:\">";
+    
+    print "</td>";
+
   
   #print "<td align=left valign=top>\n";
   #print "<p>";
