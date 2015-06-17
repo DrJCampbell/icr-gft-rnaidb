@@ -316,7 +316,7 @@ sub add_new_screen {
 										      document.addNewScreen.isogenicSet.disabled = false;
 										      document.addNewScreen.name_of_set_if_isogenic.disabled = false;
 										      document.addNewScreen.isogenic_mutant_description.disabled = false;
-										      document.addNewScreen.method_of_isogenic_knockdown.disabled = false; 
+										      document.addNewScreen.method_of_isogenic_knockdown.disabled = false;
 										    }
 										    else {
 										      document.addNewScreen.gene_name_if_isogenic.disabled = true;
@@ -326,6 +326,18 @@ sub add_new_screen {
 										      document.addNewScreen.method_of_isogenic_knockdown.disabled = true;
 										    }
 										  } 
+										  function enableText_DS() {
+										    if(document.addNewScreen.is_drug_screen.checked) {
+										      document.addNewScreen.compound.disabled = false;
+										      document.addNewScreen.concentration.disabled = false;
+										      document.addNewScreen.dosing_regime.disabled = false;  
+										    }
+										    else {
+										      document.addNewScreen.compound.disabled = true;
+										      document.addNewScreen.concentration.disabled = true;
+										      document.addNewScreen.dosing_regime.disabled = true;  
+										    }
+										  }
 										  function make_geneName_Blank() {
 										    var c = document.getElementById( \"geneName\" );
 										    if(c.value == \"Enter gene name\")
@@ -359,6 +371,27 @@ sub add_new_screen {
 										    if (g.value == \"write notes for Description.txt\")
 										    {
 										    	g.value = \"\";
+										    }
+										  }  
+										  function make_compound_Blank() {
+										    var h = document.getElementById( \"CompounD\" );
+										    if (h.value == \"e.g. drug A\")
+										    {
+										    	h.value = \"\";
+										    }
+										  } 
+										  function make_concentration_Blank() {
+										    var i = document.getElementById( \"ConcentratioN\" );
+										    if (i.value == \"e.g. 100 ng\")
+										    {
+										    	i.value = \"\";
+										    }
+										  }   
+										  function make_dosingregime_Blank() {
+										    var j = document.getElementById( \"dosingRegime\" );
+										    if (j.value == \"e.g. 24 hrs after transfection\")
+										    {
+										    	j.value = \"\";
 										    }
 										  }  
 										  function checkForm ( form ) {
@@ -399,7 +432,7 @@ sub add_new_screen {
 										      alert ( \"Please select instrument used for this screen.\" );
 										      return false;
 										    } 
-										    var answer = confirm(\"Please make sure the data are correct. The data will be saved in the database and cannot be easily changed. Click OK button to proceed.\")
+										    var answer = confirm(\"Please make sure the data are correct. Don't forget to complete the isogenic/drugscreen part of the form if it's relevant. The data once saved cannot be edited easily.\")
 										  	return answer;
 										  }
 										  </script>
@@ -844,6 +877,7 @@ sub add_new_screen {
   
   print $q -> checkbox( -name=>'is_drug_screen',
     					-checked=>0,
+    					-onclick=>"enableText_DS()",
    					    -value=>'ON',
     					-label=>'this is a drug screen' );
 
@@ -868,7 +902,10 @@ sub add_new_screen {
   print $q -> textfield ( -name => "compound",
                           -value => 'e.g. drug A',
                           -size => "30",
-                          -maxlength => "45" );
+                          -maxlength => "45",
+                          -id => "CompounD",
+                          -onClick => "make_compound_Blank()",
+                          -disabled );
   
   print "</p>";
                           
@@ -880,7 +917,10 @@ sub add_new_screen {
   print $q -> textfield ( -name => "concentration",
                           -value => 'e.g. 100 ng',
                           -size => "30",
-                          -maxlength => "45" ); 
+                          -maxlength => "45",
+                          -id => "ConcentratioN",
+                          -onClick => "make_concentration_Blank()",
+                          -disabled ); 
                           
   print "</p>";
   
@@ -889,10 +929,13 @@ sub add_new_screen {
   print "<p>";
   
   print "Dosing regime:<br />";
-  print $q -> textfield ( -name => "dosing regime",
+  print $q -> textfield ( -name => "dosing_regime",
                           -value => 'e.g. 24 hrs after transfection',
                           -size => "30",
-                          -maxlength => "45" ); 
+                          -maxlength => "45",
+                          -id => "dosingRegime",
+                          -onClick => "make_dosingregime_Blank()",
+                          -disabled ); 
     
   print "</p>";                       
                                                             
@@ -1144,7 +1187,7 @@ sub save_new_screen {
   my $method_of_isogenic_knockdown = $q -> param( "method_of_isogenic_knockdown" );
   my $compound = $q -> param( "compound" );
   my $compound_concentration = $q -> param( "concentration" );
-  my $dosing_regime = $q -> param( "dosing regime" );
+  my $dosing_regime = $q -> param( "dosing_regime" );
   my $notes = $q -> param( "notes" );
   my $sicon1 = $q -> param( "sicon1_empty" );
   my $sicon2 = $q -> param( "sicon2_empty" );
@@ -1231,7 +1274,11 @@ sub save_new_screen {
   my $screen_dir_name = $q -> param( "screen_dir_name" );
   my $screenDescription_filename;
   
+  $compound =~ s/^\s+//g;
+  $compound =~ s/[^A-Za-z0-9_-]*//g;
+  
   $compound_concentration =~ s/^\s+//g;
+  $compound_concentration =~ s/[^A-Za-z0-9_-]*//g;
   
   my $guide_file;
   
