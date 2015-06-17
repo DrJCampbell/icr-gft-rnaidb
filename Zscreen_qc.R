@@ -87,23 +87,23 @@ Zscreen_qc <- function(
   ## scatter plots
   ##
   	
-  ## scatter plots showing correlation between rep1 and rep2
+  ## scatter plot showing correlation between rep1 and rep2
 
   qc_plot_file_1 <- paste(datapath, qc_plot_1 , sep="")
 	
-  min_rep12 <- min(c(rep1,rep2))
-  max_rep12 <- max(c(rep1,rep2))
+  min_rep12 <- min(c(rep1,rep2),na.rm=TRUE)
+  #max_rep12 <- max(c(rep1,rep2),na.rm=TRUE)
 
   png(file=qc_plot_file_1, width=300, height=300)
 
   plot(
     rep1, 
  	rep2,
-    main="Rep1 vs Rep2",
+    main=paste("Rep1 vs Rep2 (r=",round(r12.cor, 2),")", sep=""),
     xlab="Normalised scores for Rep1",
   	ylab="Normalised scores for Rep2",
-  	xlim=c(min_rep12,max_rep12),
-  	ylim=c(min_rep12,max_rep12),
+  	#xlim=c(min_rep12,max_rep12),
+  	#ylim=c(min_rep12,max_rep12),
   	cex=1.5,
 	pch=19,
 	col=rgb(0,0,0,0.25)
@@ -111,23 +111,23 @@ Zscreen_qc <- function(
   dev.off()
 
 
-  ## scatter plots showing correlation between rep2 and rep3
+  ## scatter plot showing correlation between rep2 and rep3
 
   qc_plot_file_2 <- paste(datapath, qc_plot_2, sep="")
 	
-  min_rep23 <- min(c(rep2,rep3))
-  max_rep23 <- max(c(rep2,rep3))
+  #min_rep23 <- min(c(rep2,rep3),na.rm=TRUE)
+  #max_rep23 <- max(c(rep2,rep3),na.rm=TRUE)
 
   png(file=qc_plot_file_2, width=300, height=300)
 
   plot(
     rep2, 
 	rep3,
-    main="Rep2 vs Rep3",
+    main=paste("Rep2 vs Rep3 (r=",round(r23.cor, 2),")", sep=""),
     xlab="Normalised scores for Rep2",
     ylab="Normalised scores for Rep3",
-    xlim=c(min_rep23,max_rep23),
-    ylim=c(min_rep23,max_rep23),
+    #xlim=c(min_rep23,max_rep23),
+    #ylim=c(min_rep23,max_rep23),
     cex=1.5,
     pch=19,
 	col=rgb(0,0,0,0.25)
@@ -135,23 +135,23 @@ Zscreen_qc <- function(
   dev.off()
 
 
-  ## scatter plots showing correlation between rep1 and rep3
+  ## scatter plot showing correlation between rep1 and rep3
 
   qc_plot_file_3 <- paste(datapath, qc_plot_3, sep="")
 
-  min_rep13 <- min(c(rep1,rep3))
-  max_rep13 <- max(c(rep1,rep3))
+  #min_rep13 <- min(c(rep1,rep3),na.rm=TRUE)
+  #max_rep13 <- max(c(rep1,rep3),na.rm=TRUE)
 
   png(file=qc_plot_file_3, width=300, height=300)
 
   plot(
     rep1, 
 	rep3,
-	main="Rep1 vs Rep3",
+	main=paste("Rep1 vs Rep3 (r=",round(r13.cor, 2),")", sep=""),
 	xlab="Normalised scores for Rep1",
 	ylab="Normalised scores for Rep3",
-	xlim=c(min_rep13,max_rep13),
-  	ylim=c(min_rep13,max_rep13),
+	#xlim=c(min_rep13,max_rep13),
+  	#ylim=c(min_rep13,max_rep13),
 	cex=1.5,
 	pch=19,
 	col=rgb(0,0,0,0.25)

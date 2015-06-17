@@ -1230,6 +1230,9 @@ sub save_new_screen {
   
   my $screen_dir_name = $q -> param( "screen_dir_name" );
   my $screenDescription_filename;
+  
+  $compound_concentration =~ s/^\s+//g;
+  
   my $guide_file;
   
   if ( not defined ( $screen_dir_name ) ) {
@@ -1238,7 +1241,11 @@ sub save_new_screen {
     {
     	$screen_dir_name = "IS" . "_" . $tissue_type . "_" . $cell_line_name . "_" . $templib . "_" . $gene_name_if_isogenic . "_" . $date_of_run;
     }
-    if ($is_drug_screen eq 'ON')
+    if (($is_drug_screen eq 'ON') & (defined($compound_concentration)))
+    {
+    	$screen_dir_name = "DS" . "_" . $tissue_type . "_" . $cell_line_name . "_" . $templib . "_" . $compound . "_" . $compound_concentration . "_" . $date_of_run;
+    }
+    if (($is_drug_screen eq 'ON') & (not defined($compound_concentration)))
     {
     	$screen_dir_name = "DS" . "_" . $tissue_type . "_" . $cell_line_name . "_" . $templib . "_" . $compound . "_" . $date_of_run;
     }
@@ -1617,6 +1624,9 @@ sub save_new_screen {
   {
   	$is_drug_screen = "NO";
   }
+  
+  # save summary file path in a variable ao that it can be stored in Rnai_screen_info table
+  my $summary_file_complete = $file_path."/".$screen_dir_name."_summary.txt"; 
 
   ## 3. Store new Rnai screen metadata in the database ##
   
@@ -1762,7 +1772,6 @@ sub save_new_screen {
   ## 6. Store file with summary of result in the database ##
   
   #Remove the header in summary file#
-  my $summary_file_complete = $file_path."/".$screen_dir_name."_summary.txt"; 
   #my $summary_file_wo_header = $file_path."/".$screen_dir_name."_summary_wo_header.txt";
   #`cat $summary_file_complete | grep -v ^plate > $summary_file_wo_header`;
   

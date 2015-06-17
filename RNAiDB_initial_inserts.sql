@@ -20,7 +20,7 @@ insert into Tissue_type (Tissue_of_origin) values ('BILIARY_TRACT');
 insert into Tissue_type (Tissue_of_origin) values ('BONE');
 insert into Tissue_type (Tissue_of_origin) values ('BREAST');
 insert into Tissue_type (Tissue_of_origin) values ('CENTRAL_NERVOUS_SYSTEM');
-insert into Tissue_type (Tissue_of_origin) values ('CERVICAL');
+insert into Tissue_type (Tissue_of_origin) values ('CERVIX');
 insert into Tissue_type (Tissue_of_origin) values ('ENDOMETRIUM');
 insert into Tissue_type (Tissue_of_origin) values ('HAEMATOPOIETIC_AND_LYMPHOID_TISSUE');
 insert into Tissue_type (Tissue_of_origin) values ('HEADNECK');
